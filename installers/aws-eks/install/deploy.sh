@@ -2,66 +2,73 @@
   
 pwd=`readlink -f $(dirname $0)`
 
-. $pwd/env.sh
+. $pwd/manage.sh
 
-delete_namespace()
+gen_secrets()
 {
-	local namespace=$1
-	kubectl delete namespace $namespace
+        # generate random strings. remove slash
+        openssl rand -base64 8 | sed 's:/::g' > $WORK_DIR/mongo.pwd
 }
 
-delete_namespaces()
+gen_config()
 {
-	delete_namespace $EKS_LEGEND_NAMESPACE
-	delete_namespace $EKS_NGINX_NAMESPACE
+	$pwd/gen-config.sh $*
 }
 
-get_namespaces()
+print()
 {
-	kubectl get namespaces
+        (set -o posix; set) | egrep "DNS|PUBLIC_IP|GITLAB|MONGO|ENGINE|SDLC|STUDIO" | sort | nl
 }
 
-get_elb()
+print_secrets()
 {
-	local elb_arn=`aws elbv2 describe-load-balancers | jq -r .LoadBalancers[0].LoadBalancerArn`
-	echo "ELB = $elb_arn"
-	local tg_arns=`aws elbv2 describe-target-groups --load-balancer-arn $elb_arn  | jq -r .TargetGroups[].TargetGroupArn`
-
-	for tg_arn in $tg_arns
-	do
-		echo "Target Group $tg_arn"
-		aws elbv2 describe-target-health --target-group-arn $tg_arn | jq -r .TargetHealthDescriptions[].TargetHealth
-	done
+        echo "MONGO ROOT PWD : `cat $WORK_DIR/mongo.pwd`"
+        echo "GITLAB ROOT PWD : `cat  $WORK_DIR/gitlab.pwd`"
 }
 
-get_nginx()
+print_oauth()
 {
-        kubectl get all -n ingress-nginx
+        echo $LEGEND_ENGINE_URL/callback
+        echo $LEGEND_SDLC_URL/api/auth/callback
+        echo $LEGEND_SDLC_URL/api/pac4j/login/callback
+        echo $LEGEND_STUDIO_URL/log.in/callback
 }
 
-deploy_ingress_controller()
+recreate_engine_config()
 {
-	kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.44.0/deploy/static/provider/aws/deploy.yaml
-
-	kubectl apply -f $pwd/ingress-controller
+	kubectl delete configmap -n $EKS_LEGEND_NAMESPACE execution
+	kubectl create configmap -n $EKS_LEGEND_NAMESPACE execution --from-file=$ENGINE_CONFIG/config
 }
 
-deploy_hello_world()
+ping_engine()
 {
-	kubectl apply -f $pwd/hello-world/
+	elb_dns_name=`aws elbv2 describe-load-balancers | jq -r .LoadBalancers[0].DNSName`
+	local test_url="http://"$elb_dns_name"/exec/api/server/v1/info"
+	echo -e "Testing Engine Url $test_url"
+	curl $test_url | jq
 }
 
-get_hello_world()
+delete_legend()
 {
-        kubectl get all -n hello-world
+	kubectl delete -n $EKS_LEGEND_NAMESPACE -f $ENGINE_CONFIG/k8s
 }
 
-test_hello_world()
+deploy_legend()
 {
-        elb_dns_name=`aws elbv2 describe-load-balancers | jq -r .LoadBalancers[0].DNSName`
-        local test_url="http://"$elb_dns_name"/foo"
-        echo -e "Testing Hello World Url $test_url \n"
-        curl $test_url
+	recreate_engine_config
+	kubectl -n $EKS_LEGEND_NAMESPACE apply -f $ENGINE_CONFIG/k8s
+}
+
+get_legend()
+{
+	kubectl get all -n $EKS_LEGEND_NAMESPACE
+}
+
+redeploy_legend()
+{
+	delete_legend
+	for i in `seq 1 10`; do kubectl get all -n $EKS_LEGEND_NAMESPACE ; sleep 1; done
+	deploy_legend
 }
 
 $*

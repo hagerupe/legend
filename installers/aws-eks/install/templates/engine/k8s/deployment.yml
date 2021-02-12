@@ -24,17 +24,17 @@ spec:
         - name: execution
           image: finos/legend-engine-server:2.11.0
           command: ["java"]
-          args: ["-Xmx3G", "-Xms256M", "-Xss4096k", "-cp", "/app/bin/alloy-execution-server.jar", "-Djava.security.krb5.conf=/etc/krb5.conf", "-Dfile.encoding=UTF8", "com.gs.alloy.server.Server", "server", "/config/config.json"]
+          args: ["-Xmx3G", "-Xms256M", "-Xss4096k", "-cp", "/app/bin/*", "-Djava.security.krb5.conf=/etc/krb5.conf", "-Dfile.encoding=UTF8", "org.finos.legend.engine.server.Server", "server", "/config/config.json"]
           livenessProbe:
             httpGet:
               path: /exec/admin/healthcheck
-              port: 6060
+              port: __LEGEND_ENGINE_PORT__
             initialDelaySeconds: 300
             timeoutSeconds: 3
           readinessProbe:
             httpGet:
               path: /exec/admin/healthcheck
-              port: 6060
+              port: __LEGEND_ENGINE_PORT__
             timeoutSeconds: 3
           volumeMounts:
             - name: config

@@ -11,11 +11,15 @@ pwd=`readlink -f $(dirname $0)`
 # The values below are computed/static
 ##########################################
 
-WORK_DIR=/home/ec2-user/legend-temp
+WORK_DIR=/home/ec2-user/eks-legend-temp
 mkdir -p $WORK_DIR
 
 CONTAINER_WORK_DIR=$WORK_DIR/container-data
 mkdir -p $CONTAINER_WORK_DIR
+
+ENGINE_CONFIG=$WORK_DIR/generated-engine-config
+SDLC_CONFIG=$WORK_DIR/generated-sdlc-config
+STUDIO_CONFIG=$WORK_DIR/generated-studio-config
 
 type=ec2
 if [ $type == "ec2" ]
@@ -43,17 +47,18 @@ fi
 # EKS
 EKS_CLUSTER=legend-integration
 EKS_REGION=us-east-1
-EKS_LEGEND_NAMESPACE=poc2
+EKS_LEGEND_NAMESPACE=legend
 EKS_NGINX_NAMESPACE=ingress-nginx
+ELB_DNS_NAME=`aws elbv2 describe-load-balancers 2>/dev/null | jq -r .LoadBalancers[0].DNSName`
 
 # Certs
 TRUSTSTORE_PASSWORD=changeit
 
 # Gitlab 
-GITLAB_PORT=6443
-GITLAB_ROOT_USER=root
-GITLAB_HOST=$HOST_DNS_NAME
-GITLAB_PUBLIC_URL=https://$GITLAB_HOST:$GITLAB_PORT
+GITLAB_PORT=unused
+GITLAB_ROOT_USER=unused
+GITLAB_HOST=gitlab.com
+GITLAB_PUBLIC_URL=https://$GITLAB_HOST
 
 # Mongo 
 MONGO_USER=admin
@@ -61,13 +66,13 @@ MONGO_HOST_PORT=$HOST_DNS_NAME:27017
 
 # Engine
 LEGEND_ENGINE_PORT=6060
-LEGEND_ENGINE_URL=http://$HOST_DNS_NAME:$LEGEND_ENGINE_PORT
+LEGEND_ENGINE_URL=http://$ELB_DNS_NAME/exec
 
 # LEGEND_SDLC
 LEGEND_SDLC_PORT=7070
-LEGEND_SDLC_URL=http://$HOST_DNS_NAME:$LEGEND_SDLC_PORT
+LEGEND_SDLC_URL=http://$ELB_DNS_NAME/sdlc
 
 # Studio
 LEGEND_STUDIO_PORT=8080
-LEGEND_STUDIO_URL=http://$HOST_DNS_NAME:$LEGEND_STUDIO_PORT/studio
+LEGEND_STUDIO_URL=http://$ELB_DNS_NAME/studio
 

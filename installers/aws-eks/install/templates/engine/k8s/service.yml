@@ -11,5 +11,5 @@ spec:
     app: execution
   ports:
     - protocol: TCP
-      port: 6060
-      targetPort: 6060
+      port: __LEGEND_ENGINE_PORT__
+      targetPort: __LEGEND_ENGINE_PORT__
