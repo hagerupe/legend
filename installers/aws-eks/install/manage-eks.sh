@@ -2,7 +2,7 @@
   
 pwd=`readlink -f $(dirname $0)`
 
-. $pwd/env.sh
+. $pwd/manage.sh
 
 create_cluster()
 {
