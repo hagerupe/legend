@@ -13,7 +13,7 @@ export interface AlbIngressControllerProps {
 }
 
 // https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/deploy/installation/
-export class EksAlbIngressController extends Construct {
+export class EksAwsIngressController extends Construct {
     constructor(scope: Construct, id: string, props: AlbIngressControllerProps) {
         super(scope, id);
 

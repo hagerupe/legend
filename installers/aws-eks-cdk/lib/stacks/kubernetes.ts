@@ -2,9 +2,17 @@ import * as cdk from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as iam from '@aws-cdk/aws-iam';
 import * as eks from '@aws-cdk/aws-eks';
-import {EksAlbIngressController} from "./eks-alb-ingress-controller";
+import {EksAwsIngressController} from "../constructs/eks-aws-ingress-controller";
+import { Construct, Stage, StageProps } from '@aws-cdk/core';
 
-export class KubernetesInfraStack extends cdk.Stack {
+export class KubernetesStage extends Stage {
+  constructor(scope: Construct, id: string, props?: StageProps) {
+    super(scope, id, props);
+    new KubernetesStack(this, "KubernetesInfra")
+  }
+}
+
+export class KubernetesStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
@@ -28,18 +36,9 @@ export class KubernetesInfraStack extends cdk.Stack {
     eksCluster.awsAuth.addMastersRole(iam.Role.fromRoleArn(this, "SuperAdminSky", `arn:aws:iam::${this.account}:role/skylab-hagere`))
 
     // Manages ALB and NLB resources for K8 'Services'
-    const albIngressController = new EksAlbIngressController(this, "IngressController", {
+    new EksAwsIngressController(this, "IngressController", {
       cluster: eksCluster,
       vpc: vpc
     })
-
-    /*const legendCiCd = new LegendCiCd(this, "LegendCICD", {
-      cluster: eksCluster
-    });
-
-    const mongoPassword = new secretsmanager.Secret(this, "MongoPassword");
-    eksCluster.addCdk8sChart("Mongo", new MongoChart(new cdk8s.App(), "MongoChart", {
-      password: mongoPassword.secretValue.toString()
-    }))*/
   }
 }
