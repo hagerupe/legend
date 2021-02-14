@@ -41,7 +41,7 @@ export class DockerBuildProject extends Construct {
                         commands: [
                             'docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .',
                             'docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $REPOSITORY_URI:$IMAGE_TAG',
-                            'printf \'{"ImageURI":"%s"}\' $REPOSITORY_URI:$IMAGE_TAG > imageDetail.json'
+                            'printf \'{"ImageURI":"%s"}\' $REPOSITORY_URI:$IMAGE_TAG > $CODEBUILD_SRC_DIR/imageDetail.json'
                         ]
                     },
                     post_build: {
