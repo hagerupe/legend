@@ -3,10 +3,12 @@ import * as ec2 from '@aws-cdk/aws-ec2';
 import * as iam from '@aws-cdk/aws-iam';
 import * as eks from '@aws-cdk/aws-eks';
 import {EksAwsIngressController} from "../constructs/eks-aws-ingress-controller";
+import {CfnOutput} from "@aws-cdk/core";
 
 export class KubernetesStack extends cdk.Stack {
 
-  readonly cluster: eks.Cluster
+  readonly clusterName: CfnOutput;
+  readonly kubectlRoleArn: CfnOutput;
 
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -36,6 +38,9 @@ export class KubernetesStack extends cdk.Stack {
       vpc: vpc
     })
 
-    this.cluster = eksCluster
+    this.clusterName = new CfnOutput(this, 'ClusterName', { value: eksCluster.clusterName })
+    if (eksCluster.kubectlRole !== undefined) {
+      this.kubectlRoleArn = new CfnOutput(this, 'kubectlRoleArn', {value: eksCluster.kubectlRole?.roleArn})
+    }
   }
 }

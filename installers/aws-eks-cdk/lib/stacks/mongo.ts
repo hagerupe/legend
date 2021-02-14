@@ -6,15 +6,21 @@ import * as cdk8s from 'cdk8s'
 import * as cdk from "@aws-cdk/core";
 
 export interface MongoStackProps extends StackProps{
-    cluster: eks.Cluster
+    clusterName: string,
+    kubectlRoleArn: string
 }
 
 export class MongoStack extends Stack {
     constructor(scope: cdk.Construct, id: string, props: MongoStackProps) {
         super(scope, id, props);
 
+        const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", {
+            clusterName: props.clusterName,
+            kubectlRoleArn: props.kubectlRoleArn
+        })
+
         const mongoPassword = new secretsmanager.Secret(this, "MongoPassword");
-        props.cluster.addCdk8sChart("Mongo", new MongoChart(new cdk8s.App(), "MongoChart", {
+        cluster.addCdk8sChart("Mongo", new MongoChart(new cdk8s.App(), "MongoChart", {
             password: mongoPassword.secretValue.toString()
         }))
     }
