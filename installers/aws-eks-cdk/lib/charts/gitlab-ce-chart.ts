@@ -8,6 +8,7 @@ import * as path from "path";
 export interface GitlabCeChartProps {
     gitlabExternalUrl: string,
     gitlabRootPassword: string,
+    image: string,
 }
 
 export class GitlabCeChart extends cdk8s.Chart {
@@ -37,7 +38,7 @@ export class GitlabCeChart extends cdk8s.Chart {
                         containers: [
                             {
                                 name: 'gitlab-ce',
-                                image: 'gitlab/gitlab-ce',
+                                image: props.image,
                                 env: [
                                     {
                                         name: 'GITLAB_OMNIBUS_CONFIG',

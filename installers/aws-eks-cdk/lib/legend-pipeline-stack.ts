@@ -102,14 +102,17 @@ export class LegendPipelineStack extends Stack {
         }))
 
         const repositoryNames = [gitlabRepositoryName, engineRepositoryName]
+
         pipeline.addApplicationStage(new LegendInfrastructureStage(this, "PreProd", {
             env: { account: this.account, region: this.region },
-            repositoryNames: repositoryNames
+            repositoryNames: repositoryNames,
+            artifact: gitlabImageDetails
         })).addManualApprovalAction()
 
         pipeline.addApplicationStage(new LegendInfrastructureStage(this, "Prod", {
             env: { account: this.account, region: this.region },
-            repositoryNames: repositoryNames
+            repositoryNames: repositoryNames,
+            artifact: gitlabImageDetails
         }))
     }
 }

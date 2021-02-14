@@ -22,7 +22,7 @@ export class LegendSdlcStack extends Stack {
         })
 
         cluster.addCdk8sChart("SDLC", new LegendSdlcChart(new cdk8s.App(), "LegendSdlc", {
-
+            
         }))
     }
 }
