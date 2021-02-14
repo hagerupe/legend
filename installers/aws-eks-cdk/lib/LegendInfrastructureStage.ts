@@ -7,6 +7,7 @@ export class LegendInfrastructureStage extends Stage {
     constructor(scope: Construct, id: string, props?: StageProps) {
         super(scope, id, props);
         const kubernetes = new KubernetesStack(this, "Kubernetes")
-        //const mongo = new MongoStack(this, "Mongo", { cluster: kubernetes.cluster })
+        const mongo = new MongoStack(this, "Mongo", { cluster: kubernetes.cluster })
+        mongo.addDependency(kubernetes)
     }
 }
