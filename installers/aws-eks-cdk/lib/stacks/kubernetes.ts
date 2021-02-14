@@ -31,10 +31,10 @@ export class KubernetesStack extends cdk.Stack {
     eksCluster.awsAuth.addMastersRole(iam.Role.fromRoleArn(this, "SuperAdminSky", `arn:aws:iam::${this.account}:role/skylab-hagere`))
 
     // Manages ALB and NLB resources for K8 'Services'
-    new EksAwsIngressController(this, "IngressController", {
+    /*new EksAwsIngressController(this, "IngressController", {
       cluster: eksCluster,
       vpc: vpc
-    })
+    })*/
 
     this.cluster = eksCluster
   }

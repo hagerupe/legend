@@ -28,10 +28,7 @@ export class EksAwsIngressController extends Construct {
         })
         ingressCtrlPolicy.attachToRole(ingressCtrlServiceAccount.role);
 
-        let albManifest = fs.readFileSync(path.join('resources', 'alb-ingress-controller_v2.1.2.yaml'), {encoding: 'utf8'});
-        albManifest = albManifest.replace(/your-cluster-name/g, props.cluster.clusterName);
-
-        const awsLoadbalancerCrds = new eks.KubernetesManifest(this, "AwsLoadBalancerCRDS", {
+        new eks.KubernetesManifest(this, "AwsLoadBalancerCRDS", {
             cluster: props.cluster,
             manifest: yaml.loadAll(fs.readFileSync(path.join('resources', 'alb-crds_v2.1.2.yaml'), {encoding: 'utf8'}))
         });
