@@ -1,7 +1,8 @@
 import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
-import { Construct, SecretValue, Stack, StackProps } from '@aws-cdk/core';
-import { CdkPipeline, SimpleSynthAction } from "@aws-cdk/pipelines";
+import {GitHubTrigger} from '@aws-cdk/aws-codepipeline-actions';
+import {Construct, SecretValue, Stack, StackProps} from '@aws-cdk/core';
+import {CdkPipeline, SimpleSynthAction} from "@aws-cdk/pipelines";
 
 export class LegendPipelineStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
@@ -18,8 +19,9 @@ export class LegendPipelineStack extends Stack {
                 actionName: 'GitHub',
                 output: sourceArtifact,
                 oauthToken: SecretValue.secretsManager('GitHub'), // TODO rename this secret
-                owner: 'hagere',
+                owner: 'hagerupe',
                 repo: 'legend',
+                trigger: GitHubTrigger.POLL
             }),
 
             synthAction: SimpleSynthAction.standardNpmSynth({
