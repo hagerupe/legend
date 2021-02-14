@@ -87,6 +87,7 @@ export class LegendPipelineStack extends Stack {
         }))*/
 
         pipeline.addApplicationStage(new LegendInfrastructureStage(this, "PreProd", { env: { account: this.account, region: this.region } }))
+            .addManualApprovalAction()
         pipeline.addApplicationStage(new LegendInfrastructureStage(this, "Prod", { env: { account: this.account, region: this.region } }))
     }
 }
