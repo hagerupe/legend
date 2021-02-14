@@ -21,7 +21,7 @@ export class LegendSdlcStack extends Stack {
             kubectlRoleArn: props.kubectlRoleArn
         })
 
-        cluster.addCdk8sChart("Engine", new LegendSdlcChart(new cdk8s.App(), "LegendSdlc", {
+        cluster.addCdk8sChart("SDLC", new LegendSdlcChart(new cdk8s.App(), "LegendSdlc", {
 
         }))
     }

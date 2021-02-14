@@ -22,7 +22,7 @@ export class LegendStudioStack extends Stack {
             kubectlRoleArn: props.kubectlRoleArn
         })
 
-        cluster.addCdk8sChart("Engine", new LegendStudioChart(new cdk8s.App(), "LegendSdlc", {
+        cluster.addCdk8sChart("Studio", new LegendStudioChart(new cdk8s.App(), "LegendStudio", {
 
         }))
     }
