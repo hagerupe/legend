@@ -20,6 +20,10 @@ export class GitlabStack extends Stack {
             kubectlRoleArn: props.kubectlRoleArn
         })
 
-        cluster.addCdk8sChart("GitlabCE", new GitlabCeChart(new cdk8s.App(), "GitlabCEChart", { }))
+        const gitlabPassword = new secretsmanager.Secret(this, "GitlabRootPassword");
+        cluster.addCdk8sChart("GitlabCE", new GitlabCeChart(new cdk8s.App(), "GitlabCEChart", {
+            gitlabExternalUrl: 'gitlab.legend.com',
+            gitlabRootPassword: gitlabPassword.secretValue.toString(),
+        }))
     }
 }
