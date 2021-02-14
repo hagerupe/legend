@@ -13,7 +13,7 @@ export interface LegendStudioProps extends StackProps{
     kubectlRoleArn: string
 }
 
-export class LegendStudio extends Stack {
+export class LegendStudioStack extends Stack {
     constructor(scope: cdk.Construct, id: string, props: LegendStudioProps) {
         super(scope, id, props);
 

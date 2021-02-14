@@ -4,12 +4,12 @@ import * as k8s from "cdk8s-plus/lib/imports/k8s";
 import * as fs from "fs";
 import * as path from "path";
 
-export interface LegendStudioProps {
+export interface LegendStudioChartProps {
 
 }
 
 export class LegendStudioChart extends cdk8s.Chart {
-    constructor(scope: constructs.Construct, id: string, props: LegendStudioProps) {
+    constructor(scope: constructs.Construct, id: string, props: LegendStudioChartProps) {
         super(scope, id);
 
         // TODO update these based off of config
