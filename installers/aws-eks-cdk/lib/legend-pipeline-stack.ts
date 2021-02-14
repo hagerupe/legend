@@ -3,8 +3,7 @@ import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
 import {GitHubTrigger} from '@aws-cdk/aws-codepipeline-actions';
 import {Construct, SecretValue, Stack, StackProps} from '@aws-cdk/core';
 import {CdkPipeline, SimpleSynthAction} from "@aws-cdk/pipelines";
-import {MongoDeployStage} from "./mongo-deploy-stage";
-import {KubernetesInfraStage} from "./kubernetes-infra-stage";
+import {LegendCoreInfraStage} from "./legend-core-infra-stage";
 
 export class LegendPipelineStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
@@ -33,7 +32,7 @@ export class LegendPipelineStack extends Stack {
             }),
         });
 
-        const kubernetesInfraStage = pipeline.addApplicationStage(new KubernetesInfraStage(this, "PreProd", {
+        const kubernetesInfraStage = pipeline.addApplicationStage(new LegendCoreInfraStage(this, "PreProd", {
             env: {
                 account: this.account,
                 region: this.region

@@ -4,8 +4,8 @@ import * as iam from '@aws-cdk/aws-iam';
 import * as eks from '@aws-cdk/aws-eks';
 import {EksAlbIngressController} from "./eks-alb-ingress-controller";
 
-export class KubernetesInfraStage extends cdk.Stage {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StageProps) {
+export class KubernetesInfraStack extends cdk.Stack {
+  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
     const vpc = new ec2.Vpc(this, 'Vpc');

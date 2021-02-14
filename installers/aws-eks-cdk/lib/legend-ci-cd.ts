@@ -20,8 +20,6 @@ export class LegendCiCd extends Construct {
         const account = Stack.of(this).account;
         const githubSecret = secretsmanager.Secret.fromSecretPartialArn(this, "GitHubAccessToken", `arn:aws:secretsmanager:${region}:${account}:secret:GitHub`)
         const dockerHubSecret = secretsmanager.Secret.fromSecretPartialArn(this, "DockerHubCredentials", `arn:aws:secretsmanager:${region}:${account}:secret:DockerHub`)
-        const dockerHubUsername = dockerHubSecret.secretValueFromJson('Username');
-        const dockerHubPassword = dockerHubSecret.secretValueFromJson('Password');
 
         const legendEngineRepo = new ecr.Repository(this, 'LegendEngineRepo')
         const engineBuild = new codebuild.PipelineProject(this, 'LegendEngineBuild', {
