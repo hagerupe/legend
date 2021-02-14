@@ -2,6 +2,8 @@ import {Construct, Stage, StageProps} from "@aws-cdk/core";
 import {KubernetesStack} from "./stacks/kubernetes";
 import {MongoStack} from "./stacks/mongo";
 import {GitlabStack} from "./stacks/gitlab";
+import {LegendEngineStack} from "./stacks/legend-engine-stack";
+import {LegendSdlcStack} from "./stacks/legend-sdlc";
 
 export class LegendInfrastructureStage extends Stage {
     constructor(scope: Construct, id: string, props?: StageProps) {
@@ -23,5 +25,23 @@ export class LegendInfrastructureStage extends Stage {
             kubectlRoleArn: kubernetes.kubectlRoleArn.value
         })
         gitlab.addDependency(kubernetes)
+
+        // Legend Engine
+        const engine = new LegendEngineStack(this, "Engine", {
+            clusterName: kubernetes.clusterName.value,
+            kubectlRoleArn: kubernetes.kubectlRoleArn.value
+        })
+        engine.addDependency(gitlab)
+
+        // Legend SDLC
+        const sdlc = new LegendSdlcStack(this, "SDLC", {
+            clusterName: kubernetes.clusterName.value,
+            kubectlRoleArn: kubernetes.kubectlRoleArn.value
+        })
+        sdlc.addDependency(engine)
+        sdlc.addDependency(mongo)
+        sdlc.addDependency(gitlab)
+
+
     }
 }

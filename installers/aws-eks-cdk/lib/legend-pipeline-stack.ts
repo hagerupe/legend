@@ -73,7 +73,7 @@ export class LegendPipelineStack extends Stack {
             outputs: [ engineImageDetails ]
         }))
 
-        const sdlcImageDetails = new codepipeline.Artifact();
+        /*const sdlcImageDetails = new codepipeline.Artifact();
         runtimeBuildStage.addActions(new CodeBuildAction({
             actionName: 'Legend_SDLC',
             input: sdlcSource,
@@ -84,7 +84,7 @@ export class LegendPipelineStack extends Stack {
                 ]
             }).project,
             outputs: [ sdlcImageDetails ]
-        }))
+        }))*/
 
         pipeline.addApplicationStage(new LegendInfrastructureStage(this, "PreProd", { env: { account: this.account, region: this.region } }))
     }
