@@ -66,8 +66,6 @@ export class LegendPipelineStack extends Stack {
                 phases: {
                     pre_build: {
                         commands: [
-                            'echo Logging in to Amazon ECR...',
-                            'aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com',
                             'echo Logging in to DockerHub...',
                             'DOCKERHUB_USER=$(echo $DOCKER_HUB_CREDS | jq -r \'.Username\')',
                             'DOCKERHUB_PASSWORD=$(echo $DOCKER_HUB_CREDS | jq -r \'.Password\')',
@@ -92,6 +90,8 @@ export class LegendPipelineStack extends Stack {
                     },
                     post_build: {
                         commands: [
+                            'echo Logging in to Amazon ECR...',
+                            'aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com',
                             'docker push $REPOSITORY_URI:$IMAGE_TAG'
                         ]
                     },
