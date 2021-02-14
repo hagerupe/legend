@@ -16,6 +16,7 @@ export class LegendPipelineStack extends Stack {
         const sourceArtifact = new codepipeline.Artifact();
         const engineSource = new codepipeline.Artifact();
         const sdlcSource = new codepipeline.Artifact();
+        const engineImageDetails = new codepipeline.Artifact();
         const cloudAssemblyArtifact = new codepipeline.Artifact();
 
         const githubSecret = SecretValue.secretsManager('GitHub') // TODO rename this secret
@@ -65,10 +66,15 @@ export class LegendPipelineStack extends Stack {
                 phases: {
                     pre_build: {
                         commands: [
+                            'echo Logging in to Amazon ECR...',
+                            'aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com',
+                            'echo Logging in to DockerHub...',
                             'DOCKERHUB_USER=$(echo $DOCKER_HUB_CREDS | jq -r \'.Username\')',
                             'DOCKERHUB_PASSWORD=$(echo $DOCKER_HUB_CREDS | jq -r \'.Password\')',
                             'echo $DOCKERHUB_PASSWORD | docker login --username $DOCKERHUB_USER --password-stdin',
-                            'aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com'
+                            'COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)',
+                            'IMAGE_TAG=${COMMIT_HASH:=latest}',
+                            '$REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME'
                         ]
                     },
                     install: {
@@ -80,15 +86,21 @@ export class LegendPipelineStack extends Stack {
                     build: {
                         commands: [
                             'docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .',
-                            'docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG',
+                            'docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $REPOSITORY_URI:$IMAGE_TAG',
+                            'printf \'{"ImageURI":"%s"}\' $REPOSITORY_URI:$IMAGE_TAG > imageDetail.json'
                         ]
                     },
                     post_build: {
                         commands: [
-                            'docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG'
+                            'docker push $REPOSITORY_URI:$IMAGE_TAG'
                         ]
-                    }
+                    },
                 },
+                artifacts: {
+                    files: [
+                        'imageDetail.json'
+                    ]
+                }
             }),
             environment: {
                 buildImage: codebuild.LinuxBuildImage.STANDARD_4_0,
@@ -97,10 +109,6 @@ export class LegendPipelineStack extends Stack {
                     'IMAGE_REPO_NAME' : {
                         type: BuildEnvironmentVariableType.PLAINTEXT,
                         value: legendEngineRepo.repositoryName
-                    },
-                    'IMAGE_TAG' : {
-                        type: BuildEnvironmentVariableType.PLAINTEXT,
-                        value: 'latest'
                     },
                     'AWS_DEFAULT_REGION' : {
                         type: BuildEnvironmentVariableType.PLAINTEXT,
@@ -121,8 +129,9 @@ export class LegendPipelineStack extends Stack {
 
         pipeline.codePipeline.stage('Build').addAction(new CodeBuildAction({
             actionName: 'BuildGitlab',
-            input: sourceArtifact,
+            input: engineSource,
             project: engineBuild,
+            outputs: [ engineImageDetails ]
         }))
 
         const preProdInfraStage = new LegendInfrastructureStage(this, "PreProd", { env: { account: this.account, region: this.region } })
