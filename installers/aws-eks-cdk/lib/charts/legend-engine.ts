@@ -26,7 +26,7 @@ export class LegendEngineChart extends cdk8s.Chart {
         const template = JSON.parse(templateText)
 
         const config = new k8s.ConfigMap(this, "Config", {
-            data: template
+            binaryData: template
         })
 
         // TODO get image from build input source

@@ -24,8 +24,9 @@ export class LegendSdlc extends cdk8s.Chart {
             .replace('__LEGEND_SDLC_PORT__', '1234')
         const template = JSON.parse(templateText)
 
+        // TODO this was originally in YAML (does it need to be? if so switch to binary)
         const config = new k8s.ConfigMap(this, "Config", {
-            data: template
+            binaryData: template
         })
 
         // TODO get image from build input source

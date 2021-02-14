@@ -11,7 +11,7 @@ pwd=`readlink -f $(dirname $0)`
 # The values below are computed/static
 ##########################################
 
-WORK_DIR=/home/ec2-user/legend-temp
+WORK_DIR=/home/hagere/legend-temp
 mkdir -p $WORK_DIR
 
 CONTAINER_WORK_DIR=$WORK_DIR/container-data
