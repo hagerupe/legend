@@ -4,6 +4,7 @@ import * as secretsmanager from '@aws-cdk/aws-secretsmanager'
 import {MongoChart} from "../charts/mongo-chart";
 import * as cdk8s from 'cdk8s'
 import * as cdk from "@aws-cdk/core";
+import {GitlabCeChart} from "../charts/gitlab-ce-chart";
 
 export interface GitlabStackProps extends StackProps{
     clusterName: string,
@@ -19,9 +20,6 @@ export class GitlabStack extends Stack {
             kubectlRoleArn: props.kubectlRoleArn
         })
 
-        const mongoPassword = new secretsmanager.Secret(this, "MongoPassword");
-        cluster.addCdk8sChart("Mongo", new MongoChart(new cdk8s.App(), "MongoChart", {
-            password: mongoPassword.secretValue.toString()
-        }))
+        cluster.addCdk8sChart("GitlabCE", new GitlabCeChart(new cdk8s.App(), "GitlabCEChart", { }))
     }
 }
