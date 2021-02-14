@@ -14,7 +14,7 @@ export class LegendPipelineStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
         super(scope, id, props);
 
-        const sourceArtifact = new codepipeline.Artifact();
+        const legendSource = new codepipeline.Artifact();
         const engineSource = new codepipeline.Artifact();
         const sdlcSource = new codepipeline.Artifact();
         const cloudAssemblyArtifact = new codepipeline.Artifact();
@@ -26,7 +26,7 @@ export class LegendPipelineStack extends Stack {
 
             sourceAction: new codepipeline_actions.GitHubSourceAction({
                 actionName: 'Legend',
-                output: sourceArtifact,
+                output: legendSource,
                 oauthToken: githubSecret,
                 owner: 'hagerupe',
                 repo: 'legend',
@@ -35,7 +35,7 @@ export class LegendPipelineStack extends Stack {
 
             synthAction: SimpleSynthAction.standardNpmSynth({
                 subdirectory: 'installers/aws-eks-cdk',
-                sourceArtifact,
+                sourceArtifact: legendSource,
                 cloudAssemblyArtifact,
             }),
         });
@@ -73,6 +73,7 @@ export class LegendPipelineStack extends Stack {
             outputs: [ engineImageDetails ]
         }))
 
+        // TODO this build is broken in mainline
         /*const sdlcImageDetails = new codepipeline.Artifact();
         runtimeBuildStage.addActions(new CodeBuildAction({
             actionName: 'Legend_SDLC',
@@ -85,6 +86,18 @@ export class LegendPipelineStack extends Stack {
             }).project,
             outputs: [ sdlcImageDetails ]
         }))*/
+
+        const gitlabImageDetails = new codepipeline.Artifact();
+        runtimeBuildStage.addActions(new CodeBuildAction({
+            actionName: 'Legend_Gitlab',
+            input: legendSource,
+            project: new DockerBuildProject(this, 'LegendGitlab', {
+                preBuildCommands: [
+                    'cd installers/aws-eks-cdk/resources/docker/gitlab-no-signup',
+                ]
+            }).project,
+            outputs: [ gitlabImageDetails ]
+        }))
 
         pipeline.addApplicationStage(new LegendInfrastructureStage(this, "PreProd", { env: { account: this.account, region: this.region } }))
             .addManualApprovalAction()
