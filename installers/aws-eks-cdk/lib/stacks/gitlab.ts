@@ -5,12 +5,7 @@ import * as cdk8s from 'cdk8s'
 import * as cdk from "@aws-cdk/core";
 import {GitlabCeChart} from "../charts/gitlab-ce-chart";
 import * as codepipeline from '@aws-cdk/aws-codepipeline'
-import { CustomResource } from '@aws-cdk/core';
-import * as logs from '@aws-cdk/aws-logs';
-import * as lambda from '@aws-cdk/aws-lambda';
-import * as cr from '@aws-cdk/custom-resources';
-import * as path from "path";
-import {MyCustomResource} from "../constructs/artifact-image-id";
+import {ArtifactImageId} from "../constructs/artifact-image-id";
 
 export interface GitlabStackProps extends StackProps{
     clusterName: string,
@@ -27,9 +22,9 @@ export class GitlabStack extends Stack {
             kubectlRoleArn: props.kubectlRoleArn
         })
 
-        // TODO clean up
-        const resource = new MyCustomResource(this, 'DemoResource', {
-            message: 'CustomResource says hello',
+        const resource = new ArtifactImageId(this, 'DemoResource', {
+            bucket: props.artifact.bucketName,
+            objectKey: props.artifact.objectKey
         });
 
         const gitlabPassword = new secretsmanager.Secret(this, "GitlabRootPassword");

@@ -1,23 +1,36 @@
 def main(event, context):
   import logging as log
   import cfnresponse
+  import boto3
+  import zipfile
+  import json
+  import hashlib
+
+
   log.getLogger().setLevel(log.INFO)
 
-  # This needs to change if there are to be multiple resources in the same stack
-  physical_id = 'TheOnlyCustomResource'
+  fqn = event['StackId'] + event['LogicalResourceId']
+  physical_id = hashlib.md5(fqn.encode('utf-8')).hexdigest()
+  log.info(physical_id)
 
   try:
     log.info('Input event: %s', event)
 
-    # TODO get object, extract and such
-    # Check if this is a Create and we're failing Creates
-    if event['RequestType'] == 'Create' and event['ResourceProperties'].get('FailCreate', False):
-      raise RuntimeError('Create failure requested')
+    bucket = event['ResourceProperties']['Bucket']
+    key = event['ResourceProperties']['ObjectKey']
 
-    # Do the thing
-    message = event['ResourceProperties']['Message']
+    # Retrieve artifact image details
+    s3 = boto3.client('s3')
+    s3.download_file(object, key, '/tmp/artifact.zip')
+    with zipfile.ZipFile('/tmp/artifact.zip', 'r') as zip_ref:
+      zip_ref.extractall('/tmp/artifacts')
+    with open('/tmp/artifacts/imageDetail.json') as f:
+      data = json.load(f)
+    imageUri = data['ImageURI']
+
+
     attributes = {
-      'Response': 'gitlab/gitlab-ce'
+      'Response': imageUri
     }
 
     cfnresponse.send(event, context, cfnresponse.SUCCESS, attributes, physical_id)

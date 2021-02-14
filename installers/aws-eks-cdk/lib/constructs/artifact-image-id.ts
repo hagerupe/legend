@@ -5,18 +5,15 @@ import cdk = require('@aws-cdk/core');
 import fs = require('fs');
 import * as path from "path";
 
-export interface MyCustomResourceProps {
-    /**
-     * Message to echo
-     */
-    message: string;
+export interface ArtifactImageIdProps {
+    bucket: string
+    objectKey: string
 }
 
-// TODO clean up
-export class MyCustomResource extends cdk.Construct {
+export class ArtifactImageId extends cdk.Construct {
     public readonly response: string;
 
-    constructor(scope: cdk.Construct, id: string, props: MyCustomResourceProps) {
+    constructor(scope: cdk.Construct, id: string, props: ArtifactImageIdProps) {
         super(scope, id);
 
         const resource = new cfn.CustomResource(this, 'Resource', {
