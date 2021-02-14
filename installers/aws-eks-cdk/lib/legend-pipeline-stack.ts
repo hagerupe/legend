@@ -62,7 +62,7 @@ export class LegendPipelineStack extends Stack {
 
         const engineImageDetails = new codepipeline.Artifact();
         runtimeBuildStage.addActions(new CodeBuildAction({
-            actionName: 'BuildLegendEngine',
+            actionName: 'Legend_Engine',
             input: engineSource,
             project: new DockerBuildProject(this, 'LegendEngine', {
                 preBuildCommands: [
@@ -75,7 +75,7 @@ export class LegendPipelineStack extends Stack {
 
         const sdlcImageDetails = new codepipeline.Artifact();
         runtimeBuildStage.addActions(new CodeBuildAction({
-            actionName: 'BuildLegendEngine',
+            actionName: 'Legend_SDLC',
             input: engineSource,
             project: new DockerBuildProject(this, 'LegendSdlc', {
                 preBuildCommands: [
