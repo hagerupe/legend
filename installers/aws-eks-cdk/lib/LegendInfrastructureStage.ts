@@ -2,7 +2,7 @@ import {Construct, Stage, StageProps} from "@aws-cdk/core";
 import {KubernetesStack} from "./stacks/kubernetes";
 import {MongoStack} from "./stacks/mongo";
 import {GitlabStack} from "./stacks/gitlab";
-import {LegendEngineStack} from "./stacks/legend-engine-stack";
+import {LegendEngineStack} from "./stacks/legend-engine";
 import {LegendSdlcStack} from "./stacks/legend-sdlc";
 
 export class LegendInfrastructureStage extends Stage {

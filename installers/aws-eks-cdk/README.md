@@ -15,3 +15,6 @@ The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
 
 cdk bootstrap --profile skylab --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess
+
+aws eks update-kubeconfig --name LegendClusterA6751FE1-66853c12fd444fca92be6b3a8a01a9ca
+kubectl logs -n kube-system legendengine-0fc9d131-866cd4c9bd-rbq8m

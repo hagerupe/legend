@@ -5,7 +5,13 @@ import * as fs from "fs";
 import * as path from "path";
 
 export interface LegendEngineChartProps {
-
+    gitlabOauthClientId: string,
+    gitlabOauthSecret: string,
+    gitlabPublicUrl: string,
+    mongoUser: string,
+    mongoPassword: string,
+    mongoHostPort: number,
+    legendEnginePort: number
 }
 
 export class LegendEngineChart extends cdk8s.Chart {
@@ -13,13 +19,13 @@ export class LegendEngineChart extends cdk8s.Chart {
         super(scope, id);
 
         const templateText = fs.readFileSync(path.join('resources', 'configs', 'engine', 'config.json'), {encoding: 'utf8'})
-            .replace('__GITLAB_OAUTH_CLIENT_ID__', 'foo')
-            .replace('__GITLAB_OAUTH_SECRET__', 'foo')
-            .replace('__GITLAB_PUBLIC_URL__', 'foo')
-            .replace('__MONGO_USER__', 'foo')
-            .replace('__MONGO_PASSWORD__', 'foo')
-            .replace('__MONGO_HOST_PORT__', 'foo')
-            .replace('__LEGEND_ENGINE_PORT__', '1234')
+            .replace('__GITLAB_OAUTH_CLIENT_ID__', props.gitlabOauthClientId)
+            .replace('__GITLAB_OAUTH_SECRET__', props.gitlabOauthSecret)
+            .replace('__GITLAB_PUBLIC_URL__', props.gitlabPublicUrl)
+            .replace('__MONGO_USER__', props.mongoUser)
+            .replace('__MONGO_PASSWORD__', props.mongoPassword) // TODO should be in secret store not a config file...
+            .replace('__MONGO_HOST_PORT__', String(props.mongoHostPort))
+            .replace('__LEGEND_ENGINE_PORT__', String(props.legendEnginePort))
 
         const config = new k8s.ConfigMap(this, "Config", {
             data: {

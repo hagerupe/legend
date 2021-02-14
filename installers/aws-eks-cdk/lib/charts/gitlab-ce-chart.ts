@@ -1,6 +1,7 @@
 import * as constructs from 'constructs';
 import * as cdk8s from 'cdk8s';
 import * as k8s from "cdk8s-plus/lib/imports/k8s";
+import {Quantity} from "cdk8s-plus/lib/imports/k8s";
 
 export interface GitlabCeChartProps {
 
@@ -30,6 +31,12 @@ export class GitlabCeChart extends cdk8s.Chart {
                             {
                                 name: 'gitlab-ce',
                                 image: 'gitlab/gitlab-ce',
+                                resources: {
+                                    requests: {
+                                        memory: Quantity.fromString("2048Mi"),
+                                        cpu: Quantity.fromString("2000m")
+                                    }
+                                }
                             }
                         ]
                     }

@@ -21,7 +21,13 @@ export class LegendEngineStack extends Stack {
         })
 
         cluster.addCdk8sChart("Engine", new LegendEngineChart(new cdk8s.App(), "LegendEngine", {
-
+            gitlabOauthClientId: 'foo',
+            gitlabOauthSecret: 'foo',
+            gitlabPublicUrl: 'foo',
+            mongoHostPort: 1234,
+            mongoUser: 'foo',
+            mongoPassword: 'foo',
+            legendEnginePort: 1234
         }))
     }
 }
