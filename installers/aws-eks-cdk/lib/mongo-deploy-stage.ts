@@ -1,10 +1,10 @@
 import { CfnOutput, Construct, Stage, StageProps } from '@aws-cdk/core';
-import {LegendStack} from "./legend-stack";
+import {KubernetesInfraStage} from "./kubernetes-infra-stage";
 
 export class MongoDeployStage extends Stage {
 
     constructor(scope: Construct, id: string, props?: StageProps) {
         super(scope, id, props);
-        const mongo = new LegendStack(this, 'LegendStack');
+        const mongo = new KubernetesInfraStage(this, 'LegendStack');
     }
 }

@@ -1,11 +1,11 @@
 import { expect as expectCDK, matchTemplate, MatchStyle } from '@aws-cdk/assert';
 import * as cdk from '@aws-cdk/core';
-import {LegendStack} from "../lib/legend-stack";
+import {KubernetesInfraStage} from "../lib/kubernetes-infra-stage";
 
 test('Empty Stack', () => {
     const app = new cdk.App();
     // WHEN
-    const stack = new LegendStack(app, 'MyTestStack');
+    const stack = new KubernetesInfraStage(app, 'MyTestStack');
     // THEN
     expectCDK(stack).to(matchTemplate({
       "Resources": {}

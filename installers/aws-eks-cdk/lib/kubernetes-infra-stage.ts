@@ -3,15 +3,9 @@ import * as ec2 from '@aws-cdk/aws-ec2';
 import * as iam from '@aws-cdk/aws-iam';
 import * as eks from '@aws-cdk/aws-eks';
 import {EksAlbIngressController} from "./eks-alb-ingress-controller";
-import {LegendCiCd} from "./legend-ci-cd";
-import {MongoChart} from "./charts/mongo-chart";
-import * as cdk8s from 'cdk8s';
-import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
-import {Secret} from "@aws-cdk/aws-secretsmanager";
-import {CfnDynamicReference, SecretValue} from "@aws-cdk/core";
 
-export class LegendStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class KubernetesInfraStage extends cdk.Stage {
+  constructor(scope: cdk.Construct, id: string, props?: cdk.StageProps) {
     super(scope, id, props);
 
     const vpc = new ec2.Vpc(this, 'Vpc');
@@ -29,21 +23,23 @@ export class LegendStack extends cdk.Stack {
       version: eks.KubernetesVersion.V1_18,
       placeClusterHandlerInVpc: true,
     })
-    eksCluster.awsAuth.addMastersRole(iam.Role.fromRoleArn(this, "SuperAdmin", "arn:aws:iam::752499117019:role/Administration"))
-    eksCluster.awsAuth.addMastersRole(iam.Role.fromRoleArn(this, "SuperAdminSky", "arn:aws:iam::752499117019:role/skylab-hagere"))
+    // TODO parameterize (somewhere) used just for debugging
+    eksCluster.awsAuth.addMastersRole(iam.Role.fromRoleArn(this, "SuperAdmin", `arn:aws:iam::${this.account}:role/Administration`))
+    eksCluster.awsAuth.addMastersRole(iam.Role.fromRoleArn(this, "SuperAdminSky", `arn:aws:iam::${this.account}:role/skylab-hagere`))
 
+    // Manages ALB and NLB resources for K8 'Services'
     const albIngressController = new EksAlbIngressController(this, "IngressController", {
       cluster: eksCluster,
       vpc: vpc
     })
 
-    const legendCiCd = new LegendCiCd(this, "LegendCICD", {
+    /*const legendCiCd = new LegendCiCd(this, "LegendCICD", {
       cluster: eksCluster
     });
 
     const mongoPassword = new secretsmanager.Secret(this, "MongoPassword");
     eksCluster.addCdk8sChart("Mongo", new MongoChart(new cdk8s.App(), "MongoChart", {
       password: mongoPassword.secretValue.toString()
-    }))
+    }))*/
   }
 }
