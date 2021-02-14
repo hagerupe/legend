@@ -19,6 +19,7 @@ export class LegendPipelineStack extends Stack {
         const engineImageDetails = new codepipeline.Artifact();
         const cloudAssemblyArtifact = new codepipeline.Artifact();
 
+        // TODO move to construct
         const githubSecret = SecretValue.secretsManager('GitHub') // TODO rename this secret
         const pipeline = new CdkPipeline(this, 'LegendPipeline', {
             pipelineName: 'Legend',
@@ -57,7 +58,6 @@ export class LegendPipelineStack extends Stack {
             repo: 'legend-sdlc',
             trigger: GitHubTrigger.POLL
         }))
-
         const legendEngineRepo = new ecr.Repository(this, 'LegendEngineRepo')
         const dockerHubSecret = secretsmanager.Secret.fromSecretPartialArn(this, "DockerHubCredentials", `arn:aws:secretsmanager:${this.region}:${this.account}:secret:DockerHub`)
         const engineBuild = new codebuild.PipelineProject(this, 'LegendEngineBuild', {
@@ -127,15 +127,16 @@ export class LegendPipelineStack extends Stack {
         });
         legendEngineRepo.grantPullPush(engineBuild)
 
-        pipeline.codePipeline.stage('Build').addAction(new CodeBuildAction({
-            actionName: 'BuildGitlab',
+        const runtimeBuildStage = pipeline.addStage("Legend_Runtime_Build");
+        runtimeBuildStage.addActions(new CodeBuildAction({
+            actionName: 'BuildLegendEngine',
             input: engineSource,
             project: engineBuild,
             outputs: [ engineImageDetails ]
         }))
 
-        const preProdInfraStage = new LegendInfrastructureStage(this, "PreProd", { env: { account: this.account, region: this.region } })
 
+        const preProdInfraStage = new LegendInfrastructureStage(this, "PreProd", { env: { account: this.account, region: this.region } })
         pipeline.addApplicationStage(preProdInfraStage)
     }
 }
