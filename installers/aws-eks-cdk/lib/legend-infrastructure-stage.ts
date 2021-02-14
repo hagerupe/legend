@@ -4,6 +4,7 @@ import {MongoStack} from "./stacks/mongo";
 import {GitlabStack} from "./stacks/gitlab";
 import {LegendEngineStack} from "./stacks/legend-engine";
 import {LegendSdlcStack} from "./stacks/legend-sdlc";
+import {LegendStudioChart} from "./charts/legend-studio";
 
 export class LegendInfrastructureStage extends Stage {
     constructor(scope: Construct, id: string, props?: StageProps) {
@@ -43,5 +44,11 @@ export class LegendInfrastructureStage extends Stage {
         sdlc.addDependency(gitlab)
 
 
+        const studio = new LegendStudioChart(this, "Studio", {
+            clusterName: kubernetes.clusterName.value,
+            kubectlRoleArn: kubernetes.kubectlRoleArn.value
+        })
+        studio.addDependency(engine)
+        studio.addDependency(sdlc)
     }
 }

@@ -6,14 +6,15 @@ import * as cdk8s from 'cdk8s'
 import * as cdk from "@aws-cdk/core";
 import {LegendEngineChart} from "../charts/legend-engine";
 import {LegendSdlcChart} from "../charts/legend-sdlc";
+import {LegendStudioChart} from "../charts/legend-studio";
 
-export interface LegendEngineProps extends StackProps{
+export interface LegendStudioProps extends StackProps{
     clusterName: string,
     kubectlRoleArn: string
 }
 
-export class LegendSdlcStack extends Stack {
-    constructor(scope: cdk.Construct, id: string, props: LegendEngineProps) {
+export class LegendStudio extends Stack {
+    constructor(scope: cdk.Construct, id: string, props: LegendStudioProps) {
         super(scope, id, props);
 
         const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", {
@@ -21,7 +22,7 @@ export class LegendSdlcStack extends Stack {
             kubectlRoleArn: props.kubectlRoleArn
         })
 
-        cluster.addCdk8sChart("Engine", new LegendSdlcChart(new cdk8s.App(), "LegendSdlc", {
+        cluster.addCdk8sChart("Engine", new LegendStudioChart(new cdk8s.App(), "LegendSdlc", {
 
         }))
     }

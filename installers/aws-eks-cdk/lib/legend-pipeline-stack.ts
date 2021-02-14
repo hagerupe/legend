@@ -4,7 +4,7 @@ import {CodeBuildAction, GitHubSourceAction, GitHubTrigger} from '@aws-cdk/aws-c
 import {Construct, SecretValue, Stack, StackProps} from '@aws-cdk/core';
 import * as codebuild from '@aws-cdk/aws-codebuild';
 import {CdkPipeline, SimpleSynthAction} from "@aws-cdk/pipelines";
-import {LegendInfrastructureStage} from "./LegendInfrastructureStage";
+import {LegendInfrastructureStage} from "./legend-infrastructure-stage";
 import {BuildEnvironmentVariableType} from "@aws-cdk/aws-codebuild";
 import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
 import * as ecr from "@aws-cdk/aws-ecr";
@@ -87,5 +87,6 @@ export class LegendPipelineStack extends Stack {
         }))*/
 
         pipeline.addApplicationStage(new LegendInfrastructureStage(this, "PreProd", { env: { account: this.account, region: this.region } }))
+        pipeline.addApplicationStage(new LegendInfrastructureStage(this, "Prod", { env: { account: this.account, region: this.region } }))
     }
 }

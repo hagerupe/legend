@@ -4,16 +4,17 @@ import * as k8s from "cdk8s-plus/lib/imports/k8s";
 import * as fs from "fs";
 import * as path from "path";
 
-export interface LegendSdlcProps {
+export interface LegendStudioProps {
 
 }
 
-export class LegendSdlcChart extends cdk8s.Chart {
-    constructor(scope: constructs.Construct, id: string, props: LegendSdlcProps) {
+export class LegendStudioChart extends cdk8s.Chart {
+    constructor(scope: constructs.Construct, id: string, props: LegendStudioProps) {
         super(scope, id);
 
         // TODO update these based off of config
-        const templateText = fs.readFileSync(path.join('resources', 'configs', 'sdlc', 'config.json'), {encoding: 'utf8'})
+        // TODO add the other config file
+        const templateText = fs.readFileSync(path.join('resources', 'configs', 'studio', 'httpConfig.json'), {encoding: 'utf8'})
             .replace('__GITLAB_OAUTH_CLIENT_ID__', 'foo')
             .replace('__GITLAB_OAUTH_SECRET__', 'foo')
             .replace('__GITLAB_PUBLIC_URL__', 'foo')
@@ -25,14 +26,14 @@ export class LegendSdlcChart extends cdk8s.Chart {
 
         const config = new k8s.ConfigMap(this, "Config", {
             data: {
-                'config.json': templateText
+                'httpConfig.json': templateText
             }
         })
 
         // TODO get image from build input source
-        const app = 'legend-sdlc'
+        const app = 'legend-studio'
         const service = app + "-service"
-        new k8s.Deployment(this, "LegendSdlc", {
+        new k8s.Deployment(this, "LegendStudio", {
             spec: {
                 selector: {
                     matchLabels: {
@@ -67,8 +68,8 @@ export class LegendSdlcChart extends cdk8s.Chart {
                                     name: config.name,
                                     items: [
                                         {
-                                            key: 'config.json',
-                                            path: 'config.json'
+                                            key: 'httpConfig.json',
+                                            path: 'httpConfig.json'
                                         }
                                     ]
                                 }
@@ -79,7 +80,7 @@ export class LegendSdlcChart extends cdk8s.Chart {
             }
         })
 
-        new k8s.Service(this, "LegendSDLCService", {
+        new k8s.Service(this, "LegendStudioService", {
             metadata: {
                 name: service,
                 annotations: {
