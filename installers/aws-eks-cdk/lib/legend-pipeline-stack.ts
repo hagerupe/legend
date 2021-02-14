@@ -76,7 +76,7 @@ export class LegendPipelineStack extends Stack {
         const sdlcImageDetails = new codepipeline.Artifact();
         runtimeBuildStage.addActions(new CodeBuildAction({
             actionName: 'Legend_SDLC',
-            input: engineSource,
+            input: sdlcSource,
             project: new DockerBuildProject(this, 'LegendSdlc', {
                 preBuildCommands: [
                     'mvn install',
