@@ -3,16 +3,11 @@ import * as ec2 from '@aws-cdk/aws-ec2';
 import * as iam from '@aws-cdk/aws-iam';
 import * as eks from '@aws-cdk/aws-eks';
 import {EksAwsIngressController} from "../constructs/eks-aws-ingress-controller";
-import { Construct, Stage, StageProps } from '@aws-cdk/core';
-
-export class KubernetesStage extends Stage {
-  constructor(scope: Construct, id: string, props?: StageProps) {
-    super(scope, id, props);
-    new KubernetesStack(this, "KubernetesInfra")
-  }
-}
 
 export class KubernetesStack extends cdk.Stack {
+
+  readonly cluster: eks.Cluster
+
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
@@ -40,5 +35,7 @@ export class KubernetesStack extends cdk.Stack {
       cluster: eksCluster,
       vpc: vpc
     })
+
+    this.cluster = eksCluster
   }
 }
