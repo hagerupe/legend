@@ -22,11 +22,11 @@ export class LegendSdlc extends cdk8s.Chart {
             .replace('__MONGO_HOST_PORT__', 'foo')
             .replace('__LEGEND_SDLC_URL__', '1234')
             .replace('__LEGEND_SDLC_PORT__', '1234')
-        const template = JSON.parse(templateText)
 
-        // TODO this was originally in YAML (does it need to be? if so switch to binary)
         const config = new k8s.ConfigMap(this, "Config", {
-            binaryData: template
+            data: {
+                'config.json': templateText
+            }
         })
 
         // TODO get image from build input source
@@ -64,7 +64,13 @@ export class LegendSdlc extends cdk8s.Chart {
                             {
                                 name: 'configurations',
                                 configMap: {
-                                    name: config.name
+                                    name: config.name,
+                                    items: [
+                                        {
+                                            key: 'config.json',
+                                            path: 'config.json'
+                                        }
+                                    ]
                                 }
                             }
                         ]

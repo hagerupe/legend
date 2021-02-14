@@ -21,12 +21,10 @@ export class LegendEngineChart extends cdk8s.Chart {
             .replace('__MONGO_HOST_PORT__', 'foo')
             .replace('__LEGEND_ENGINE_PORT__', '1234')
 
-        console.log(templateText)
-
-        const template = JSON.parse(templateText)
-
         const config = new k8s.ConfigMap(this, "Config", {
-            binaryData: template
+            data: {
+                'config.json': templateText
+            }
         })
 
         // TODO get image from build input source
@@ -64,7 +62,13 @@ export class LegendEngineChart extends cdk8s.Chart {
                             {
                                 name: 'configurations',
                                 configMap: {
-                                    name: config.name
+                                    name: config.name,
+                                    items: [
+                                        {
+                                            key: 'config.json',
+                                            path: 'config.json'
+                                        }
+                                    ]
                                 }
                             }
                         ]
