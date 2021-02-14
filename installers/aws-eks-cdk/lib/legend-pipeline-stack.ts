@@ -2,12 +2,8 @@ import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
 import {CodeBuildAction, GitHubSourceAction, GitHubTrigger} from '@aws-cdk/aws-codepipeline-actions';
 import {Construct, SecretValue, Stack, StackProps} from '@aws-cdk/core';
-import * as codebuild from '@aws-cdk/aws-codebuild';
 import {CdkPipeline, SimpleSynthAction} from "@aws-cdk/pipelines";
 import {LegendInfrastructureStage} from "./legend-infrastructure-stage";
-import {BuildEnvironmentVariableType} from "@aws-cdk/aws-codebuild";
-import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
-import * as ecr from "@aws-cdk/aws-ecr";
 import {DockerBuildProject} from "./constructs/docker-build-project";
 
 export class LegendPipelineStack extends Stack {
@@ -61,15 +57,18 @@ export class LegendPipelineStack extends Stack {
         const runtimeBuildStage = pipeline.addStage("Legend_Runtime_Build");
 
         const engineImageDetails = new codepipeline.Artifact();
+        const engineRepositoryName = 'legend-engine'
+        const legendEngineProject = new DockerBuildProject(this, 'LegendEngine', {
+            preBuildCommands: [
+                'mvn install',
+                'cd legend-engine-server',
+            ],
+            repositoryName: engineRepositoryName
+        });
         runtimeBuildStage.addActions(new CodeBuildAction({
             actionName: 'Legend_Engine',
             input: engineSource,
-            project: new DockerBuildProject(this, 'LegendEngine', {
-                preBuildCommands: [
-                    'mvn install',
-                    'cd legend-engine-server',
-                ]
-            }).project,
+            project: legendEngineProject.project,
             outputs: [ engineImageDetails ]
         }))
 
@@ -88,19 +87,29 @@ export class LegendPipelineStack extends Stack {
         }))*/
 
         const gitlabImageDetails = new codepipeline.Artifact();
+        const gitlabRepositoryName = 'legend-gitlab';
+        const gitlabProject = new DockerBuildProject(this, 'LegendGitlab', {
+            preBuildCommands: [
+                'cd installers/aws-eks-cdk/resources/docker/gitlab-no-signup',
+            ],
+            repositoryName: gitlabRepositoryName
+        })
         runtimeBuildStage.addActions(new CodeBuildAction({
             actionName: 'Legend_Gitlab',
             input: legendSource,
-            project: new DockerBuildProject(this, 'LegendGitlab', {
-                preBuildCommands: [
-                    'cd installers/aws-eks-cdk/resources/docker/gitlab-no-signup',
-                ]
-            }).project,
+            project: gitlabProject.project,
             outputs: [ gitlabImageDetails ]
         }))
 
-        pipeline.addApplicationStage(new LegendInfrastructureStage(this, "PreProd", { env: { account: this.account, region: this.region } }))
-            .addManualApprovalAction()
-        pipeline.addApplicationStage(new LegendInfrastructureStage(this, "Prod", { env: { account: this.account, region: this.region } }))
+        const repositoryNames = [gitlabRepositoryName, engineRepositoryName]
+        pipeline.addApplicationStage(new LegendInfrastructureStage(this, "PreProd", {
+            env: { account: this.account, region: this.region },
+            repositoryNames: repositoryNames
+        })).addManualApprovalAction()
+
+        pipeline.addApplicationStage(new LegendInfrastructureStage(this, "Prod", {
+            env: { account: this.account, region: this.region },
+            repositoryNames: repositoryNames
+        }))
     }
 }

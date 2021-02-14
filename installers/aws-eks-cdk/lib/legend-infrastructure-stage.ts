@@ -4,15 +4,20 @@ import {MongoStack} from "./stacks/mongo";
 import {GitlabStack} from "./stacks/gitlab";
 import {LegendEngineStack} from "./stacks/legend-engine";
 import {LegendSdlcStack} from "./stacks/legend-sdlc";
-import {LegendStudioChart} from "./charts/legend-studio";
 import {LegendStudioStack} from "./stacks/legend-studio";
 
+export interface LegendInfrastructureStageProps extends StageProps {
+    repositoryNames: string[] // TODO will need to use ARNS for cross account /region
+}
+
 export class LegendInfrastructureStage extends Stage {
-    constructor(scope: Construct, id: string, props?: StageProps) {
+    constructor(scope: Construct, id: string, props: LegendInfrastructureStageProps) {
         super(scope, id, props);
 
         // Base networking and Kubernetes infrastructure
-        const kubernetes = new KubernetesStack(this, "Kubernetes")
+        const kubernetes = new KubernetesStack(this, "Kubernetes", {
+            repositoryNames: props.repositoryNames
+        })
 
         // Mongo DB database used for ???? TODO
         const mongo = new MongoStack(this, "Mongo", {

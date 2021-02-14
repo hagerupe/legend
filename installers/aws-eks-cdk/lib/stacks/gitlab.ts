@@ -1,7 +1,6 @@
 import {Stack, StackProps} from '@aws-cdk/core';
 import * as eks from '@aws-cdk/aws-eks'
 import * as secretsmanager from '@aws-cdk/aws-secretsmanager'
-import {MongoChart} from "../charts/mongo-chart";
 import * as cdk8s from 'cdk8s'
 import * as cdk from "@aws-cdk/core";
 import {GitlabCeChart} from "../charts/gitlab-ce-chart";

@@ -1,10 +1,11 @@
-import {Construct, Stack} from "@aws-cdk/core";
+import {CfnOutput, Construct, Stack} from "@aws-cdk/core";
 import * as ecr from "@aws-cdk/aws-ecr";
 import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
 import * as codebuild from "@aws-cdk/aws-codebuild";
 import {BuildEnvironmentVariableType, IProject} from "@aws-cdk/aws-codebuild";
 
 export interface DockerBuildProjectProps {
+    repositoryName: string,
     preBuildCommands: string[]
 }
 
@@ -15,11 +16,13 @@ export class DockerBuildProject extends Construct {
     constructor(scope: Construct, id: string, props: DockerBuildProjectProps) {
         super(scope, id);
 
-        const repository = new ecr.Repository(this, 'Repository')
+        const repository = new ecr.Repository(this, props.repositoryName, {
+            repositoryName: props.repositoryName
+        })
         const region = Stack.of(this).region
         const account = Stack.of(this).account
         const dockerHubSecret = secretsmanager.Secret.fromSecretPartialArn(this, "DockerHubCredentials", `arn:aws:secretsmanager:${region}:${account}:secret:DockerHub`)
-        const project = new codebuild.PipelineProject(this, 'Project', {
+        this.project = new codebuild.PipelineProject(this, 'Project', {
             buildSpec: codebuild.BuildSpec.fromObject({
                 version: '0.2',
                 phases: {
@@ -81,8 +84,6 @@ export class DockerBuildProject extends Construct {
                 }
             },
         });
-        repository.grantPullPush(project)
-
-        this.project = project
+        repository.grantPullPush(this.project)
     }
 }
