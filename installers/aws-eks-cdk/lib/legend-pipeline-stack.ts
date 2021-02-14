@@ -8,6 +8,7 @@ import {LegendInfrastructureStage} from "./LegendInfrastructureStage";
 import {BuildEnvironmentVariableType} from "@aws-cdk/aws-codebuild";
 import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
 import * as ecr from "@aws-cdk/aws-ecr";
+import {DockerBuildProject} from "./constructs/docker-build-project";
 
 export class LegendPipelineStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
@@ -16,10 +17,8 @@ export class LegendPipelineStack extends Stack {
         const sourceArtifact = new codepipeline.Artifact();
         const engineSource = new codepipeline.Artifact();
         const sdlcSource = new codepipeline.Artifact();
-        const engineImageDetails = new codepipeline.Artifact();
         const cloudAssemblyArtifact = new codepipeline.Artifact();
 
-        // TODO move to construct
         const githubSecret = SecretValue.secretsManager('GitHub') // TODO rename this secret
         const pipeline = new CdkPipeline(this, 'LegendPipeline', {
             pipelineName: 'Legend',
@@ -58,85 +57,35 @@ export class LegendPipelineStack extends Stack {
             repo: 'legend-sdlc',
             trigger: GitHubTrigger.POLL
         }))
-        const legendEngineRepo = new ecr.Repository(this, 'LegendEngineRepo')
-        const dockerHubSecret = secretsmanager.Secret.fromSecretPartialArn(this, "DockerHubCredentials", `arn:aws:secretsmanager:${this.region}:${this.account}:secret:DockerHub`)
-        const engineBuild = new codebuild.PipelineProject(this, 'LegendEngineBuild', {
-            buildSpec: codebuild.BuildSpec.fromObject({
-                version: '0.2',
-                phases: {
-                    pre_build: {
-                        commands: [
-                            'echo Logging in to DockerHub...',
-                            'DOCKERHUB_USER=$(echo $DOCKER_HUB_CREDS | jq -r \'.Username\')',
-                            'DOCKERHUB_PASSWORD=$(echo $DOCKER_HUB_CREDS | jq -r \'.Password\')',
-                            'echo $DOCKERHUB_PASSWORD | docker login --username $DOCKERHUB_USER --password-stdin',
-                            'COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)',
-                            'IMAGE_TAG=${COMMIT_HASH:=latest}',
-                            '$REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME'
-                        ]
-                    },
-                    install: {
-                        commands: [
-                            'mvn install',
-                            'cd legend-engine-server',
-                        ],
-                    },
-                    build: {
-                        commands: [
-                            'docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .',
-                            'docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $REPOSITORY_URI:$IMAGE_TAG',
-                            'printf \'{"ImageURI":"%s"}\' $REPOSITORY_URI:$IMAGE_TAG > imageDetail.json'
-                        ]
-                    },
-                    post_build: {
-                        commands: [
-                            'echo Logging in to Amazon ECR...',
-                            'aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com',
-                            'docker push $REPOSITORY_URI:$IMAGE_TAG'
-                        ]
-                    },
-                },
-                artifacts: {
-                    files: [
-                        'imageDetail.json'
-                    ]
-                }
-            }),
-            environment: {
-                buildImage: codebuild.LinuxBuildImage.STANDARD_4_0,
-                privileged: true,
-                environmentVariables: {
-                    'IMAGE_REPO_NAME' : {
-                        type: BuildEnvironmentVariableType.PLAINTEXT,
-                        value: legendEngineRepo.repositoryName
-                    },
-                    'AWS_DEFAULT_REGION' : {
-                        type: BuildEnvironmentVariableType.PLAINTEXT,
-                        value: Stack.of(this).region
-                    },
-                    'AWS_ACCOUNT_ID' : {
-                        type: BuildEnvironmentVariableType.PLAINTEXT,
-                        value: Stack.of(this).account
-                    },
-                    'DOCKER_HUB_CREDS': {
-                        type: BuildEnvironmentVariableType.SECRETS_MANAGER,
-                        value: dockerHubSecret.secretName
-                    },
-                }
-            },
-        });
-        legendEngineRepo.grantPullPush(engineBuild)
 
         const runtimeBuildStage = pipeline.addStage("Legend_Runtime_Build");
+
+        const engineImageDetails = new codepipeline.Artifact();
         runtimeBuildStage.addActions(new CodeBuildAction({
             actionName: 'BuildLegendEngine',
             input: engineSource,
-            project: engineBuild,
+            project: new DockerBuildProject(this, 'LegendEngine', {
+                preBuildCommands: [
+                    'mvn install',
+                    'cd legend-engine-server',
+                ]
+            }).project,
             outputs: [ engineImageDetails ]
         }))
 
+        const sdlcImageDetails = new codepipeline.Artifact();
+        runtimeBuildStage.addActions(new CodeBuildAction({
+            actionName: 'BuildLegendEngine',
+            input: engineSource,
+            project: new DockerBuildProject(this, 'LegendSdlc', {
+                preBuildCommands: [
+                    'mvn install',
+                    'cd legend-sdlc-server',
+                ]
+            }).project,
+            outputs: [ sdlcImageDetails ]
+        }))
 
-        const preProdInfraStage = new LegendInfrastructureStage(this, "PreProd", { env: { account: this.account, region: this.region } })
-        pipeline.addApplicationStage(preProdInfraStage)
+        pipeline.addApplicationStage(new LegendInfrastructureStage(this, "PreProd", { env: { account: this.account, region: this.region } }))
     }
 }

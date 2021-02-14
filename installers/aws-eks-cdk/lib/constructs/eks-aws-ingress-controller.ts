@@ -9,7 +9,6 @@ import * as iam from "@aws-cdk/aws-iam";
 export interface AlbIngressControllerProps {
     cluster: eks.Cluster
     vpc: ec2.Vpc
-    //certificateManager: CertificateManager
 }
 
 // https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/deploy/installation/
