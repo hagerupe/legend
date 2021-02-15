@@ -27,10 +27,10 @@ export class EksAwsIngressController extends Construct {
         })
         ingressCtrlPolicy.attachToRole(ingressCtrlServiceAccount.role);
 
-        new eks.KubernetesManifest(this, "AwsLoadBalancerCRDS", {
+        /*new eks.KubernetesManifest(this, "AwsLoadBalancerCRDS", {
             cluster: props.cluster,
             manifest: yaml.loadAll(fs.readFileSync(path.join('resources', 'alb-crds_v2.1.2.yaml'), {encoding: 'utf8'}))
-        });
+        });*/
 
         props.cluster.addHelmChart( 'AwsLoadBalancer', {
             repository: 'https://aws.github.io/eks-charts',
