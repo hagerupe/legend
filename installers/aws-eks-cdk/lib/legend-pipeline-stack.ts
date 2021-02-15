@@ -126,9 +126,9 @@ export class LegendPipelineStack extends Stack {
         pipeline.codePipeline.artifactBucket.encryptionKey?.grantDecrypt(artifactImageIdFunction)
         pipeline.codePipeline.artifactBucket.grantRead(artifactImageIdFunction)
 
-        const resolveFunction = new lambda.SingletonFunction(this, 'ResolveSecretFunction', {
-            functionName: 'ResolveSecretFunction',
-            uuid: 'f7d4f730-4ee1-11e8-9c2d-fa7ae01bbebc',
+        const resolveFunction = new lambda.SingletonFunction(this, 'ResolveSecret', {
+            functionName: 'ResolveSecret',
+            uuid: 'def1918a-6fbb-11eb-9439-0242ac130002',
             code: new lambda.InlineCode(fs.readFileSync(path.join('resources', 'handlers', 'resolveSecret', 'index.py'), { encoding: 'utf-8' })),
             handler: 'index.main',
             timeout: cdk.Duration.seconds(300),

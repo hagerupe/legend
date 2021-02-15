@@ -24,8 +24,8 @@ export class KubernetesStack extends LegendApplicationStack {
 
     this.clusterRole = new iam.Role(this, "LegendClusterRole", {
       assumedBy: new iam.ServicePrincipal("eks"),
-      managedPolicies: [iam.ManagedPolicy.fromManagedPolicyArn(this, "AmazonEKSClusterPolicy",
-          "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy")]
+      managedPolicies: [iam.ManagedPolicy.fromManagedPolicyArn(this, "AmazonEKSClusterPolicy", "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"),
+                        iam.ManagedPolicy.fromManagedPolicyArn(this, "CloudWatchAgentServerPolicy", "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy")]
     })
 
     // Grant EKS permissions to image repositories

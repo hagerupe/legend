@@ -1,28 +1,48 @@
+1. **Create AWS account if one is not yet available**
 
-Create AWS account
+https://portal.aws.amazon.com/billing/signup
 
-Create IAM user
+1. **Create IAM user**
 
-Install AWS CLI
+* Navigate to: https://console.aws.amazon.com/iam/home?region=us-east-1#/users
 
-aws configure
+* Add user and enable 'Programitic Access'
 
-Install NPM
+* On the next page attach an existing policy of `AdministratorAccess`
 
-Install CDK
+* Create the user and make note of the `access key id` and `secret access key`
 
-Create github secret
+1. **Install and configure AWS CLI**
 
-Create dockerhub secret
+https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html
 
-Create CDK Bootstrap Environment:
+From the terminal run `aws configure` and set the `access key` and `secret access key` from the IAM user setup.  Set the region to `us-east-1`
 
-`cdk bootstrap --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess`
+Verify by running `aws sts get-caller-identity`, it should return the ARN of the configured user
 
-Synthesize and Deploy Legend Pipeline: 
+1. **Install NPM**
+
+1. **Install CDK**
+
+1. **Create github secret**
+
+1. **Create dockerhub secret**
+
+1. **Create Route53 hosted zone for existing / new domain**
+
+1. **Create CDK Bootstrap Environment:**
+
+Execute `cdk bootstrap --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess`
+
+1. **Synthesize and Deploy Legend Pipeline:** 
 
 `cdk synth && cdk deploy`
 
+1. **Sign into the aws console and navigate to .... this will take a couple hours, because you know, EKS...**
+
+https://console.aws.amazon.com/codesuite/codepipeline/pipelines/Legend/view?region=us-east-1
+
+----
 
 ### TODOs:
 
@@ -43,3 +63,5 @@ Make Mongo durable
 Switch mongo LB to be internal instead of external
 
 Dashboards! (Woot)
+
+Health checks?
