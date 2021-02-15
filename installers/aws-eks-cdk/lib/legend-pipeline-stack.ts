@@ -1,7 +1,7 @@
 import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
 import {CodeBuildAction, GitHubSourceAction, GitHubTrigger} from '@aws-cdk/aws-codepipeline-actions';
-import {Construct, SecretValue, Stack, StackProps} from '@aws-cdk/core';
+import {CfnOutput, CfnParameter, Construct, SecretValue, Stack, StackProps} from '@aws-cdk/core';
 import {CdkPipeline, SimpleSynthAction} from "@aws-cdk/pipelines";
 import {LegendInfrastructureStage} from "./legend-infrastructure-stage";
 import {DockerBuildProject} from "./constructs/docker-build-project";
@@ -106,13 +106,15 @@ export class LegendPipelineStack extends Stack {
         pipeline.addApplicationStage(new LegendInfrastructureStage(this, "PreProd", {
             env: { account: this.account, region: this.region },
             repositoryNames: repositoryNames,
-            gitlabContainerArtifact: gitlabImageDetails
+            artifactBucketName: new CfnParameter(this, "ArtifactBucketName", { default: gitlabImageDetails.bucketName }),
+            artifactObjectKey: new CfnParameter(this, "ArtifactBucketObjectKey", { default: gitlabImageDetails.objectKey })
         })).addManualApprovalAction()
 
-        pipeline.addApplicationStage(new LegendInfrastructureStage(this, "Prod", {
+        /*pipeline.addApplicationStage(new LegendInfrastructureStage(this, "Prod", {
             env: { account: this.account, region: this.region },
             repositoryNames: repositoryNames,
-            gitlabContainerArtifact: gitlabImageDetails
-        }))
+            gitlabContainerArtifact: gitlabImageDetails,
+            artifactEncryptionKey: pipeline.codePipeline.artifactBucket.encryptionKey
+        }))*/
     }
 }

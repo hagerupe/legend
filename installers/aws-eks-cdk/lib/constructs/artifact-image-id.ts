@@ -2,14 +2,14 @@ import cfn = require('@aws-cdk/aws-cloudformation');
 import lambda = require('@aws-cdk/aws-lambda');
 import s3 = require('@aws-cdk/aws-s3');
 import cdk = require('@aws-cdk/core');
-import * as codepipeline from '@aws-cdk/aws-codepipeline'
+import * as kms from '@aws-cdk/aws-kms'
 
 import fs = require('fs');
 import * as path from "path";
 
 export interface ArtifactImageIdProps {
-    artifactBucketName: string,
-    artifactObjectKey: string,
+    artifactBucketName: string
+    artifactObjectKey: string
 }
 
 export class ArtifactImageId extends cdk.Construct {
@@ -26,9 +26,7 @@ export class ArtifactImageId extends cdk.Construct {
             runtime: lambda.Runtime.PYTHON_3_6,
         })
 
-        const artifactBucket = s3.Bucket.fromBucketAttributes(this, "ArtifactBucket", {
-            bucketName: props.artifactBucketName
-        })
+        const artifactBucket = s3.Bucket.fromBucketAttributes(this, "ArtifactBucket", { bucketName: props.artifactBucketName })
         artifactBucket.grantRead(lambdaSingleton)
 
         const resource = new cfn.CustomResource(this, 'Resource', {
