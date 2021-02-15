@@ -6,10 +6,10 @@ import * as codepipeline from '@aws-cdk/aws-codepipeline'
 
 import fs = require('fs');
 import * as path from "path";
-import {PermissionsBoundary} from "@aws-cdk/aws-iam";
 
 export interface ArtifactImageIdProps {
-    artifact: codepipeline.Artifact
+    artifactBucketName: string,
+    artifactObjectKey: string,
 }
 
 export class ArtifactImageId extends cdk.Construct {
@@ -26,14 +26,16 @@ export class ArtifactImageId extends cdk.Construct {
             runtime: lambda.Runtime.PYTHON_3_6,
         })
 
-        const artifactBucket = s3.Bucket.fromBucketAttributes(this, "ArtifactBucket", props.artifact)
+        const artifactBucket = s3.Bucket.fromBucketAttributes(this, "ArtifactBucket", {
+            bucketName: props.artifactBucketName
+        })
         artifactBucket.grantRead(lambdaSingleton)
 
         const resource = new cfn.CustomResource(this, 'Resource', {
             provider: cfn.CustomResourceProvider.lambda(lambdaSingleton),
             properties: {
-                bucket: props.artifact.bucketName,
-                objectKey: props.artifact.objectKey,
+                bucket: props.artifactBucketName,
+                objectKey: props.artifactObjectKey,
             }
         });
 

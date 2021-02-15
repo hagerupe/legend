@@ -8,9 +8,10 @@ import * as codepipeline from '@aws-cdk/aws-codepipeline'
 import {ArtifactImageId} from "../constructs/artifact-image-id";
 
 export interface GitlabStackProps extends StackProps{
-    clusterName: string,
+    clusterName: string
     kubectlRoleArn: string
-    artifact: codepipeline.Artifact
+    artifactBucketName: string
+    artifactObjectKey: string
 }
 
 export class GitlabStack extends Stack {

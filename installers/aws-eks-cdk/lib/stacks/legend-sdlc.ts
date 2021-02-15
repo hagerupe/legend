@@ -13,11 +13,7 @@ export class LegendSdlcStack extends Stack {
     constructor(scope: cdk.Construct, id: string, props: LegendEngineProps) {
         super(scope, id, props);
 
-        const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", {
-            clusterName: props.clusterName,
-            kubectlRoleArn: props.kubectlRoleArn
-        })
-
+        const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", props)
         cluster.addCdk8sChart("SDLC", new LegendSdlcChart(new cdk8s.App(), "LegendSdlc", {
             
         }))

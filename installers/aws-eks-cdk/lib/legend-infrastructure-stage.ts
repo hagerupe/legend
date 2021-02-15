@@ -32,7 +32,8 @@ export class LegendInfrastructureStage extends Stage {
         const gitlab = new GitlabStack(this, "Gitlab", {
             clusterName: kubernetes.clusterName.value,
             kubectlRoleArn: kubernetes.kubectlRoleArn.value,
-            artifact: props.gitlabContainerArtifact,
+            artifactBucketName: props.gitlabContainerArtifact.bucketName,
+            artifactObjectKey: props.gitlabContainerArtifact.objectKey,
         })
         gitlab.addDependency(kubernetes)
 
@@ -52,7 +53,7 @@ export class LegendInfrastructureStage extends Stage {
         sdlc.addDependency(mongo)
         sdlc.addDependency(gitlab)
 
-
+        // Legend Studio
         const studio = new LegendStudioStack(this, "Studio", {
             clusterName: kubernetes.clusterName.value,
             kubectlRoleArn: kubernetes.kubectlRoleArn.value

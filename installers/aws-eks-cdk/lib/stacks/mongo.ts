@@ -14,12 +14,10 @@ export class MongoStack extends Stack {
     constructor(scope: cdk.Construct, id: string, props: MongoStackProps) {
         super(scope, id, props);
 
-        const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", {
-            clusterName: props.clusterName,
-            kubectlRoleArn: props.kubectlRoleArn
-        })
-
+        const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", props)
         const mongoPassword = new secretsmanager.Secret(this, "MongoPassword");
+        // TODO resolve password with custom resource
+        // TODO long term, use external secrets reference
         cluster.addCdk8sChart("Mongo", new MongoChart(new cdk8s.App(), "MongoChart", {
             password: mongoPassword.secretValue.toString()
         }))
