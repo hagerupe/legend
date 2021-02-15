@@ -58,14 +58,14 @@ export class KubernetesStack extends LegendApplicationStack {
     // Container Insights
     // TODO: [ERROR] Exception: b'error: error validating "/tmp/manifest.yaml": error validating data: invalid object to validate; if you choose to ignore these errors, turn validation off with --validate=false\n' Traceback (most recent call last):   File "/var/task/index.py", line 14, in handler     return apply_handler(event, context)   File "/var/task/apply/__init__.py", line 60, in apply_handler
     // kubectl('create', manifest_file, *kubectl_opts)   File "/var/task/apply/__init__.py", line 87, in kubectl     raise Exception(output)
-    /*const containerInsightsManaifestRaw = fs.readFileSync(path.join('resources', 'container-insights.yaml'), {encoding: 'utf8'})
+    const containerInsightsManaifestRaw = fs.readFileSync(path.join('resources', 'container-insights.yaml'), {encoding: 'utf8'})
         .replace("{{cluster_name}}", eksCluster.clusterName)
         .replace("{{region_name}}", this.region)
         .replace("{{http_server_toggle}}", "On")
         .replace("{{http_server_port}}", "200")
         .replace("{{read_from_head}}", "Off")
         .replace("{{read_from_tail}}", "On")
-    eksCluster.addManifest("ContainerInsights", yaml.loadAll(containerInsightsManaifestRaw))*/
+    eksCluster.addManifest("ContainerInsights", yaml.loadAll(containerInsightsManaifestRaw))
 
     this.clusterName = new CfnOutput(this, 'ClusterName', { value: eksCluster.clusterName })
     if (eksCluster.kubectlRole !== undefined) {
