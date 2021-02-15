@@ -10,7 +10,6 @@ import {LegendApplicationStack} from "./legend-application-stack";
 export interface GitlabStackProps extends StackProps{
     clusterName: string
     kubectlRoleArn: string
-    artifactEncryptionKeyArn: string
 }
 
 export class GitlabStack extends LegendApplicationStack {
@@ -21,7 +20,6 @@ export class GitlabStack extends LegendApplicationStack {
         const artifactImageId = new ArtifactImageId(this, 'DemoResource', {
             artifactBucketName: this.gitlabArtifactBucketName.value.toString(),
             artifactObjectKey: this.gitlabArtifactObjectKey.value.toString(),
-            encryptionKeyArn: props.artifactEncryptionKeyArn,
         }).response;
         const gitlabPassword = new secretsmanager.Secret(this, "GitlabRootPassword");
         cluster.addCdk8sChart("GitlabCE", new GitlabCeChart(new cdk8s.App(), "GitlabCEChart", {

@@ -1,5 +1,7 @@
 import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
+import * as lambda from '@aws-cdk/aws-lambda';
+import cdk = require('@aws-cdk/core');
 import {
     CloudFormationCreateUpdateStackAction,
     CodeBuildAction,
@@ -11,6 +13,8 @@ import {CdkPipeline} from "./override/pipelines/lib/pipeline";
 import {LegendInfrastructureStage} from "./legend-infrastructure-stage";
 import {DockerBuildProject} from "./constructs/docker-build-project";
 import {SimpleSynthAction} from "./override/pipelines/lib/synths";
+import * as path from "path";
+import * as fs from "fs";
 
 export class LegendPipelineStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
@@ -105,20 +109,25 @@ export class LegendPipelineStack extends Stack {
             ]
         }
 
-        if (pipeline.codePipeline.artifactBucket.encryptionKey?.keyArn === undefined) {
-            throw new Error('No encryption key available for artifact bucket')
-        }
+        const artifactImageIdFunction = new lambda.SingletonFunction(this, 'ArtifactImageId', {
+            functionName: 'ArtifactImageId',
+            uuid: 'f7d4f730-4ee1-11e8-9c2d-fa7ae01bbebc',
+            code: new lambda.InlineCode(fs.readFileSync(path.join('resources', 'handlers', 'artifactImageId', 'index.py'), { encoding: 'utf-8' })),
+            handler: 'index.main',
+            timeout: cdk.Duration.seconds(300),
+            runtime: lambda.Runtime.PYTHON_3_6,
+        })
+        pipeline.codePipeline.artifactBucket.encryptionKey?.grantDecrypt(artifactImageIdFunction)
+        pipeline.codePipeline.artifactBucket.grantRead(artifactImageIdFunction)
 
         pipeline.addApplicationStage(new LegendInfrastructureStage(this, "PreProd", {
             env: { account: this.account, region: this.region },
             repositoryNames: repositoryNames,
-            artifactEncryptionKeyArn: pipeline.codePipeline.artifactBucket.encryptionKey.keyArn,
         }), appStageOptions).addManualApprovalAction()
 
         pipeline.addApplicationStage(new LegendInfrastructureStage(this, "Prod", {
             env: { account: this.account, region: this.region },
             repositoryNames: repositoryNames,
-            artifactEncryptionKeyArn: pipeline.codePipeline.artifactBucket.encryptionKey.keyArn,
         }), appStageOptions).addManualApprovalAction()
     }
 }

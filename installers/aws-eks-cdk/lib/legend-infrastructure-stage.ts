@@ -6,7 +6,6 @@ import {LegendEngineStack} from "./stacks/legend-engine";
 
 export interface LegendInfrastructureStageProps extends StageProps {
     repositoryNames: string[],
-    artifactEncryptionKeyArn: string,
 }
 
 export class LegendInfrastructureStage extends Stage {
