@@ -6,9 +6,7 @@ import {EksAwsIngressController} from "../constructs/eks-aws-ingress-controller"
 import {CfnOutput, StackProps} from "@aws-cdk/core";
 import * as ecr from "@aws-cdk/aws-ecr";
 import {LegendApplicationStack} from "./legend-application-stack";
-import * as fs from "fs";
-import * as path from "path";
-import * as yaml from 'js-yaml';
+import {ContainerInsights} from "../constructs/container-insights";
 
 export interface KubernetesStackProperties extends StackProps{
   repositoryNames: string[];
@@ -37,7 +35,7 @@ export class KubernetesStack extends LegendApplicationStack {
       repository.grantPull(this.clusterRole)
     }
 
-    const eksCluster = new eks.FargateCluster(this, "LegendCluster", {
+    const cluster = new eks.FargateCluster(this, "LegendCluster", {
       role: this.clusterRole,
       vpc: vpc,
       vpcSubnets: [{ subnetType: ec2.SubnetType.PRIVATE }],
@@ -46,30 +44,15 @@ export class KubernetesStack extends LegendApplicationStack {
 
     })
     // TODO parameterize (somewhere) used just for debugging
-    eksCluster.awsAuth.addMastersRole(iam.Role.fromRoleArn(this, "SuperAdmin", `arn:aws:iam::${this.account}:role/Administration`))
-    eksCluster.awsAuth.addMastersRole(iam.Role.fromRoleArn(this, "SuperAdminSky", `arn:aws:iam::${this.account}:role/skylab-hagere`))
+    cluster.awsAuth.addMastersRole(iam.Role.fromRoleArn(this, "SuperAdmin", `arn:aws:iam::${this.account}:role/Administration`))
+    cluster.awsAuth.addMastersRole(iam.Role.fromRoleArn(this, "SuperAdminSky", `arn:aws:iam::${this.account}:role/skylab-hagere`))
 
-    // Manages ALB and NLB resources for K8 'Services'
-    new EksAwsIngressController(this, "IngressController", {
-      cluster: eksCluster,
-      vpc: vpc
-    })
+    new EksAwsIngressController(this, "IngressController", { cluster, vpc })
+    new ContainerInsights(this, "ContainerInsights", { cluster })
 
-    // Container Insights
-    // TODO: [ERROR] Exception: b'error: error validating "/tmp/manifest.yaml": error validating data: invalid object to validate; if you choose to ignore these errors, turn validation off with --validate=false\n' Traceback (most recent call last):   File "/var/task/index.py", line 14, in handler     return apply_handler(event, context)   File "/var/task/apply/__init__.py", line 60, in apply_handler
-    // kubectl('create', manifest_file, *kubectl_opts)   File "/var/task/apply/__init__.py", line 87, in kubectl     raise Exception(output)
-    /*const containerInsightsManaifestRaw = fs.readFileSync(path.join('resources', 'container-insights.yaml'), {encoding: 'utf8'})
-        .replace("{{cluster_name}}", eksCluster.clusterName)
-        .replace("{{region_name}}", this.region)
-        .replace("{{http_server_toggle}}", "On")
-        .replace("{{http_server_port}}", "200")
-        .replace("{{read_from_head}}", "Off")
-        .replace("{{read_from_tail}}", "On")
-    eksCluster.addManifest("ContainerInsights", yaml.loadAll(containerInsightsManaifestRaw))*/
-
-    this.clusterName = new CfnOutput(this, 'ClusterName', { value: eksCluster.clusterName })
-    if (eksCluster.kubectlRole !== undefined) {
-      this.kubectlRoleArn = new CfnOutput(this, 'kubectlRoleArn', {value: eksCluster.kubectlRole?.roleArn})
+    this.clusterName = new CfnOutput(this, 'ClusterName', { value: cluster.clusterName })
+    if (cluster.kubectlRole !== undefined) {
+      this.kubectlRoleArn = new CfnOutput(this, 'kubectlRoleArn', {value: cluster.kubectlRole?.roleArn})
     }
   }
 }
