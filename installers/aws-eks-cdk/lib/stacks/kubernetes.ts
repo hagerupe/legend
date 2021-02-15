@@ -5,12 +5,13 @@ import * as eks from '@aws-cdk/aws-eks';
 import {EksAwsIngressController} from "../constructs/eks-aws-ingress-controller";
 import {CfnOutput, StackProps} from "@aws-cdk/core";
 import * as ecr from "@aws-cdk/aws-ecr";
+import {LegendApplicationStack} from "./legend-application-stack";
 
 export interface KubernetesStackProperties extends StackProps{
   repositoryNames: string[];
 }
 
-export class KubernetesStack extends cdk.Stack {
+export class KubernetesStack extends LegendApplicationStack {
 
   readonly clusterName: CfnOutput;
   readonly kubectlRoleArn: CfnOutput;

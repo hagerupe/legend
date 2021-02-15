@@ -5,23 +5,21 @@ import * as cdk8s from 'cdk8s'
 import * as cdk from "@aws-cdk/core";
 import {GitlabCeChart} from "../charts/gitlab-ce-chart";
 import {ArtifactImageId} from "../constructs/artifact-image-id";
+import {LegendApplicationStack} from "./legend-application-stack";
 
 export interface GitlabStackProps extends StackProps{
     clusterName: string
     kubectlRoleArn: string
 }
 
-export class GitlabStack extends Stack {
+export class GitlabStack extends LegendApplicationStack {
     constructor(scope: cdk.Construct, id: string, props: GitlabStackProps) {
         super(scope, id, props);
 
-        const artifactBucketName = new CfnParameter(this, "GitlabArtifactBucketName");
-        const artifactObjectKey = new CfnParameter(this, "GitlabArtifactObjectKey");
-
         const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", props)
         const artifactImageId = new ArtifactImageId(this, 'DemoResource', {
-            artifactBucketName: artifactBucketName.value.toString(),
-            artifactObjectKey: artifactObjectKey.value.toString(),
+            artifactBucketName: this.gitlabArtifactBucketName.value.toString(),
+            artifactObjectKey: this.gitlabArtifactObjectKey.value.toString(),
         }).response;
         const gitlabPassword = new secretsmanager.Secret(this, "GitlabRootPassword");
         cluster.addCdk8sChart("GitlabCE", new GitlabCeChart(new cdk8s.App(), "GitlabCEChart", {

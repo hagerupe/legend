@@ -4,13 +4,14 @@ import * as secretsmanager from '@aws-cdk/aws-secretsmanager'
 import {MongoChart} from "../charts/mongo-chart";
 import * as cdk8s from 'cdk8s'
 import * as cdk from "@aws-cdk/core";
+import {LegendApplicationStack} from "./legend-application-stack";
 
 export interface MongoStackProps extends StackProps{
     clusterName: string,
     kubectlRoleArn: string
 }
 
-export class MongoStack extends Stack {
+export class MongoStack extends LegendApplicationStack {
     constructor(scope: cdk.Construct, id: string, props: MongoStackProps) {
         super(scope, id, props);
 

@@ -3,13 +3,14 @@ import * as eks from '@aws-cdk/aws-eks'
 import * as cdk8s from 'cdk8s'
 import * as cdk from "@aws-cdk/core";
 import {LegendEngineChart} from "../charts/legend-engine";
+import {LegendApplicationStack} from "./legend-application-stack";
 
 export interface LegendEngineProps extends StackProps{
     clusterName: string,
     kubectlRoleArn: string
 }
 
-export class LegendEngineStack extends Stack {
+export class LegendEngineStack extends LegendApplicationStack {
     constructor(scope: cdk.Construct, id: string, props: LegendEngineProps) {
         super(scope, id, props);
 
