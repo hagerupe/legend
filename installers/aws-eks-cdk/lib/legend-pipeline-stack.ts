@@ -64,7 +64,7 @@ export class LegendPipelineStack extends Stack {
 
         const engineImageDetails = new codepipeline.Artifact();
         const engineRepositoryName = 'legend-engine'
-        /*const legendEngineProject = new DockerBuildProject(this, 'LegendEngine', {
+        const legendEngineProject = new DockerBuildProject(this, 'LegendEngine', {
             preBuildCommands: [
                 'mvn install',
                 'cd legend-engine-server',
@@ -76,21 +76,7 @@ export class LegendPipelineStack extends Stack {
             input: engineSource,
             project: legendEngineProject.project,
             outputs: [ engineImageDetails ]
-        }))*/
-
-        // TODO this build is broken in mainline
-        /*const sdlcImageDetails = new codepipeline.Artifact();
-        runtimeBuildStage.addActions(new CodeBuildAction({
-            actionName: 'Legend_SDLC',
-            input: sdlcSource,
-            project: new DockerBuildProject(this, 'LegendSdlc', {
-                preBuildCommands: [
-                    'mvn install',
-                    'cd legend-sdlc-server',
-                ]
-            }).project,
-            outputs: [ sdlcImageDetails ]
-        }))*/
+        }))
 
         const gitlabImageDetails = new codepipeline.Artifact();
         const gitlabRepositoryName = 'legend-gitlab';
@@ -108,17 +94,31 @@ export class LegendPipelineStack extends Stack {
         }))
 
         const repositoryNames = [gitlabRepositoryName, engineRepositoryName]
-        pipeline.addApplicationStage(new LegendInfrastructureStage(this, "PreProd", {
-            env: { account: this.account, region: this.region },
-            repositoryNames: repositoryNames,
-        }), {
+        const appStageOptions = {
             parameterOverrides: {
                 GitlabArtifactBucketName: gitlabImageDetails.bucketName,
                 GitlabArtifactObjectKey: gitlabImageDetails.objectKey,
             },
             extraInputs: [
-                gitlabImageDetails
+                gitlabImageDetails,
+                engineImageDetails,
             ]
-        }).addManualApprovalAction()
+        }
+
+        if (pipeline.codePipeline.artifactBucket.encryptionKey?.keyArn === undefined) {
+            throw new Error('No encryption key available for artifact bucket')
+        }
+
+        pipeline.addApplicationStage(new LegendInfrastructureStage(this, "PreProd", {
+            env: { account: this.account, region: this.region },
+            repositoryNames: repositoryNames,
+            artifactEncryptionKeyArn: pipeline.codePipeline.artifactBucket.encryptionKey.keyArn,
+        }), appStageOptions).addManualApprovalAction()
+
+        pipeline.addApplicationStage(new LegendInfrastructureStage(this, "Prod", {
+            env: { account: this.account, region: this.region },
+            repositoryNames: repositoryNames,
+            artifactEncryptionKeyArn: pipeline.codePipeline.artifactBucket.encryptionKey.keyArn,
+        }), appStageOptions).addManualApprovalAction()
     }
 }

@@ -102,7 +102,6 @@ export class CdkStage extends CoreConstruct {
 
       // These don't have a dependency on each other, so can all be added in parallel
       for (const stack of stacks) {
-        console.log(stack)
         this.addStackArtifactDeployment(stack, { runOrder, executeRunOrder, parameterOverrides: options.parameterOverrides, extraInputs: options.extraInputs });
       }
     }
