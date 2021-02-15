@@ -8,8 +8,8 @@ import {LegendStudioStack} from "./stacks/legend-studio";
 import * as codepipeline from '@aws-cdk/aws-codepipeline';
 
 export interface LegendInfrastructureStageProps extends StageProps {
-    repositoryNames: string[] // TODO will need to use ARNS for cross account /region
-    artifact: codepipeline.Artifact
+    repositoryNames: string[]
+    gitlabContainerArtifact: codepipeline.Artifact
 }
 
 export class LegendInfrastructureStage extends Stage {
@@ -32,7 +32,7 @@ export class LegendInfrastructureStage extends Stage {
         const gitlab = new GitlabStack(this, "Gitlab", {
             clusterName: kubernetes.clusterName.value,
             kubectlRoleArn: kubernetes.kubectlRoleArn.value,
-            artifact: props.artifact,
+            artifact: props.gitlabContainerArtifact,
         })
         gitlab.addDependency(kubernetes)
 

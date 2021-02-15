@@ -17,21 +17,13 @@ export class GitlabStack extends Stack {
     constructor(scope: cdk.Construct, id: string, props: GitlabStackProps) {
         super(scope, id, props);
 
-        const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", {
-            clusterName: props.clusterName,
-            kubectlRoleArn: props.kubectlRoleArn
-        })
-
-        const resource = new ArtifactImageId(this, 'DemoResource', {
-            bucket: props.artifact.bucketName,
-            objectKey: props.artifact.objectKey
-        });
-
+        const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", props)
+        const artifactImageId = new ArtifactImageId(this, 'DemoResource', props).response;
         const gitlabPassword = new secretsmanager.Secret(this, "GitlabRootPassword");
         cluster.addCdk8sChart("GitlabCE", new GitlabCeChart(new cdk8s.App(), "GitlabCEChart", {
             gitlabExternalUrl: 'gitlab.legend.com',
             gitlabRootPassword: gitlabPassword.secretValue.toString(),
-            image: resource.response
+            image: artifactImageId
         }))
     }
 }
