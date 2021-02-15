@@ -73,7 +73,7 @@ export class LegendPipelineStack extends Stack {
                 'mvn install',
                 'cd legend-engine-server',
             ],
-            repositoryName: engineRepositoryName
+            repositoryName: engineRepositoryName,
         });
         runtimeBuildStage.addActions(new CodeBuildAction({
             actionName: 'Legend_Engine',
@@ -120,7 +120,7 @@ export class LegendPipelineStack extends Stack {
         pipeline.codePipeline.artifactBucket.encryptionKey?.grantDecrypt(artifactImageIdFunction)
         pipeline.codePipeline.artifactBucket.grantRead(artifactImageIdFunction)
 
-        pipeline.addApplicationStage(new LegendInfrastructureStage(this, "PreProd", {
+        pipeline.addApplicationStage(new LegendInfrastructureStage(this, "UAT", {
             env: { account: this.account, region: this.region },
             repositoryNames: repositoryNames,
         }), appStageOptions).addManualApprovalAction()

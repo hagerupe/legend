@@ -17,7 +17,7 @@ export class GitlabStack extends LegendApplicationStack {
         super(scope, id, props);
 
         const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", props)
-        const artifactImageId = new ArtifactImageId(this, 'DemoResource', {
+        const artifactImageId = new ArtifactImageId(this, 'ArtifactImageId', {
             artifactBucketName: this.gitlabArtifactBucketName.value.toString(),
             artifactObjectKey: this.gitlabArtifactObjectKey.value.toString(),
         }).response;

@@ -1,8 +1,8 @@
-import {CfnOutput, Construct, Stack} from "@aws-cdk/core";
+import {Construct, RemovalPolicy, Stack} from "@aws-cdk/core";
 import * as ecr from "@aws-cdk/aws-ecr";
 import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
 import * as codebuild from "@aws-cdk/aws-codebuild";
-import {BuildEnvironmentVariableType, IProject} from "@aws-cdk/aws-codebuild";
+import {BuildEnvironmentVariableType} from "@aws-cdk/aws-codebuild";
 
 export interface DockerBuildProjectProps {
     repositoryName: string,
@@ -16,8 +16,10 @@ export class DockerBuildProject extends Construct {
     constructor(scope: Construct, id: string, props: DockerBuildProjectProps) {
         super(scope, id);
 
+        // TODO lifecycle rules
         const repository = new ecr.Repository(this, props.repositoryName, {
-            repositoryName: props.repositoryName
+            repositoryName: props.repositoryName,
+            removalPolicy: RemovalPolicy.DESTROY,
         })
         const region = Stack.of(this).region
         const account = Stack.of(this).account

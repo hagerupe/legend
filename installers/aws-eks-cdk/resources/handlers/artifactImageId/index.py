@@ -6,7 +6,6 @@ def main(event, context):
   import json
   import hashlib
 
-
   log.getLogger().setLevel(log.INFO)
 
   fqn = event['StackId'] + event['LogicalResourceId']
