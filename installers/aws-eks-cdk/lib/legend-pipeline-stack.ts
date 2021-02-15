@@ -7,10 +7,10 @@ import {
     GitHubTrigger
 } from '@aws-cdk/aws-codepipeline-actions';
 import {CfnParameter, Construct, SecretValue, Stack, StackProps} from '@aws-cdk/core';
-import {CdkPipeline} from "./override/pipeline";
+import {CdkPipeline} from "./override/pipelines/lib/pipeline";
 import {LegendInfrastructureStage} from "./legend-infrastructure-stage";
 import {DockerBuildProject} from "./constructs/docker-build-project";
-import {SimpleSynthAction} from "./override/synths";
+import {SimpleSynthAction} from "./override/pipelines/lib/synths";
 
 export class LegendPipelineStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
@@ -112,11 +112,6 @@ export class LegendPipelineStack extends Stack {
         pipeline.addApplicationStage(new LegendInfrastructureStage(this, "PreProd", {
             env: { account: this.account, region: this.region },
             repositoryNames: repositoryNames,
-        }), {
-            parameterOverrides: {
-                GitlabArtifactBucketName: gitlabImageDetails.bucketName,
-                GitlabArtifactObjectKey: gitlabImageDetails.objectKey,
-            }
-        }).addManualApprovalAction()
+        })).addManualApprovalAction()
     }
 }
