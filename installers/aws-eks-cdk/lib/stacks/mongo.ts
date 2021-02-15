@@ -5,6 +5,7 @@ import {MongoChart} from "../charts/mongo-chart";
 import * as cdk8s from 'cdk8s'
 import * as cdk from "@aws-cdk/core";
 import {LegendApplicationStack} from "./legend-application-stack";
+import {ResolveSecret} from "../constructs/resolve-secret";
 
 export interface MongoStackProps extends StackProps{
     clusterName: string,
@@ -17,10 +18,10 @@ export class MongoStack extends LegendApplicationStack {
 
         const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", props)
         const mongoPassword = new secretsmanager.Secret(this, "MongoPassword");
-        // TODO resolve password with custom resource
-        // TODO long term, use external secrets reference
+        // TODO use external secrets reference CRDS in K8
+        const resolveSecret = new ResolveSecret(this, "ResolveMongoPassword", { secret: mongoPassword })
         cluster.addCdk8sChart("Mongo", new MongoChart(new cdk8s.App(), "MongoChart", {
-            password: mongoPassword.secretValue.toString()
+            password: resolveSecret.response
         }))
     }
 }
