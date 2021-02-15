@@ -43,6 +43,7 @@ export class KubernetesStack extends LegendApplicationStack {
       vpcSubnets: [{ subnetType: ec2.SubnetType.PRIVATE }],
       version: eks.KubernetesVersion.V1_18,
       placeClusterHandlerInVpc: true,
+
     })
     // TODO parameterize (somewhere) used just for debugging
     eksCluster.awsAuth.addMastersRole(iam.Role.fromRoleArn(this, "SuperAdmin", `arn:aws:iam::${this.account}:role/Administration`))
