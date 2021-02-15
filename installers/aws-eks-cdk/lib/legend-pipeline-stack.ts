@@ -3,7 +3,7 @@ import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
 import * as lambda from '@aws-cdk/aws-lambda';
 import cdk = require('@aws-cdk/core');
 import { CodeBuildAction, GitHubSourceAction, GitHubTrigger } from '@aws-cdk/aws-codepipeline-actions';
-import {CfnParameter, Construct, SecretValue, Stack, StackProps} from '@aws-cdk/core';
+import { Construct, SecretValue, Stack, StackProps } from '@aws-cdk/core';
 import {CdkPipeline} from "./override/pipelines/lib/pipeline";
 import {LegendInfrastructureStage} from "./legend-infrastructure-stage";
 import {DockerBuildProject} from "./constructs/docker-build-project";
@@ -56,6 +56,15 @@ export class LegendPipelineStack extends Stack {
             oauthToken: githubSecret,
             owner: 'hagerupe',
             repo: 'legend-sdlc',
+            trigger: GitHubTrigger.POLL
+        }))
+
+        pipeline.codePipeline.stage('Source').addAction(new GitHubSourceAction({
+            actionName: 'LegendStudio',
+            output: sdlcSource,
+            oauthToken: githubSecret,
+            owner: 'hagerupe',
+            repo: 'legend-studio',
             trigger: GitHubTrigger.POLL
         }))
 
