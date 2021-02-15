@@ -64,7 +64,7 @@ export class LegendPipelineStack extends Stack {
 
         const engineImageDetails = new codepipeline.Artifact();
         const engineRepositoryName = 'legend-engine'
-        const legendEngineProject = new DockerBuildProject(this, 'LegendEngine', {
+        /*const legendEngineProject = new DockerBuildProject(this, 'LegendEngine', {
             preBuildCommands: [
                 'mvn install',
                 'cd legend-engine-server',
@@ -76,7 +76,7 @@ export class LegendPipelineStack extends Stack {
             input: engineSource,
             project: legendEngineProject.project,
             outputs: [ engineImageDetails ]
-        }))
+        }))*/
 
         // TODO this build is broken in mainline
         /*const sdlcImageDetails = new codepipeline.Artifact();
@@ -107,11 +107,18 @@ export class LegendPipelineStack extends Stack {
             outputs: [ gitlabImageDetails ]
         }))
 
-
         const repositoryNames = [gitlabRepositoryName, engineRepositoryName]
         pipeline.addApplicationStage(new LegendInfrastructureStage(this, "PreProd", {
             env: { account: this.account, region: this.region },
             repositoryNames: repositoryNames,
-        })).addManualApprovalAction()
+        }), {
+            parameterOverrides: {
+                GitlabArtifactBucketName: gitlabImageDetails.bucketName,
+                GitlabArtifactObjectKey: gitlabImageDetails.objectKey,
+            },
+            extraInputs: [
+                gitlabImageDetails
+            ]
+        }).addManualApprovalAction()
     }
 }

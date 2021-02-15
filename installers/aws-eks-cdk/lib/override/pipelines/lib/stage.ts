@@ -102,7 +102,7 @@ export class CdkStage extends CoreConstruct {
 
       // These don't have a dependency on each other, so can all be added in parallel
       for (const stack of stacks) {
-        this.addStackArtifactDeployment(stack, { runOrder, executeRunOrder });
+        this.addStackArtifactDeployment(stack, { runOrder, executeRunOrder, parameterOverrides: options.parameterOverrides, extraInputs: options.extraInputs });
       }
     }
   }
@@ -122,6 +122,8 @@ export class CdkStage extends CoreConstruct {
       prepareRunOrder: runOrder,
       executeRunOrder,
       stackArtifact,
+      parameterOverrides: options.parameterOverrides,
+      extraInputs: options.extraInputs,
     });
 
     this.advanceRunOrderPast(runOrder);
@@ -196,7 +198,7 @@ export class CdkStage extends CoreConstruct {
     if (this._prepared) { return; }
     this._prepared = true;
 
-    for (const { prepareRunOrder, stackArtifact, executeRunOrder } of this.stacksToDeploy) {
+    for (const { prepareRunOrder, stackArtifact, executeRunOrder, parameterOverrides, extraInputs } of this.stacksToDeploy) {
       const artifact = this.host.stackOutputArtifact(stackArtifact.id);
 
       this.pipelineStage.addAction(DeployCdkStackAction.fromStackArtifact(this, stackArtifact, {
@@ -206,6 +208,8 @@ export class CdkStage extends CoreConstruct {
         outputFileName: artifact ? 'outputs.json' : undefined,
         prepareRunOrder,
         executeRunOrder,
+        parameterOverrides,
+        extraInputs,
       }));
     }
   }
@@ -284,6 +288,12 @@ export interface AddStackOptions {
    * @default - runOrder + 1
    */
   readonly executeRunOrder?: number;
+
+  readonly parameterOverrides?: {
+    [name: string]: any;
+  };
+
+  readonly extraInputs?: codepipeline.Artifact[];
 }
 
 /**
@@ -381,6 +391,12 @@ export interface AddStageOptions {
    * @default 0
    */
   readonly extraRunOrderSpace?: number;
+
+  readonly parameterOverrides?: {
+    [name: string]: any;
+  };
+
+  readonly extraInputs?: codepipeline.Artifact[];
 }
 
 /**
@@ -409,4 +425,8 @@ interface DeployStackCommand {
   prepareRunOrder: number;
   executeRunOrder: number;
   stackArtifact: cxapi.CloudFormationStackArtifact;
+  readonly parameterOverrides?: {
+    [name: string]: any;
+  };
+  readonly extraInputs?: codepipeline.Artifact[];
 }

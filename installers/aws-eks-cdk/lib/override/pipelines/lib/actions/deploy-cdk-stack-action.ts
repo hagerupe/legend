@@ -125,6 +125,12 @@ export interface DeployCdkStackActionProps extends DeployCdkStackActionOptions {
    * @default - No template configuration
    */
   readonly templateConfigurationPath?: string;
+
+  readonly parameterOverrides?: {
+    [name: string]: any;
+  };
+
+  readonly extraInputs?: codepipeline.Artifact[];
 }
 
 /**
@@ -137,6 +143,12 @@ export interface CdkStackActionFromArtifactOptions extends DeployCdkStackActionO
    * @default - Same as stack artifact
    */
   readonly stackName?: string;
+
+  readonly parameterOverrides?: {
+    [name: string]: any;
+  };
+
+  readonly extraInputs?: codepipeline.Artifact[];
 }
 
 /**
@@ -250,6 +262,8 @@ export class DeployCdkStackAction implements codepipeline.IAction {
       region: props.region,
       cfnCapabilities: [CfnCapabilities.NAMED_IAM, CfnCapabilities.AUTO_EXPAND],
       templateConfiguration: props.templateConfigurationPath ? props.cloudAssemblyInput.atPath(props.templateConfigurationPath) : undefined,
+      parameterOverrides: props.parameterOverrides,
+      extraInputs: props.extraInputs,
     });
     this.executeChangeSetAction = new cpactions.CloudFormationExecuteChangeSetAction({
       actionName: `${baseActionName}.Deploy`,
