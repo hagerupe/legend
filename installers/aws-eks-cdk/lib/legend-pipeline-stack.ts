@@ -18,6 +18,7 @@ export class LegendPipelineStack extends Stack {
         const legendSource = new codepipeline.Artifact();
         const engineSource = new codepipeline.Artifact();
         const sdlcSource = new codepipeline.Artifact();
+        const studioSource = new codepipeline.Artifact();
         const cloudAssemblyArtifact = new codepipeline.Artifact();
 
         const githubSecret = SecretValue.secretsManager('GitHub') // TODO rename this secret
@@ -61,7 +62,7 @@ export class LegendPipelineStack extends Stack {
 
         pipeline.codePipeline.stage('Source').addAction(new GitHubSourceAction({
             actionName: 'LegendStudio',
-            output: sdlcSource,
+            output: studioSource,
             oauthToken: githubSecret,
             owner: 'hagerupe',
             repo: 'legend-studio',
@@ -112,6 +113,8 @@ export class LegendPipelineStack extends Stack {
             extraInputs: [
                 gitlabImageDetails,
                 engineImageDetails,
+                studioSource,
+                sdlcSource,
             ]
         }
 
@@ -128,7 +131,7 @@ export class LegendPipelineStack extends Stack {
 
         const resolveFunction = new lambda.SingletonFunction(this, 'ResolveSecret', {
             functionName: 'ResolveSecret',
-            uuid: 'def1918a-6fbb-11eb-9439-0242ac130002',
+            uuid: 'def1918a-6fbb-11eb-9439-0242ac130002l',
             code: new lambda.InlineCode(fs.readFileSync(path.join('resources', 'handlers', 'resolveSecret', 'index.py'), { encoding: 'utf-8' })),
             handler: 'index.main',
             timeout: cdk.Duration.seconds(300),
