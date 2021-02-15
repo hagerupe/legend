@@ -1,10 +1,16 @@
 import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
-import {CodeBuildAction, GitHubSourceAction, GitHubTrigger} from '@aws-cdk/aws-codepipeline-actions';
-import {CfnOutput, CfnParameter, Construct, SecretValue, Stack, StackProps} from '@aws-cdk/core';
-import {CdkPipeline, SimpleSynthAction} from "@aws-cdk/pipelines";
+import {
+    CloudFormationCreateUpdateStackAction,
+    CodeBuildAction,
+    GitHubSourceAction,
+    GitHubTrigger
+} from '@aws-cdk/aws-codepipeline-actions';
+import {CfnParameter, Construct, SecretValue, Stack, StackProps} from '@aws-cdk/core';
+import {CdkPipeline} from "./override/pipeline";
 import {LegendInfrastructureStage} from "./legend-infrastructure-stage";
 import {DockerBuildProject} from "./constructs/docker-build-project";
+import {SimpleSynthAction} from "./override/synths";
 
 export class LegendPipelineStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
@@ -101,20 +107,16 @@ export class LegendPipelineStack extends Stack {
             outputs: [ gitlabImageDetails ]
         }))
 
-        const repositoryNames = [gitlabRepositoryName, engineRepositoryName]
 
+        const repositoryNames = [gitlabRepositoryName, engineRepositoryName]
         pipeline.addApplicationStage(new LegendInfrastructureStage(this, "PreProd", {
             env: { account: this.account, region: this.region },
             repositoryNames: repositoryNames,
-            artifactBucketName: new CfnParameter(this, "ArtifactBucketName", { default: gitlabImageDetails.bucketName }),
-            artifactObjectKey: new CfnParameter(this, "ArtifactBucketObjectKey", { default: gitlabImageDetails.objectKey })
-        })).addManualApprovalAction()
-
-        /*pipeline.addApplicationStage(new LegendInfrastructureStage(this, "Prod", {
-            env: { account: this.account, region: this.region },
-            repositoryNames: repositoryNames,
-            gitlabContainerArtifact: gitlabImageDetails,
-            artifactEncryptionKey: pipeline.codePipeline.artifactBucket.encryptionKey
-        }))*/
+        }), {
+            parameterOverrides: {
+                GitlabArtifactBucketName: gitlabImageDetails.bucketName,
+                GitlabArtifactObjectKey: gitlabImageDetails.objectKey,
+            }
+        }).addManualApprovalAction()
     }
 }

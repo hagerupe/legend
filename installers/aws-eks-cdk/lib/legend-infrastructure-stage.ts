@@ -9,9 +9,7 @@ import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as kms from '@aws-cdk/aws-kms';
 
 export interface LegendInfrastructureStageProps extends StageProps {
-    repositoryNames: string[]
-    artifactBucketName: CfnParameter
-    artifactObjectKey: CfnParameter
+    repositoryNames: string[],
 }
 
 export class LegendInfrastructureStage extends Stage {
@@ -30,19 +28,15 @@ export class LegendInfrastructureStage extends Stage {
         })
         mongo.addDependency(kubernetes)
 
-
-
         // Gitlab CE TODO there's some config needed here.
         const gitlab = new GitlabStack(this, "Gitlab", {
             clusterName: kubernetes.clusterName.value,
             kubectlRoleArn: kubernetes.kubectlRoleArn.value,
-            artifactBucketName: props.artifactBucketName,
-            artifactObjectKey: props.artifactObjectKey,
         })
         gitlab.addDependency(kubernetes)
 
         // Legend Engine
-        const engine = new LegendEngineStack(this, "Engine", {
+        /*const engine = new LegendEngineStack(this, "Engine", {
             clusterName: kubernetes.clusterName.value,
             kubectlRoleArn: kubernetes.kubectlRoleArn.value
         })
@@ -63,6 +57,6 @@ export class LegendInfrastructureStage extends Stage {
             kubectlRoleArn: kubernetes.kubectlRoleArn.value
         })
         studio.addDependency(engine)
-        studio.addDependency(sdlc)
+        studio.addDependency(sdlc)*/
     }
 }

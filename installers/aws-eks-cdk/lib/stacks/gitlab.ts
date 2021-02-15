@@ -9,18 +9,19 @@ import {ArtifactImageId} from "../constructs/artifact-image-id";
 export interface GitlabStackProps extends StackProps{
     clusterName: string
     kubectlRoleArn: string
-    artifactBucketName: CfnParameter
-    artifactObjectKey: CfnParameter
 }
 
 export class GitlabStack extends Stack {
     constructor(scope: cdk.Construct, id: string, props: GitlabStackProps) {
         super(scope, id, props);
 
+        const artifactBucketName = new CfnParameter(this, "GitlabArtifactBucketName");
+        const artifactObjectKey = new CfnParameter(this, "GitlabArtifactObjectKey");
+
         const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", props)
         const artifactImageId = new ArtifactImageId(this, 'DemoResource', {
-            artifactBucketName: props.artifactBucketName.toString(),
-            artifactObjectKey: props.artifactObjectKey.toString(),
+            artifactBucketName: artifactBucketName.value.toString(),
+            artifactObjectKey: artifactObjectKey.value.toString(),
         }).response;
         const gitlabPassword = new secretsmanager.Secret(this, "GitlabRootPassword");
         cluster.addCdk8sChart("GitlabCE", new GitlabCeChart(new cdk8s.App(), "GitlabCEChart", {
