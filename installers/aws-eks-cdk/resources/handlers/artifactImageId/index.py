@@ -20,7 +20,7 @@ def main(event, context):
 
     # Retrieve artifact image details
     s3 = boto3.client('s3')
-    s3.download_file(object, key, '/tmp/artifact.zip')
+    s3.download_file(bucket, key, '/tmp/artifact.zip')
     with zipfile.ZipFile('/tmp/artifact.zip', 'r') as zip_ref:
       zip_ref.extractall('/tmp/artifacts')
     with open('/tmp/artifacts/imageDetail.json') as f:

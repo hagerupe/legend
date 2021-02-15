@@ -2,13 +2,8 @@ import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
 import * as lambda from '@aws-cdk/aws-lambda';
 import cdk = require('@aws-cdk/core');
-import {
-    CloudFormationCreateUpdateStackAction,
-    CodeBuildAction,
-    GitHubSourceAction,
-    GitHubTrigger
-} from '@aws-cdk/aws-codepipeline-actions';
-import {CfnParameter, Construct, SecretValue, Stack, StackProps} from '@aws-cdk/core';
+import { CodeBuildAction, GitHubSourceAction, GitHubTrigger } from '@aws-cdk/aws-codepipeline-actions';
+import {Construct, SecretValue, Stack, StackProps} from '@aws-cdk/core';
 import {CdkPipeline} from "./override/pipelines/lib/pipeline";
 import {LegendInfrastructureStage} from "./legend-infrastructure-stage";
 import {DockerBuildProject} from "./constructs/docker-build-project";
