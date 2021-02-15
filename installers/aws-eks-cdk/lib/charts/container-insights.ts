@@ -18,6 +18,7 @@ export class ContainerInsightsChart extends cdk8s.Chart {
 
         const namespace = new Namespace(this, 'amazon-cloudwatch', {
             metadata: {
+                name: 'amazon-cloudwatch',
                 labels: {
                     name: 'amazon-cloudwatch'
                 }
@@ -25,6 +26,7 @@ export class ContainerInsightsChart extends cdk8s.Chart {
         })
         const serviceAccount = new ServiceAccount(this, "cloudwatch-agent-service-account", {
             metadata: {
+                name: 'cloudwatch-agent',
                 namespace: namespace.name
             }
         })
@@ -74,10 +76,15 @@ export class ContainerInsightsChart extends cdk8s.Chart {
                     namespace: namespace.name
                 }
             ],
-            roleRef: clusterRole
+            roleRef: {
+                kind: clusterRole.kind,
+                name: clusterRole.name,
+                apiGroup: clusterRole.apiGroup,
+            }
         })
         const cwAgentConfig = new ConfigMap(this, 'cwagentconfig', {
             metadata: {
+                name: 'cwagentconfig',
                 namespace: namespace.name
             },
             data: {
@@ -88,6 +95,7 @@ export class ContainerInsightsChart extends cdk8s.Chart {
         })
         const cloudwatchAgent = new DaemonSet(this, "cloudwatch-agent", {
             metadata: {
+                name: 'cloudwatch-agent',
                 namespace: namespace.name
             },
             spec: {
@@ -226,6 +234,7 @@ export class ContainerInsightsChart extends cdk8s.Chart {
         })
         const fluentBitClusterInfo = new ConfigMap(this, 'fluent-bit-cluster-info', {
             metadata: {
+                name: 'fluent-bit-cluster-info',
                 namespace: namespace.name
             },
             data: {
@@ -263,7 +272,11 @@ export class ContainerInsightsChart extends cdk8s.Chart {
             metadata: {
                 name: 'fluent-bit-role-binding'
             },
-            roleRef: fluentBitRole,
+            roleRef: {
+                kind: fluentBitRole.kind,
+                name: fluentBitRole.name,
+                apiGroup: fluentBitRole.apiGroup,
+            },
             subjects: [
                 {
                     kind: 'ServiceAccount',
