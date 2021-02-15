@@ -6,6 +6,9 @@ import {EksAwsIngressController} from "../constructs/eks-aws-ingress-controller"
 import {CfnOutput, StackProps} from "@aws-cdk/core";
 import * as ecr from "@aws-cdk/aws-ecr";
 import {LegendApplicationStack} from "./legend-application-stack";
+import * as fs from "fs";
+import * as path from "path";
+import * as yaml from 'js-yaml';
 
 export interface KubernetesStackProperties extends StackProps{
   repositoryNames: string[];
@@ -50,6 +53,16 @@ export class KubernetesStack extends LegendApplicationStack {
       cluster: eksCluster,
       vpc: vpc
     })
+
+    // Container Insights
+    const containerInsightsManaifestRaw = fs.readFileSync(path.join('resources', 'container-insights.yaml'), {encoding: 'utf8'})
+        .replace("{{cluster_name}}", eksCluster.clusterName)
+        .replace("{{region_name}}", this.region)
+        .replace("{{http_server_toggle}}", "On")
+        .replace("{{http_server_port}}", "200")
+        .replace("{{read_from_head}}", "Off")
+        .replace("{{read_from_tail}}", "On")
+    eksCluster.addManifest("ContainerInsights", yaml.loadAll(containerInsightsManaifestRaw))
 
     this.clusterName = new CfnOutput(this, 'ClusterName', { value: eksCluster.clusterName })
     if (eksCluster.kubectlRole !== undefined) {
