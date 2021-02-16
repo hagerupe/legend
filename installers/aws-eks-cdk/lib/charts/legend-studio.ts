@@ -64,7 +64,6 @@ export class LegendStudioChart extends cdk8s.Chart {
                             {
                                 name: 'legend-studio',
                                 image: props.imageId,
-                                command: [ "/bin/sh", "-c", "ls /etc/config/" ],
                                 volumeMounts: [
                                     {
                                         name: 'configurations',
@@ -82,6 +81,10 @@ export class LegendStudioChart extends cdk8s.Chart {
                                         {
                                             key: 'httpConfig.json',
                                             path: 'httpConfig.json'
+                                        },
+                                        {
+                                            key: 'uiConfig.json',
+                                            path: 'uiConfig.json'
                                         }
                                     ]
                                 }
@@ -91,7 +94,8 @@ export class LegendStudioChart extends cdk8s.Chart {
                 }
             }
         })
-        /*new k8s.Service(this, "LegendStudioService", {
+
+        new k8s.Service(this, "LegendStudioService", {
             metadata: {
                 name: service,
             },
@@ -103,10 +107,11 @@ export class LegendStudioChart extends cdk8s.Chart {
                         protocol: 'TCP'
                     },
                 ],
+                type: 'NodePort',
                 selector: {
                     app: app
                 }
             },
-        })*/
+        })
     }
 }
