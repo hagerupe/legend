@@ -1,9 +1,10 @@
 import * as cdk from '@aws-cdk/core';
+import {CfnOutput, StackProps} from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as iam from '@aws-cdk/aws-iam';
 import * as eks from '@aws-cdk/aws-eks';
+import {DefaultCapacityType} from '@aws-cdk/aws-eks';
 import {EksAwsIngressController} from "../constructs/eks-aws-ingress-controller";
-import {CfnOutput, StackProps} from "@aws-cdk/core";
 import * as ecr from "@aws-cdk/aws-ecr";
 import {LegendApplicationStack} from "./legend-application-stack";
 import {ContainerInsights} from "../constructs/container-insights";
@@ -40,12 +41,18 @@ export class KubernetesStack extends LegendApplicationStack {
       vpcSubnets: [{ subnetType: ec2.SubnetType.PRIVATE }],
       version: eks.KubernetesVersion.V1_18,
       placeClusterHandlerInVpc: true,
+      defaultCapacity: 0,
     })
+    const nodeGroup = cluster.addNodegroupCapacity('custom-node-group', {
+      instanceTypes: [new ec2.InstanceType('m5.large')],
+      minSize: 3,
+      diskSize: 100,
+      amiType: eks.NodegroupAmiType.AL2_X86_64,
+    });
 
-    if (cluster.defaultCapacity?.role !== undefined) {
-      cluster.defaultCapacity.role.addManagedPolicy(iam.ManagedPolicy.fromManagedPolicyArn(this,
-          "CloudWatchAgentServerPolicy", "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"))
-    }
+    // TODO move to container insight construct
+    nodeGroup.role.addManagedPolicy(iam.ManagedPolicy.fromManagedPolicyArn(this,
+        "CloudWatchAgentServerPolicy", "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"))
 
     // TODO parameterize (somewhere) used just for debugging
     cluster.awsAuth.addMastersRole(iam.Role.fromRoleArn(this, "SuperAdmin", `arn:aws:iam::${this.account}:role/Administration`))
