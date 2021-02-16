@@ -41,7 +41,9 @@ aws secretsmanager create-secret --name dockerhub-credentials --secret-string '{
     - A domain name may either be registered via Route53, or an existing domains nameservers can be pointed to a new HostedZone.
     - Store the zone name (e.g. foobar.com) in parameter store:
     
-    `aws ssm put-parameter --type String --name legend-domain-name --value <<zone-name>>`
+    `aws ssm put-parameter --type String --name legend-zone-name --value <<zone-name>>`
+    
+    `aws ssm put-parameter --type String --name legend-hosted-zone-id --value <<zone-id>>`
 
 1. **Set master role that will be used for viewing cluster details in the AWS console**
 

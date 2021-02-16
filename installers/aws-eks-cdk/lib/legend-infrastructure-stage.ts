@@ -14,24 +14,28 @@ export class LegendInfrastructureStage extends Stage {
 
         // Base networking and Kubernetes infrastructure
         const kubernetes = new KubernetesStack(this, "Kubernetes", {
-            repositoryNames: props.repositoryNames
+            repositoryNames: props.repositoryNames,
+            env: props.env
         })
 
         const mongo = new MongoStack(this, "Mongo", {
             clusterName: kubernetes.clusterName.value,
-            kubectlRoleArn: kubernetes.kubectlRoleArn.value
+            kubectlRoleArn: kubernetes.kubectlRoleArn.value,
+            env: props.env
         })
         mongo.addDependency(kubernetes)
 
         const gitlab = new GitlabStack(this, "Gitlab", {
             clusterName: kubernetes.clusterName.value,
             kubectlRoleArn: kubernetes.kubectlRoleArn.value,
+            env: props.env
         })
         gitlab.addDependency(kubernetes)
 
         const engine = new LegendEngineStack(this, "Engine", {
             clusterName: kubernetes.clusterName.value,
-            kubectlRoleArn: kubernetes.kubectlRoleArn.value
+            kubectlRoleArn: kubernetes.kubectlRoleArn.value,
+            env: props.env
         })
         engine.addDependency(gitlab)
     }

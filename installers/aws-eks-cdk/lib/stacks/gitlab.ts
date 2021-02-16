@@ -21,8 +21,14 @@ export class GitlabStack extends LegendApplicationStack {
         super(scope, id, props);
 
         const legendZoneName = ssm.StringParameter.valueForStringParameter(
-            this, 'legend-domain-name');
-        const hostedZone = route53.HostedZone.fromLookup(this, "HostedZone", { domainName: legendZoneName })
+            this, 'legend-zone-name');
+        const legendHostedZoneId = ssm.StringParameter.valueForStringParameter(
+            this, 'legend-hosted-zone-id');
+
+        const hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, "HostedZone", {
+            zoneName: legendZoneName,
+            hostedZoneId: legendHostedZoneId,
+        })
         const certificate = new certificatemanager.DnsValidatedCertificate(this, "GitlabCert", {
             hostedZone: hostedZone,
             domainName: `gitlab.${legendZoneName}`,
