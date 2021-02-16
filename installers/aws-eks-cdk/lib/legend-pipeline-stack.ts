@@ -158,7 +158,7 @@ export class LegendPipelineStack extends Stack {
         const artifactImageIdFunction = new lambda.SingletonFunction(this, 'ArtifactImageId', {
             functionName: 'ArtifactImageId',
             uuid: 'f7d4f730-4ee1-11e8-9c2d-fa7ae01bbebc',
-            code: new lambda.InlineCode(fs.readFileSync(path.join('resources', 'handlers', 'artifactImageId', 'index.py'), { encoding: 'utf-8' })),
+            code: new lambda.InlineCode(fs.readFileSync(path.join('lib', 'handlers', 'artifactImageId', 'index.py'), { encoding: 'utf-8' })),
             handler: 'index.main',
             timeout: cdk.Duration.seconds(300),
             runtime: lambda.Runtime.PYTHON_3_6,
@@ -169,7 +169,7 @@ export class LegendPipelineStack extends Stack {
         const resolveFunction = new lambda.SingletonFunction(this, 'ResolveSecret', {
             functionName: 'ResolveSecret',
             uuid: 'def1918a-6fbb-11eb-9439-0242ac130002l',
-            code: new lambda.InlineCode(fs.readFileSync(path.join('resources', 'handlers', 'resolveSecret', 'index.py'), { encoding: 'utf-8' })),
+            code: new lambda.InlineCode(fs.readFileSync(path.join('lib', 'handlers', 'resolveSecret', 'index.py'), { encoding: 'utf-8' })),
             handler: 'index.main',
             timeout: cdk.Duration.seconds(300),
             runtime: lambda.Runtime.PYTHON_3_6,
