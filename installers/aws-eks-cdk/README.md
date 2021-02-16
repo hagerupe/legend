@@ -1,64 +1,73 @@
+## Getting Started
+
 1. **Create AWS account if one is not yet available**
-
-https://portal.aws.amazon.com/billing/signup
-
+    - Refer to: https://portal.aws.amazon.com/billing/signup
 1. **Create IAM user**
-
-* Navigate to: https://console.aws.amazon.com/iam/home?region=us-east-1#/users
-
-* Add user and enable 'Programitic Access'
-
-* On the next page attach an existing policy of `AdministratorAccess`
-
-* Create the user and make note of the `access key id` and `secret access key`
-
+    - Navigate to: https://console.aws.amazon.com/iam/home?region=us-east-1#/users
+    - Add user and enable `Programatic Access`
+    - On the next page attach an existing policy of `AdministratorAccess`
+    - Create the user and make note of the `access key id` and `secret access key`
 1. **Install and configure AWS CLI**
-
-https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html
-
-From the terminal run `aws configure` and set the `access key` and `secret access key` from the IAM user setup.  Set the region to `us-east-1`
-
-Verify by running `aws sts get-caller-identity`, it should return the ARN of the configured user
+    - Reference: https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html
+    - From the terminal run `aws configure`
+        - Set the `access key` and `secret access key` from the IAM user setup.  
+        - Set the region to `us-east-1`
+    - Verify by running `aws sts get-caller-identity`, it should return the ARN of the configured user
 
 1. **Install NPM**
-
-1. **Install CDK**
-
+    - Refer to: https://nodejs.org/en/download/package-manager/
+1. **Install CDK/CDK8S**
+    - Execute `npm install cdk cdk8s -g`
 1. **Create github secret**
+    - The github token allows the pipeline to trigger on new commits.
+    - The required permission is `Repo`.  
+    - Refer to: https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token
+    - Store the access token in secrets manager (replace values): 
+    
+    `aws secretsmanager create-secret --name github-access-token --secret-string <<access-token>>`
 
 aws secretsmanager create-secret --name github-access-token --secret-string <<access-token>>
 
 1. **Create dockerhub secret**
+    - The addresses used by CodeBuild are recycled, as such the anonymous access limits for dockerhub are often encountered during builds.
+    - Create an access token, refer to: https://docs.docker.com/docker-hub/access-tokens/
+    - Store the access token in secrets manager (replace values):
+
+    `aws secretsmanager create-secret --name dockerhub-credentials --secret-string '{  "Username": "<<username>>", "Password": "<<access-token>>" }'`
 
 aws secretsmanager create-secret --name dockerhub-credentials --secret-string '{  "Username": "<<username>>"," Password": "<<access-token>>" }'
 
 1. **Create Route53 hosted zone for existing / new domain**
+    - A domain name may either be registered via Route53, or an existing domains nameservers can be pointed to a new HostedZone.
+    - Store the zone name (e.g. foobar.com) in parameter store:
+    
+    `aws ssm put-parameter --type String --name legend-zone-name --value <<zone-name>>`
 
 1. **Create CDK Bootstrap Environment:**
 
-Execute `cdk bootstrap --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess`
+    - Execute `cdk bootstrap --cloudformation-execution-policies arn:aws:iam::aws:policy/AdministratorAccess`
 
 1. **Synthesize and Deploy Legend Pipeline:** 
 
-`cdk synth && cdk deploy`
+    - Execute: `cdk synth && cdk deploy`
 
-1. **Sign into the aws console and navigate to .... this will take a couple hours, because you know, EKS...**
+1. **Monitor Deployment**
+    - Navigate to: https://console.aws.amazon.com/codesuite/codepipeline/pipelines/Legend/view?region=us-east-1
+    - Setup will take approximately 60 minutes
 
-https://console.aws.amazon.com/codesuite/codepipeline/pipelines/Legend/view?region=us-east-1
+## Debug Utilities:
 
-----
+- Setup kubectl for EKS: `aws eks update-kubeconfig --name <<cluster-name>>`
 
-### TODOs:
-
-Make dockerhub secret optional
+## TODOs:
 
 Setup container insights
 
 Add documentation on running kubectl / installing etc
 
-LegendSDLC build fails
+LegendSDLC build fails - need to disable docker integ test stuff
 
-No container for LegendStudio yet?
+LegendStudio build fails - Add profile for legend-studio to disable git commit plugin 
 
 Make Gitlab durable
 
@@ -68,10 +77,4 @@ Switch mongo LB to be internal instead of external
 
 Dashboards! (Woot)
 
-Health checks?
-
-Add profile for legend-studio to disable git commit plugin
-
-### Commands:
-
-aws eks update-kubeconfig --name LegendClusterA6751FE1-01bd21f5cf2d4292beef14b4d338375d
+Health checks? Scaling, etc...

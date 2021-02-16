@@ -1,9 +1,8 @@
 import {Construct, Stack} from "@aws-cdk/core";
 import * as fs from "fs";
 import * as path from "path";
-import * as eks from '@aws-cdk/aws-eks'
+import * as eks from '@aws-cdk/aws-eks';
 import * as ec2 from '@aws-cdk/aws-ec2'
-import * as yaml from 'js-yaml';
 import * as iam from "@aws-cdk/aws-iam";
 
 export interface AlbIngressControllerProps {

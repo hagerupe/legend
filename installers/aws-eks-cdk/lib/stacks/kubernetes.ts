@@ -8,6 +8,8 @@ import * as ecr from "@aws-cdk/aws-ecr";
 import {LegendApplicationStack} from "./legend-application-stack";
 import * as cdk8s from "cdk8s";
 import {FluentBitChart} from "../charts/fluent-bit";
+import {ClusterResource} from "@aws-cdk/aws-eks/lib/cluster-resource";
+import {ContainerInsights} from "../constructs/container-insights";
 
 export interface KubernetesStackProperties extends StackProps{
   repositoryNames: string[];
@@ -36,7 +38,7 @@ export class KubernetesStack extends LegendApplicationStack {
       repository.grantPull(this.clusterRole)
     }
 
-    const cluster = new eks.FargateCluster(this, "LegendCluster", {
+    const cluster = new eks.Cluster(this, "LegendCluster", {
       role: this.clusterRole,
       vpc: vpc,
       vpcSubnets: [{ subnetType: ec2.SubnetType.PRIVATE }],
@@ -53,10 +55,7 @@ export class KubernetesStack extends LegendApplicationStack {
     // Note: does not work with Fargate since it uses a sidecar daemonset on the nodes
     // Worth considering instead: https://aws.amazon.com/blogs/containers/fluent-bit-for-amazon-eks-on-aws-fargate-is-here/
     // https://github.com/aws/containers-roadmap/issues/971
-    // new ContainerInsights(this, "ContainerInsights", { cluster })
-
-    // Details: https://aws.amazon.com/blogs/containers/fluent-bit-for-amazon-eks-on-aws-fargate-is-here/
-    cluster.addCdk8sChart("FluentBit", new FluentBitChart(new cdk8s.App(), "FluentBitChart", { }))
+    new ContainerInsights(this, "ContainerInsights", { cluster })
 
     this.clusterName = new CfnOutput(this, 'ClusterName', { value: cluster.clusterName })
     if (cluster.kubectlRole !== undefined) {
