@@ -66,6 +66,8 @@ Dashboards! (Woot)
 
 Health checks?
 
+Add profile for legend-studio to disable git commit plugin
+
 ### Commands:
 
 aws eks update-kubeconfig --name LegendClusterA6751FE1-01bd21f5cf2d4292beef14b4d338375d
