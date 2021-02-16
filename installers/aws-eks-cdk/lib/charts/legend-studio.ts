@@ -67,7 +67,7 @@ export class LegendStudioChart extends cdk8s.Chart {
                                 volumeMounts: [
                                     {
                                         name: 'configurations',
-                                        mountPath: '/etc/config'
+                                        mountPath: '/config'
                                     }
                                 ]
                             }
