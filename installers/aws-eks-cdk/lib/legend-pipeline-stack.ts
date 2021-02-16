@@ -102,7 +102,38 @@ export class LegendPipelineStack extends Stack {
             outputs: [ gitlabImageDetails ]
         }))
 
-        const repositoryNames = [gitlabRepositoryName, engineRepositoryName]
+        const studioImageDetails = new codepipeline.Artifact();
+        const studioRepositoryName = 'legend-studio';
+        const studioProject = new DockerBuildProject(this, 'LegendStudio', {
+            preBuildCommands: [
+                'mvn install'
+            ],
+            repositoryName: studioRepositoryName
+        })
+        runtimeBuildStage.addActions(new CodeBuildAction({
+            actionName: 'Legend_Studio',
+            input: studioSource,
+            project: studioProject.project,
+            outputs: [ studioImageDetails ]
+        }))
+
+        const sdlcImageDetails = new codepipeline.Artifact();
+        const sdlcRepositoryName = 'legend-sdlc';
+        const sdlcProject = new DockerBuildProject(this, 'LegendSDLC', {
+            preBuildCommands: [
+                'cd legend-sdlc-server',
+                'mvn install'
+            ],
+            repositoryName: sdlcRepositoryName
+        })
+        runtimeBuildStage.addActions(new CodeBuildAction({
+            actionName: 'Legend_SDLC',
+            input: sdlcSource,
+            project: sdlcProject.project,
+            outputs: [ sdlcImageDetails ]
+        }))
+        
+        const repositoryNames = [gitlabRepositoryName, engineRepositoryName, studioRepositoryName]
         const appStageOptions = {
             parameterOverrides: {
                 GitlabArtifactBucketName: gitlabImageDetails.bucketName,
@@ -113,8 +144,8 @@ export class LegendPipelineStack extends Stack {
             extraInputs: [
                 gitlabImageDetails,
                 engineImageDetails,
-                studioSource,
-                sdlcSource,
+                studioImageDetails,
+                sdlcImageDetails,
             ]
         }
 
