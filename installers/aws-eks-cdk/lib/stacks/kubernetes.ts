@@ -6,9 +6,6 @@ import {EksAwsIngressController} from "../constructs/eks-aws-ingress-controller"
 import {CfnOutput, StackProps} from "@aws-cdk/core";
 import * as ecr from "@aws-cdk/aws-ecr";
 import {LegendApplicationStack} from "./legend-application-stack";
-import * as cdk8s from "cdk8s";
-import {FluentBitChart} from "../charts/fluent-bit";
-import {ClusterResource} from "@aws-cdk/aws-eks/lib/cluster-resource";
 import {ContainerInsights} from "../constructs/container-insights";
 
 export interface KubernetesStackProperties extends StackProps{
@@ -28,8 +25,7 @@ export class KubernetesStack extends LegendApplicationStack {
 
     this.clusterRole = new iam.Role(this, "LegendClusterRole", {
       assumedBy: new iam.ServicePrincipal("eks"),
-      managedPolicies: [iam.ManagedPolicy.fromManagedPolicyArn(this, "AmazonEKSClusterPolicy", "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"),
-                        iam.ManagedPolicy.fromManagedPolicyArn(this, "CloudWatchAgentServerPolicy", "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy")]
+      managedPolicies: [iam.ManagedPolicy.fromManagedPolicyArn(this, "AmazonEKSClusterPolicy", "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy")]
     })
 
     // Grant EKS permissions to image repositories
@@ -45,6 +41,11 @@ export class KubernetesStack extends LegendApplicationStack {
       version: eks.KubernetesVersion.V1_18,
       placeClusterHandlerInVpc: true,
     })
+
+    if (cluster.defaultCapacity?.role !== undefined) {
+      cluster.defaultCapacity.role.addManagedPolicy(iam.ManagedPolicy.fromManagedPolicyArn(this,
+          "CloudWatchAgentServerPolicy", "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"))
+    }
 
     // TODO parameterize (somewhere) used just for debugging
     cluster.awsAuth.addMastersRole(iam.Role.fromRoleArn(this, "SuperAdmin", `arn:aws:iam::${this.account}:role/Administration`))

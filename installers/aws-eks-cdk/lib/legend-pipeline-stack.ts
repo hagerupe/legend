@@ -4,13 +4,12 @@ import * as lambda from '@aws-cdk/aws-lambda';
 import cdk = require('@aws-cdk/core');
 import { CodeBuildAction, GitHubSourceAction, GitHubTrigger } from '@aws-cdk/aws-codepipeline-actions';
 import { Construct, SecretValue, Stack, StackProps } from '@aws-cdk/core';
-import {CdkPipeline} from "./override/pipelines/lib/pipeline";
+import {CdkPipeline} from "./override/pipelines/lib";
 import {LegendInfrastructureStage} from "./legend-infrastructure-stage";
 import {DockerBuildProject} from "./constructs/docker-build-project";
 import {SimpleSynthAction} from "./override/pipelines/lib/synths";
 import * as path from "path";
 import * as fs from "fs";
-import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
 
 export class LegendPipelineStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
@@ -175,12 +174,11 @@ export class LegendPipelineStack extends Stack {
             repositoryNames: repositoryNames,
         }), appStageOptions)
 
-        /*pipeline.addApplicationStage(new LegendInfrastructureStage(this, "Prod", {
+        // TODO manaual sign off stage
+
+        pipeline.addApplicationStage(new LegendInfrastructureStage(this, "Prod", {
             env: { account: this.account, region: this.region },
             repositoryNames: repositoryNames,
-        }), {
-            manualApprovals: true,
-            ...appStageOptions
-        })*/
+        }), appStageOptions)
     }
 }

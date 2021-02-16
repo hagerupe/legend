@@ -75,7 +75,7 @@ export class ContainerInsightsChart extends cdk8s.Chart {
             subjects: [
                 {
                     kind: 'ServiceAccount',
-                    name: clusterRole.name,
+                    name: serviceAccount.name,
                     namespace: namespace.name
                 }
             ],
