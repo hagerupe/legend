@@ -12,14 +12,6 @@ export class ContainerInsights extends Construct {
     constructor(scope: Construct, id: string, props: ContainerInsightsProps) {
         super(scope, id);
 
-        props.cluster.addFargateProfile("CloudwatchProfile", {
-            selectors: [
-                {
-                    namespace: 'amazon-cloudwatch',
-                }
-            ]
-        })
-
         props.cluster.addCdk8sChart("ContainerInsights", new ContainerInsightsChart(new cdk8s.App(), "ContainerInsightsChart", {
             clusterName: props.cluster.clusterName,
             clusterRegion: Stack.of(this).region

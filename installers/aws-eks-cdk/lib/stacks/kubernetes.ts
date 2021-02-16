@@ -7,6 +7,7 @@ import {CfnOutput, StackProps} from "@aws-cdk/core";
 import * as ecr from "@aws-cdk/aws-ecr";
 import {LegendApplicationStack} from "./legend-application-stack";
 import {ContainerInsights} from "../constructs/container-insights";
+import {CapacityType} from "@aws-cdk/aws-eks";
 
 export interface KubernetesStackProperties extends StackProps{
   repositoryNames: string[];
@@ -35,14 +36,19 @@ export class KubernetesStack extends LegendApplicationStack {
       repository.grantPull(this.clusterRole)
     }
 
-    const cluster = new eks.FargateCluster(this, "LegendCluster", {
+    const cluster = new eks.Cluster(this, "LegendCluster", {
       role: this.clusterRole,
       vpc: vpc,
       vpcSubnets: [{ subnetType: ec2.SubnetType.PRIVATE }],
       version: eks.KubernetesVersion.V1_18,
       placeClusterHandlerInVpc: true,
-
     })
+    cluster.addAutoScalingGroupCapacity("ClusterCapacity", {
+      instanceType: new ec2.InstanceType('m5.large'),
+      minCapacity: 3,
+      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE },
+    })
+
     // TODO parameterize (somewhere) used just for debugging
     cluster.awsAuth.addMastersRole(iam.Role.fromRoleArn(this, "SuperAdmin", `arn:aws:iam::${this.account}:role/Administration`))
     cluster.awsAuth.addMastersRole(iam.Role.fromRoleArn(this, "SuperAdminSky", `arn:aws:iam::${this.account}:role/skylab-hagere`))
