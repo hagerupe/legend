@@ -54,6 +54,9 @@ export class KubernetesStack extends LegendApplicationStack {
     cluster.awsAuth.addMastersRole(iam.Role.fromRoleArn(this, "SuperAdminSky", `arn:aws:iam::${this.account}:role/skylab-hagere`))
 
     new EksAwsIngressController(this, "IngressController", { cluster, vpc })
+
+    // Note: does not work with Fargate since it uses a sidecar daemonset on the nodes
+    // Worth considering instead: https://aws.amazon.com/blogs/containers/fluent-bit-for-amazon-eks-on-aws-fargate-is-here/
     new ContainerInsights(this, "ContainerInsights", { cluster })
 
     this.clusterName = new CfnOutput(this, 'ClusterName', { value: cluster.clusterName })
