@@ -3,7 +3,7 @@ import {CfnOutput, StackProps} from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as iam from '@aws-cdk/aws-iam';
 import * as eks from '@aws-cdk/aws-eks';
-import {DefaultCapacityType} from '@aws-cdk/aws-eks';
+import * as ssm from '@aws-cdk/aws-ssm';
 import {EksAwsIngressController} from "../constructs/eks-aws-ingress-controller";
 import * as ecr from "@aws-cdk/aws-ecr";
 import {LegendApplicationStack} from "./legend-application-stack";
@@ -54,9 +54,15 @@ export class KubernetesStack extends LegendApplicationStack {
     nodeGroup.role.addManagedPolicy(iam.ManagedPolicy.fromManagedPolicyArn(this,
         "CloudWatchAgentServerPolicy", "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"))
 
-    // TODO parameterize (somewhere) used just for debugging
-    cluster.awsAuth.addMastersRole(iam.Role.fromRoleArn(this, "SuperAdmin", `arn:aws:iam::${this.account}:role/Administration`))
-    cluster.awsAuth.addMastersRole(iam.Role.fromRoleArn(this, "SuperAdminSky", `arn:aws:iam::${this.account}:role/skylab-hagere`))
+    // Set up EKS master roles
+    const masterRoleAccessName = ssm.StringParameter.valueForStringParameter(
+        this, 'master-role-access');
+    const masterRoleAssumedBy = iam.Role.fromRoleArn(this, "MasterRoleAssumedBy", `arn:aws:iam::${this.account}:role/${masterRoleAccessName}`)
+    const kubernetesMasterRole = new iam.Role(this, "KubernetesMasterRole", {
+      roleName: 'KubernetesMasterRole',
+      assumedBy: new iam.ArnPrincipal(masterRoleAssumedBy.roleArn)});
+    cluster.awsAuth.addMastersRole(kubernetesMasterRole)
+    cluster.awsAuth.addMastersRole(masterRoleAssumedBy)
 
     new EksAwsIngressController(this, "IngressController", { cluster, vpc })
 

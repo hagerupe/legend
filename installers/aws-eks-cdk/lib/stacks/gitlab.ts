@@ -9,6 +9,7 @@ import {GitlabCeChart} from "../charts/gitlab-ce-chart";
 import {ArtifactImageId} from "../constructs/artifact-image-id";
 import {LegendApplicationStack} from "./legend-application-stack";
 import {ResolveSecret} from "../constructs/resolve-secret";
+import * as ssm from "@aws-cdk/aws-ssm";
 
 export interface GitlabStackProps extends StackProps{
     clusterName: string
@@ -19,14 +20,12 @@ export class GitlabStack extends LegendApplicationStack {
     constructor(scope: cdk.Construct, id: string, props: GitlabStackProps) {
         super(scope, id, props);
 
-        // TODO get from parameter store
-        const hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, "HostedZone", {
-            hostedZoneId: 'Z03966132F39A227RN4A4',
-            zoneName: 'sky-hagere.io'
-        })
+        const legendZoneName = ssm.StringParameter.valueForStringParameter(
+            this, 'legend-domain-name');
+        const hostedZone = route53.HostedZone.fromLookup(this, "HostedZone", { domainName: legendZoneName })
         const certificate = new certificatemanager.DnsValidatedCertificate(this, "GitlabCert", {
             hostedZone: hostedZone,
-            domainName: 'gitlab.sky-hagere.io',
+            domainName: `gitlab.${legendZoneName}`,
         });
 
         const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", props)
