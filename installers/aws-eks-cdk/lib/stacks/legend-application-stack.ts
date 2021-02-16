@@ -9,6 +9,12 @@ export class LegendApplicationStack extends Stack {
     readonly engineArtifactBucketName: CfnParameter
     readonly engineArtifactObjectKey: CfnParameter
 
+    readonly sdlcArtifactBucketName: CfnParameter
+    readonly sdlcArtifactObjectKey: CfnParameter
+
+    readonly studioArtifactBucketName: CfnParameter
+    readonly studioArtifactObjectKey: CfnParameter
+
     constructor(scope: cdk.Construct, id: string, props: StackProps) {
         super(scope, id, props);
 
@@ -17,5 +23,11 @@ export class LegendApplicationStack extends Stack {
 
         this.engineArtifactBucketName = new CfnParameter(this, "EngineArtifactBucketName");
         this.engineArtifactObjectKey = new CfnParameter(this, "EngineArtifactObjectKey");
+
+        this.sdlcArtifactBucketName = new CfnParameter(this, "SDLCArtifactBucketName");
+        this.sdlcArtifactObjectKey = new CfnParameter(this, "SDLCArtifactObjectKey");
+
+        this.studioArtifactBucketName = new CfnParameter(this, "StudioArtifactBucketName");
+        this.studioArtifactObjectKey = new CfnParameter(this, "StudioArtifactObjectKey");
     }
 }

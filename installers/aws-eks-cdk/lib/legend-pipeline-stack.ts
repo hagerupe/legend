@@ -142,10 +142,16 @@ export class LegendPipelineStack extends Stack {
                 GitlabArtifactObjectKey: gitlabImageDetails.objectKey,
                 EngineArtifactBucketName: engineImageDetails.bucketName,
                 EngineArtifactObjectKey: engineImageDetails.objectKey,
+                SDLCArtifactBucketName: sdlcImageDetails.bucketName,
+                SDLCArtifactObjectKey: sdlcImageDetails.objectKey,
+                StudioArtifactBucketName: studioImageDetails.bucketName,
+                StudioArtifactObjectKey: studioImageDetails.objectKey,
             },
             extraInputs: [
                 gitlabImageDetails,
                 engineImageDetails,
+                sdlcImageDetails,
+                studioImageDetails
             ]
         }
 

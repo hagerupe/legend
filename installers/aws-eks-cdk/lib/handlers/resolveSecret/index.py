@@ -13,7 +13,7 @@ def main(event, context):
   try:
     log.info('Input event: %s', event)
 
-    # TODO call secret managerg
+    # TODO call secret manager
     attributes = {
       'Response': '8296daf8-6fb6-11eb-9439-0242ac130002'
     }
