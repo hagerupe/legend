@@ -47,6 +47,7 @@ export class LegendStudioStack extends LegendApplicationStack {
             legendStudioPort: 80,
             legendEngineUrl: `engine.${legendZoneName}`,
             legendSdlcUrl: `sdlc.${legendZoneName}`,
+            legendStudioHost: legendZoneName,
         }))
     }
 }
