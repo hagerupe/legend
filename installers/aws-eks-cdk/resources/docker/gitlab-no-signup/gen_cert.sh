@@ -3,13 +3,12 @@ set -e; set -x
 
 # https://www.digitalocean.com/community/tutorials/openssl-essentials-working-with-ssl-certificates-private-keys-and-csrs
 
-HOST_DNS_NAME=gitlab.legend.com # TODO
+HOST_DNS_NAME=gitlab.legend.com
 
-mkdir -p $CONFIG_DIR/ssl
-KEY_FILE=$CONFIG_DIR/ssl/self.key
-CERT_FILE=$CONFIG_DIR/ssl/self.crt
-DER_FILE=$CONFIG_DIR/ssl/self.der
-TRUST_STORE=$CONFIG_DIR/ssl/truststore.jks
+mkdir -p /ssl
+KEY_FILE=/ssl/self.key
+CERT_FILE=/ssl/self.crt
+DER_FILE=/ssl/self.der
 
 echo "Generating certs to $CONFIG_DIR/ssl ..."
 
