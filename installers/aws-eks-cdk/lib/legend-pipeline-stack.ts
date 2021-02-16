@@ -103,7 +103,7 @@ export class LegendPipelineStack extends Stack {
         }))
 
         // https://console.aws.amazon.com/codesuite/codebuild/752499117019/projects/LegendStudioProject54E1861C-8uRXUEqTK5vq/build/LegendStudioProject54E1861C-8uRXUEqTK5vq%3A31d602c9-fd1f-4237-92f2-c29510f35fef/?region=us-east-1
-        /*const studioImageDetails = new codepipeline.Artifact();
+        const studioImageDetails = new codepipeline.Artifact();
         const studioRepositoryName = 'legend-studio';
         const studioProject = new DockerBuildProject(this, 'LegendStudio', {
             preBuildCommands: [
@@ -119,7 +119,7 @@ export class LegendPipelineStack extends Stack {
         }))
 
         // https://console.aws.amazon.com/codesuite/codebuild/752499117019/projects/LegendSDLCProject1E6074E7-lgyP9viVXqkI/build/LegendSDLCProject1E6074E7-lgyP9viVXqkI%3A64cec97b-ffd3-43a7-bc79-f06556d63ec9/?region=us-east-1
-        const sdlcImageDetails = new codepipeline.Artifact();
+        /*const sdlcImageDetails = new codepipeline.Artifact();
         const sdlcRepositoryName = 'legend-sdlc';
         const sdlcProject = new DockerBuildProject(this, 'LegendSDLC', {
             preBuildCommands: [
