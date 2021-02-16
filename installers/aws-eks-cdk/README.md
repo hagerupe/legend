@@ -65,6 +65,8 @@ aws secretsmanager create-secret --name dockerhub-credentials --secret-string '{
 
 - Setup kubectl for EKS: `aws eks update-kubeconfig --name <<cluster-name>>`
 
+- https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#dashboards:name=Legend;expand=true;autoRefresh=60
+
 ## TODOs:
 
 Setup container insights

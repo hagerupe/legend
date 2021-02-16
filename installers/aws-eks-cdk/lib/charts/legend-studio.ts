@@ -8,7 +8,7 @@ export interface LegendStudioChartProps {
     readonly imageId: string,
     readonly mongoUser: string,
     readonly mongoPassword: string,
-    readonly mongoPort: number,
+    readonly mongoHostPort: string,
     readonly gitlabOauthClientId: string,
     readonly gitlabOauthSecret: string,
     readonly gitlabPublicUrl: string,
@@ -25,7 +25,7 @@ export class LegendStudioChart extends cdk8s.Chart {
         const httpConfigText = fs.readFileSync(path.join('resources', 'configs', 'studio', 'httpConfig.json'), {encoding: 'utf8'})
             .replace('__MONGO_USER__', props.mongoUser)
             .replace('__MONGO_PASSWORD__', props.mongoPassword)
-            .replace('__MONGO_HOST_PORT__', String(props.mongoPassword))
+            .replace('__MONGO_HOST_PORT__', props.mongoHostPort)
             .replace('__GITLAB_OAUTH_CLIENT_ID__', props.gitlabOauthSecret)
             .replace('__GITLAB_OAUTH_SECRET__', props.gitlabOauthSecret)
             .replace('__GITLAB_PUBLIC_URL__', props.gitlabPublicUrl)

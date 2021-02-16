@@ -8,6 +8,13 @@ export interface MongoCharProps {
 }
 
 export class MongoChart extends cdk8s.Chart {
+
+    static synth() {
+        const app = new cdk8s.App();
+        new MongoChart(app, "MonogoChart", { password: '8296daf8-6fb6-11eb-9439-0242ac130002' })
+        app.synth()
+    }
+
     constructor(scope: constructs.Construct, id: string, props: MongoCharProps) {
         super(scope, id);
 
@@ -62,19 +69,16 @@ export class MongoChart extends cdk8s.Chart {
         const service = new k8s.Service(this, "MongoService", {
             metadata: {
                 name: 'mongo-service',
-                annotations: {
-                    'service.beta.kubernetes.io/aws-load-balancer-type': 'nlb-ip'
-                }
             },
             spec: {
                 ports: [
                     {
                         port: 27017,
                         targetPort: 27017,
-                        protocol: 'TCP'
+                        protocol: 'TCP',
                     },
                 ],
-                type: 'LoadBalancer',
+                type: 'ClusterIP',
                 selector: {
                     app: 'database'
                 }

@@ -22,5 +22,7 @@ export class MongoStack extends LegendApplicationStack {
         cluster.addCdk8sChart("Mongo", new MongoChart(new cdk8s.App(), "MongoChart", {
             password: resolveSecret.response
         }))
+
+        MongoChart.synth();
     }
 }

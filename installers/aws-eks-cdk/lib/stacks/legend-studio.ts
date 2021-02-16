@@ -40,7 +40,7 @@ export class LegendStudioStack extends LegendApplicationStack {
             imageId: artifactImageId,
             mongoUser: 'admin',
             mongoPassword: resolveMongoPass.response,
-            mongoPort: 27017,
+            mongoHostPort: 'mongo-service.default.svc.cluster.local',
             gitlabOauthClientId: 'foo', // TODO
             gitlabOauthSecret: 'foo', // TODO
             gitlabPublicUrl: `gitlab.${legendZoneName}`,
