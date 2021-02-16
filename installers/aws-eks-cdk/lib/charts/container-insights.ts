@@ -31,6 +31,9 @@ export class ContainerInsightsChart extends cdk8s.Chart {
             }
         })
         const clusterRole = new ClusterRole(this, "cloudwatch-agent-role", {
+            metadata: {
+                name: 'cloudwatch-agent-role',
+            },
             rules: [
                 {
                     apiGroups: [""],
@@ -285,6 +288,8 @@ export class ContainerInsightsChart extends cdk8s.Chart {
                 }
             ]
         })
+
+        const encode = (str: string):string => Buffer.from(str, 'binary').toString('base64');
         const fluentBitConfig = new ConfigMap(this, 'fluent-bit-config', {
             metadata: {
                 name: 'fluent-bit-config',
@@ -293,12 +298,12 @@ export class ContainerInsightsChart extends cdk8s.Chart {
                     'k8s-app': 'fluent-bit'
                 }
             },
-            data: {
-                'fluent-bit.conf': fs.readFileSync(path.join('resources', 'cwagent', 'fluent-bit.conf'), {encoding: 'utf8'}),
-                'application-log.conf': fs.readFileSync(path.join('resources', 'cwagent', 'application-log.conf'), {encoding: 'utf8'}),
-                'dataplane-log.conf': fs.readFileSync(path.join('resources', 'cwagent', 'dataplane-log.conf'), {encoding: 'utf8'}),
-                'host-log.conf': fs.readFileSync(path.join('resources', 'cwagent', 'host-log.conf'), {encoding: 'utf8'}),
-                'parsers.conf': fs.readFileSync(path.join('resources', 'cwagent', 'parsers.conf'), {encoding: 'utf8'}),
+            binaryData: {
+                'fluent-bit.conf': encode(fs.readFileSync(path.join('resources', 'cwagent', 'fluent-bit.conf'), {encoding: 'utf8'})),
+                'application-log.conf': encode(fs.readFileSync(path.join('resources', 'cwagent', 'application-log.conf'), {encoding: 'utf8'})),
+                'dataplane-log.conf': encode(fs.readFileSync(path.join('resources', 'cwagent', 'dataplane-log.conf'), {encoding: 'utf8'})),
+                'host-log.conf': encode(fs.readFileSync(path.join('resources', 'cwagent', 'host-log.conf'), {encoding: 'utf8'})),
+                'parsers.conf': encode(fs.readFileSync(path.join('resources', 'cwagent', 'parsers.conf'), {encoding: 'utf8'})),
             }
         })
         const fluentBitDaemonSet = new DaemonSet(this, 'fluent-bit', {

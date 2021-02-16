@@ -65,3 +65,7 @@ Switch mongo LB to be internal instead of external
 Dashboards! (Woot)
 
 Health checks?
+
+### Commands:
+
+aws eks update-kubeconfig --name LegendClusterA6751FE1-01bd21f5cf2d4292beef14b4d338375d
