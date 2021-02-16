@@ -6,8 +6,8 @@ import {EksAwsIngressController} from "../constructs/eks-aws-ingress-controller"
 import {CfnOutput, StackProps} from "@aws-cdk/core";
 import * as ecr from "@aws-cdk/aws-ecr";
 import {LegendApplicationStack} from "./legend-application-stack";
-import {ContainerInsights} from "../constructs/container-insights";
-import {CapacityType} from "@aws-cdk/aws-eks";
+import * as cdk8s from "cdk8s";
+import {FluentBitChart} from "../charts/fluent-bit";
 
 export interface KubernetesStackProperties extends StackProps{
   repositoryNames: string[];
@@ -36,17 +36,12 @@ export class KubernetesStack extends LegendApplicationStack {
       repository.grantPull(this.clusterRole)
     }
 
-    const cluster = new eks.Cluster(this, "LegendCluster", {
+    const cluster = new eks.FargateCluster(this, "LegendCluster", {
       role: this.clusterRole,
       vpc: vpc,
       vpcSubnets: [{ subnetType: ec2.SubnetType.PRIVATE }],
       version: eks.KubernetesVersion.V1_18,
       placeClusterHandlerInVpc: true,
-    })
-    cluster.addAutoScalingGroupCapacity("ClusterCapacity", {
-      instanceType: new ec2.InstanceType('m5.large'),
-      minCapacity: 3,
-      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE },
     })
 
     // TODO parameterize (somewhere) used just for debugging
@@ -57,7 +52,11 @@ export class KubernetesStack extends LegendApplicationStack {
 
     // Note: does not work with Fargate since it uses a sidecar daemonset on the nodes
     // Worth considering instead: https://aws.amazon.com/blogs/containers/fluent-bit-for-amazon-eks-on-aws-fargate-is-here/
-    new ContainerInsights(this, "ContainerInsights", { cluster })
+    // https://github.com/aws/containers-roadmap/issues/971
+    // new ContainerInsights(this, "ContainerInsights", { cluster })
+
+    // Details: https://aws.amazon.com/blogs/containers/fluent-bit-for-amazon-eks-on-aws-fargate-is-here/
+    cluster.addCdk8sChart("FluentBit", new FluentBitChart(new cdk8s.App(), "FluentBitChart", { }))
 
     this.clusterName = new CfnOutput(this, 'ClusterName', { value: cluster.clusterName })
     if (cluster.kubectlRole !== undefined) {
