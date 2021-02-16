@@ -91,7 +91,7 @@ export class LegendStudioChart extends cdk8s.Chart {
                 }
             }
         })
-        new k8s.Service(this, "LegendStudioService", {
+        /*new k8s.Service(this, "LegendStudioService", {
             metadata: {
                 name: service,
             },
@@ -107,6 +107,6 @@ export class LegendStudioChart extends cdk8s.Chart {
                     app: app
                 }
             },
-        })
+        })*/
     }
 }

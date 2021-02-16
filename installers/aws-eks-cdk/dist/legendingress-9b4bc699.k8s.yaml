@@ -1,0 +1,16 @@
+apiVersion: "networking.k8s.io/v1beta1"
+kind: "Ingress"
+metadata:
+  annotations:
+    alb.ingress.kubernetes.io/listen-ports: "[{\"HTTPS\":443}]"
+    kubernetes.io/ingress.class: "alb"
+  name: "legend-ingress"
+spec:
+  rules:
+    - host: "${Token[TOKEN.1628]}"
+      http:
+        paths:
+          - backend:
+              serviceName: "legend-studio-service"
+              servicePort: 80
+            path: "/sudio/*"

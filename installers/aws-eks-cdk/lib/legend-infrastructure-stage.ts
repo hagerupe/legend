@@ -5,6 +5,7 @@ import {GitlabStack} from "./stacks/gitlab";
 import {LegendEngineStack} from "./stacks/legend-engine";
 import {LegendSdlcStack} from "./stacks/legend-sdlc";
 import {LegendStudioStack} from "./stacks/legend-studio";
+import {LegendIngressStack} from "./stacks/legend-ingress";
 
 export interface LegendInfrastructureStageProps extends StageProps {
     repositoryNames: string[],
@@ -41,5 +42,7 @@ export class LegendInfrastructureStage extends Stage {
 
         const studio = new LegendStudioStack(this, "Studio", stackParams)
         studio.addDependency(sdlc)
+
+        const ingress = new LegendIngressStack(this, "Ingress", stackParams);
     }
 }
