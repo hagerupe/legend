@@ -84,3 +84,7 @@ Switch mongo LB to be internal instead of external
 Dashboards! (Woot)
 
 Health checks? Scaling, etc...
+
+Move master kubernetes role to pipeline stack (broken prod provision)
+
+Gitlab oauth app create automation, somehow?

@@ -62,7 +62,7 @@ export class LegendStudioChart extends cdk8s.Chart {
                     spec: {
                         containers: [
                             {
-                                name: 'legend-engine',
+                                name: 'legend-studio',
                                 image: props.imageId,
                                 command: [ "/bin/sh", "-c", "ls /etc/config/" ],
                                 volumeMounts: [

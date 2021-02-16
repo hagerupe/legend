@@ -182,9 +182,10 @@ export class LegendPipelineStack extends Stack {
 
         // TODO manaual sign off stage
 
-        pipeline.addApplicationStage(new LegendInfrastructureStage(this, "Prod", {
+        // TODO disable due to master role name conflict
+        /*pipeline.addApplicationStage(new LegendInfrastructureStage(this, "Prod", {
             env: { account: this.account, region: this.region },
             repositoryNames: repositoryNames,
-        }), appStageOptions)
+        }), appStageOptions)*/
     }
 }
