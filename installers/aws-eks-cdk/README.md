@@ -88,3 +88,7 @@ Health checks? Scaling, etc...
 Move master kubernetes role to pipeline stack (broken prod provision)
 
 Gitlab oauth app create automation, somehow?
+
+Move secrets to direct kubernetes external secrets instead of secrets manager directly
+
+Automate A record aliases to LB, needs to await for lb to be created by k8

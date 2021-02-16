@@ -40,7 +40,6 @@ export class GitlabStack extends LegendApplicationStack {
             artifactObjectKey: this.gitlabArtifactObjectKey.value.toString(),
         }).response;
         const gitlabPassword = new secretsmanager.Secret(this, "GitlabRootPassword");
-        // TODO use external secrets reference CRDS in K8
         const resolveSecret = new ResolveSecret(this, "ResolvedGitlabPassword", { secret: gitlabPassword })
         cluster.addCdk8sChart("GitlabCE", new GitlabCeChart(new cdk8s.App(), "GitlabCEChart", {
             gitlabExternalUrl: 'gitlab.legend.com',

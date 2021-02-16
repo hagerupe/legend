@@ -44,5 +44,6 @@ export class LegendInfrastructureStage extends Stage {
         studio.addDependency(sdlc)
 
         const ingress = new LegendIngressStack(this, "Ingress", stackParams);
+        ingress.addDependency(studio)
     }
 }

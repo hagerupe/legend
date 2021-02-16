@@ -22,7 +22,6 @@ export class LegendStudioChart extends cdk8s.Chart {
     constructor(scope: constructs.Construct, id: string, props: LegendStudioChartProps) {
         super(scope, id);
 
-        // TODO add the other config file
         const httpConfigText = fs.readFileSync(path.join('resources', 'configs', 'studio', 'httpConfig.json'), {encoding: 'utf8'})
             .replace('__MONGO_USER__', props.mongoUser)
             .replace('__MONGO_PASSWORD__', props.mongoPassword)

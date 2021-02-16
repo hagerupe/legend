@@ -18,10 +18,8 @@ export class LegendIngressStack extends LegendApplicationStack {
         const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", props)
         const legendZoneName = ssm.StringParameter.valueForStringParameter(this, 'legend-zone-name');
 
-        const app = new cdk8s.App();
-        new LegendIngressChart(app, "LegendIngress", {
+        cluster.addCdk8sChart("LegendIngressChart", new LegendIngressChart(new cdk8s.App(), "LegendIngress", {
             legendDomain: legendZoneName
-        })
-        app.synth()
+        }))
     }
 }
