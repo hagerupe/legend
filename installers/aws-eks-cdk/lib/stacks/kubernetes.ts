@@ -50,9 +50,10 @@ export class KubernetesStack extends LegendApplicationStack {
       amiType: eks.NodegroupAmiType.AL2_X86_64,
     });
 
-    // TODO move to container insight construct
     nodeGroup.role.addManagedPolicy(iam.ManagedPolicy.fromManagedPolicyArn(this,
         "CloudWatchAgentServerPolicy", "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"))
+    nodeGroup.role.addManagedPolicy(iam.ManagedPolicy.fromManagedPolicyArn(this,
+        "SSMManagedInstancePolicy", "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"))
 
     // Set up EKS master roles
     const masterRoleAccessName = ssm.StringParameter.valueForStringParameter(
