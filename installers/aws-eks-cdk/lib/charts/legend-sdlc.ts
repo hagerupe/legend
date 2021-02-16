@@ -5,7 +5,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 export interface LegendSdlcProps {
-
+    readonly imageId: string
 }
 
 export class LegendSdlcChart extends cdk8s.Chart {
@@ -50,7 +50,7 @@ export class LegendSdlcChart extends cdk8s.Chart {
                         containers: [
                             {
                                 name: 'legend-engine',
-                                image: 'k8s.gcr.io/busybox',
+                                image: props.imageId,
                                 command: [ "/bin/sh", "-c", "ls /etc/config/" ],
                                 volumeMounts: [
                                     {

@@ -18,7 +18,6 @@ export class MongoStack extends LegendApplicationStack {
 
         const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", props)
         const mongoPassword = new secretsmanager.Secret(this, "MongoPassword");
-        // TODO use external secrets reference CRDS in K8
         const resolveSecret = new ResolveSecret(this, "ResolveMongoPassword", { secret: mongoPassword })
         cluster.addCdk8sChart("Mongo", new MongoChart(new cdk8s.App(), "MongoChart", {
             password: resolveSecret.response

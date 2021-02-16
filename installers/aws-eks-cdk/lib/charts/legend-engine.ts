@@ -5,13 +5,14 @@ import * as fs from "fs";
 import * as path from "path";
 
 export interface LegendEngineChartProps {
-    gitlabOauthClientId: string,
-    gitlabOauthSecret: string,
-    gitlabPublicUrl: string,
-    mongoUser: string,
-    mongoPassword: string,
-    mongoHostPort: number,
-    legendEnginePort: number
+    readonly imageId: string,
+    readonly gitlabOauthClientId: string,
+    readonly gitlabOauthSecret: string,
+    readonly gitlabPublicUrl: string,
+    readonly mongoUser: string,
+    readonly mongoPassword: string,
+    readonly mongoHostPort: number,
+    readonly legendEnginePort: number
 }
 
 export class LegendEngineChart extends cdk8s.Chart {
@@ -54,7 +55,7 @@ export class LegendEngineChart extends cdk8s.Chart {
                         containers: [
                             {
                                 name: 'legend-engine',
-                                image: 'k8s.gcr.io/busybox',
+                                image: props.imageId,
                                 command: [ "/bin/sh", "-c", "ls /etc/config/" ],
                                 volumeMounts: [
                                     {
@@ -93,8 +94,8 @@ export class LegendEngineChart extends cdk8s.Chart {
             spec: {
                 ports: [
                     {
-                        port: 80,
-                        targetPort: 80,
+                        port: 443,
+                        targetPort: 443,
                         protocol: 'TCP'
                     },
                 ],

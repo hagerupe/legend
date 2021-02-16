@@ -5,32 +5,44 @@ import * as fs from "fs";
 import * as path from "path";
 
 export interface LegendStudioChartProps {
-
+    readonly imageId: string,
+    readonly mongoUser: string,
+    readonly mongoPassword: string,
+    readonly mongoPort: number,
+    readonly gitlabOauthClientId: string,
+    readonly gitlabOauthSecret: string,
+    readonly gitlabPublicUrl: string,
+    readonly legendStudioPort: number,
+    readonly legendEngineUrl: string,
+    readonly legendSdlcUrl: string,
+    readonly legendStudioHost: string,
 }
 
 export class LegendStudioChart extends cdk8s.Chart {
     constructor(scope: constructs.Construct, id: string, props: LegendStudioChartProps) {
         super(scope, id);
 
-        // TODO update these based off of config
         // TODO add the other config file
-        const templateText = fs.readFileSync(path.join('resources', 'configs', 'studio', 'httpConfig.json'), {encoding: 'utf8'})
-            .replace('__GITLAB_OAUTH_CLIENT_ID__', 'foo')
-            .replace('__GITLAB_OAUTH_SECRET__', 'foo')
-            .replace('__GITLAB_PUBLIC_URL__', 'foo')
-            .replace('__MONGO_USER__', 'foo')
-            .replace('__MONGO_PASSWORD__', 'foo')
-            .replace('__MONGO_HOST_PORT__', 'foo')
-            .replace('__LEGEND_SDLC_URL__', '1234')
-            .replace('__LEGEND_SDLC_PORT__', '1234')
+        const httpConfigText = fs.readFileSync(path.join('resources', 'configs', 'studio', 'httpConfig.json'), {encoding: 'utf8'})
+            .replace('__MONGO_USER__', props.mongoUser)
+            .replace('__MONGO_PASSWORD__', props.mongoPassword)
+            .replace('__MONGO_HOST_PORT__', String(props.mongoPassword))
+            .replace('__GITLAB_OAUTH_CLIENT_ID__', props.gitlabOauthSecret)
+            .replace('__GITLAB_OAUTH_SECRET__', props.gitlabOauthSecret)
+            .replace('__GITLAB_PUBLIC_URL__', props.gitlabPublicUrl)
+            .replace('__LEGEND_STUDIO_PORT__', String(props.legendStudioPort))
+
+        const uiConfig = fs.readFileSync(path.join('resources', 'configs', 'studio', 'uiConfig.json'), {encoding: 'utf8'})
+            .replace('__LEGEND_ENGINE_URL__', props.legendEngineUrl)
+            .replace('__LEGEND_SDLC_URL__', props.legendSdlcUrl)
 
         const config = new k8s.ConfigMap(this, "Config", {
             data: {
-                'httpConfig.json': templateText
+                'httpConfig.json': httpConfigText,
+                'uiConfig.json': uiConfig,
             }
         })
 
-        // TODO get image from build input source
         const app = 'legend-studio'
         const service = app + "-service"
         new k8s.Deployment(this, "LegendStudio", {
@@ -51,7 +63,7 @@ export class LegendStudioChart extends cdk8s.Chart {
                         containers: [
                             {
                                 name: 'legend-engine',
-                                image: 'k8s.gcr.io/busybox',
+                                image: props.imageId,
                                 command: [ "/bin/sh", "-c", "ls /etc/config/" ],
                                 volumeMounts: [
                                     {
@@ -79,13 +91,9 @@ export class LegendStudioChart extends cdk8s.Chart {
                 }
             }
         })
-
         new k8s.Service(this, "LegendStudioService", {
             metadata: {
                 name: service,
-                annotations: {
-                    'service.beta.kubernetes.io/aws-load-balancer-type': 'nlb-ip'
-                }
             },
             spec: {
                 ports: [
@@ -95,12 +103,10 @@ export class LegendStudioChart extends cdk8s.Chart {
                         protocol: 'TCP'
                     },
                 ],
-                type: 'LoadBalancer',
                 selector: {
                     app: app
                 }
             },
         })
-
     }
 }

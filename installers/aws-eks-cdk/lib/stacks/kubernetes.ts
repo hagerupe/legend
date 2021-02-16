@@ -64,6 +64,8 @@ export class KubernetesStack extends LegendApplicationStack {
       assumedBy: new iam.ArnPrincipal(masterRoleAssumedBy.roleArn)});
     cluster.awsAuth.addMastersRole(kubernetesMasterRole)
     cluster.awsAuth.addMastersRole(masterRoleAssumedBy)
+    kubernetesMasterRole.addManagedPolicy(iam.ManagedPolicy.fromManagedPolicyArn(this,
+        "KubernetesMasterRoleAdministratorAccess", "arn:aws:iam::aws:policy/AdministratorAccess"))
 
     new EksAwsIngressController(this, "IngressController", { cluster, vpc })
 
