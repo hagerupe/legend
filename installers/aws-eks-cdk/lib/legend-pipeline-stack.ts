@@ -10,6 +10,7 @@ import {DockerBuildProject} from "./constructs/docker-build-project";
 import {SimpleSynthAction} from "./override/pipelines/lib/synths";
 import * as path from "path";
 import * as fs from "fs";
+import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
 
 export class LegendPipelineStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
@@ -21,7 +22,7 @@ export class LegendPipelineStack extends Stack {
         const studioSource = new codepipeline.Artifact();
         const cloudAssemblyArtifact = new codepipeline.Artifact();
 
-        const githubSecret = SecretValue.secretsManager('GitHub') // TODO rename this secret
+        const githubSecret = SecretValue.secretsManager('github-access-token')
         const pipeline = new CdkPipeline(this, 'LegendPipeline', {
             pipelineName: 'Legend',
             cloudAssemblyArtifact,

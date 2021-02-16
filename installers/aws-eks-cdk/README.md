@@ -26,7 +26,11 @@ Verify by running `aws sts get-caller-identity`, it should return the ARN of the
 
 1. **Create github secret**
 
+aws secretsmanager create-secret --name github-access-token --secret-string <<access-token>>
+
 1. **Create dockerhub secret**
+
+aws secretsmanager create-secret --name dockerhub-credentials --secret-string '{  "Username": "<<username>>"," Password": "<<access-token>>" }'
 
 1. **Create Route53 hosted zone for existing / new domain**
 

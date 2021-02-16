@@ -1,4 +1,4 @@
-import {Construct, RemovalPolicy, Stack} from "@aws-cdk/core";
+import {Construct, RemovalPolicy, SecretValue, Stack} from "@aws-cdk/core";
 import * as ecr from "@aws-cdk/aws-ecr";
 import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
 import * as codebuild from "@aws-cdk/aws-codebuild";
@@ -23,7 +23,8 @@ export class DockerBuildProject extends Construct {
         })
         const region = Stack.of(this).region
         const account = Stack.of(this).account
-        const dockerHubSecret = secretsmanager.Secret.fromSecretPartialArn(this, "DockerHubCredentials", `arn:aws:secretsmanager:${region}:${account}:secret:DockerHub`)
+
+        const dockerHubSecret = secretsmanager.Secret.fromSecretPartialArn(this, "DockerHubCredentials", `arn:aws:secretsmanager:${region}:${account}:secret:dockerhub-credentials`)
         this.project = new codebuild.PipelineProject(this, 'Project', {
             buildSpec: codebuild.BuildSpec.fromObject({
                 version: '0.2',
