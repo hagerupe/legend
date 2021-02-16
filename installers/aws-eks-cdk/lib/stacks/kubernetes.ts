@@ -44,7 +44,7 @@ export class KubernetesStack extends LegendApplicationStack {
       defaultCapacity: 0,
     })
     const nodeGroup = cluster.addNodegroupCapacity('custom-node-group', {
-      instanceTypes: [new ec2.InstanceType('m5.large')],
+      instanceTypes: [new ec2.InstanceType('m5.xlarge')],
       minSize: 3,
       diskSize: 100,
       amiType: eks.NodegroupAmiType.AL2_X86_64,
