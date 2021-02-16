@@ -56,7 +56,6 @@ export class LegendEngineChart extends cdk8s.Chart {
                             {
                                 name: 'legend-engine',
                                 image: props.imageId,
-                                command: [ "/bin/sh", "-c", "ls /etc/config/" ],
                                 volumeMounts: [
                                     {
                                         name: 'configurations',
