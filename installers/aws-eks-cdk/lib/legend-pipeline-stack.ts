@@ -172,11 +172,14 @@ export class LegendPipelineStack extends Stack {
         pipeline.addApplicationStage(new LegendInfrastructureStage(this, "UAT", {
             env: { account: this.account, region: this.region },
             repositoryNames: repositoryNames,
-        }), appStageOptions).addManualApprovalAction()
+        }), appStageOptions)
 
         pipeline.addApplicationStage(new LegendInfrastructureStage(this, "Prod", {
             env: { account: this.account, region: this.region },
             repositoryNames: repositoryNames,
-        }), appStageOptions)
+        }), {
+            manualApprovals: true,
+            ...appStageOptions
+        })
     }
 }
