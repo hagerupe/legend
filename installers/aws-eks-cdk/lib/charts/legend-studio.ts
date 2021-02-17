@@ -27,8 +27,8 @@ export class LegendStudioChart extends cdk8s.Chart {
             mongoUser: 'admin',
             mongoPassword: '8296daf8-6fb6-11eb-9439-0242ac130002',
             mongoHostPort: 'mongo-service.default.svc.cluster.local',
-            gitlabOauthClientId: 'foo', // TODO
-            gitlabOauthSecret: 'foo', // TODO
+            gitlabOauthClientId: 'legend',
+            gitlabOauthSecret: 'foobar',
             gitlabPublicUrl: `https://gitlab.sky-hagere.io`,
             legendStudioPort: 80,
             legendEngineUrl: `https://engine.sky-hagere.io`,

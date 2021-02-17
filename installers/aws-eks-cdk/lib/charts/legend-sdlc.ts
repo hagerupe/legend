@@ -89,5 +89,24 @@ export class LegendSdlcChart extends cdk8s.Chart {
                 }
             }
         })
+
+        new k8s.Service(this, "LegendSDLCService", {
+            metadata: {
+                name: service,
+            },
+            spec: {
+                ports: [
+                    {
+                        port: 80,
+                        targetPort: 80,
+                        protocol: 'TCP'
+                    },
+                ],
+                type: 'NodePort',
+                selector: {
+                    app: app
+                }
+            },
+        })
     }
 }
