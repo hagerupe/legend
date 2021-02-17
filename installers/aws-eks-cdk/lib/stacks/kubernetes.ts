@@ -74,6 +74,17 @@ export class KubernetesStack extends LegendApplicationStack {
     // https://github.com/aws/containers-roadmap/issues/971
     new ContainerInsights(this, "ContainerInsights", { cluster })
 
+    cluster.addHelmChart("EBSDriver", {
+      repository: 'https://kubernetes-sigs.github.io/aws-ebs-csi-driver',
+      chart: 'aws-ebs-csi-driver',
+      namespace: 'kube-system',
+      values: {
+        enableVolumeScheduling: true,
+        enableVolumeResizing: true,
+        enableVolumeSnapshot: true
+      }
+    })
+
     this.clusterName = new CfnOutput(this, 'ClusterName', { value: cluster.clusterName })
     if (cluster.kubectlRole !== undefined) {
       this.kubectlRoleArn = new CfnOutput(this, 'kubectlRoleArn', {value: cluster.kubectlRole?.roleArn})
