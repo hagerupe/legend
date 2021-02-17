@@ -50,7 +50,7 @@ export class LegendSdlcStack extends LegendApplicationStack {
             mongoPassword: resolveMongoPass.response,
             gitlabHost: `gitlab.${legendZoneName}`,
             gitlabPort: 443,
-            legendSdlcUrl: `sdlc.${legendZoneName}`,
+            legendSdlcUrl: `https://sdlc.${legendZoneName}`,
         }))
     }
 }
