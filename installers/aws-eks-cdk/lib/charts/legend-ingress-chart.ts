@@ -26,6 +26,7 @@ export class LegendIngressChart extends cdk8s.Chart {
                     'kubernetes.io/ingress.class': 'alb',
                     'alb.ingress.kubernetes.io/listen-ports': '[{"HTTPS":443}]',
                     'alb.ingress.kubernetes.io/scheme': 'internet-facing',
+                    'alb.ingress.kubernetes.io/success-codes': '200,201,302,401',
                 },
             },
             spec: {

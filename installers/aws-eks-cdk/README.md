@@ -61,13 +61,28 @@ aws secretsmanager create-secret --name dockerhub-credentials --secret-string '{
     - Navigate to: https://console.aws.amazon.com/codesuite/codepipeline/pipelines/Legend/view?region=us-east-1
     - Setup will take approximately 60 minutes
 
+1. **Setup CNAME for gitlab**
+
+1. **Setup GitLab Access Token**
+   - Navigate to `https://gitlab.<<zone-name>>/`
+   - Create an access token
+   - Store in parameter store (replace values):
+
+    `aws ssm put-parameter --type String --name gitlab-client-id --value <<client-id>>`
+       
+    `aws ssm put-parameter --type String --name gitlab-access-code --value <<access-token>>`
+
 ## Debug Utilities:
 
-- Setup kubectl for EKS: `aws eks update-kubeconfig --name <<cluster-name>>`
+- Setup kubectl for EKS: `aws eks update-kubeconfig --name [cluster_name]`
 
 - https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#dashboards:name=Legend;expand=true;autoRefresh=60
 
-- `kubectl exec --stdin --tty mongodb-standalone-0 -- /bin/bash`
+- `kubectl exec --stdin --tty [pod_name] -- /bin/bash`
+
+- `kubectl describe configmaps [config_map_name]`
+
+- `kubectl rollout restart deployment [deployment_name]`
 
 ## TODOs:
 

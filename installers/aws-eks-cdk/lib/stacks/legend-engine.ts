@@ -37,10 +37,13 @@ export class LegendEngineStack extends LegendApplicationStack {
         const certificate = new certificatemanager.DnsValidatedCertificate(this, "LegendEngineCert", {
             hostedZone: hostedZone, domainName: `engine.${legendZoneName}`, })
 
+        const gitlabClientId = ssm.StringParameter.valueForStringParameter(this, 'gitlab-client-id');
+        const gitlabAccessCode = ssm.StringParameter.valueForStringParameter(this, 'gitlab-access-code');
+
         cluster.addCdk8sChart("Engine", new LegendEngineChart(new cdk8s.App(), "LegendEngine", {
             imageId: artifactImageId,
-            gitlabOauthClientId: 'foo', // TODO
-            gitlabOauthSecret: 'foo', // TODO
+            gitlabOauthClientId: gitlabClientId,
+            gitlabOauthSecret: gitlabAccessCode,
             gitlabPublicUrl: `https://gitlab.${legendZoneName}`,
             mongoHostPort: 'mongo-service.default.svc.cluster.local',
             mongoUser: 'admin',
