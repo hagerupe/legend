@@ -8,6 +8,8 @@ import {ArtifactImageId} from "../constructs/artifact-image-id";
 import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
 import {ResolveSecret} from "../constructs/resolve-secret";
 import * as ssm from "@aws-cdk/aws-ssm";
+import * as certificatemanager from "@aws-cdk/aws-certificatemanager";
+import * as route53 from "@aws-cdk/aws-route53";
 
 export interface LegendEngineProps extends StackProps{
     clusterName: string,
@@ -28,6 +30,11 @@ export class LegendSdlcStack extends LegendApplicationStack {
         const resolveMongoPass = new ResolveSecret(this, "ResolveMongoPassword", { secret: mongoPassword })
 
         const legendZoneName = ssm.StringParameter.valueForStringParameter(this, 'legend-zone-name');
+        const legendHostedZoneId = ssm.StringParameter.valueForStringParameter(this, 'legend-hosted-zone-id');
+        const hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, "HostedZone", {
+            zoneName: legendZoneName, hostedZoneId: legendHostedZoneId, })
+        const certificate = new certificatemanager.DnsValidatedCertificate(this, "LegendSdlcCert", {
+            hostedZone: hostedZone, domainName: `sdlc.${legendZoneName}`, })
 
         cluster.addCdk8sChart("SDLC", new LegendSdlcChart(new cdk8s.App(), "LegendSdlc", {
             imageId: artifactImageId,

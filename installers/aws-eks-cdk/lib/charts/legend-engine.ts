@@ -82,28 +82,5 @@ export class LegendEngineChart extends cdk8s.Chart {
                 }
             }
         })
-
-        new k8s.Service(this, "LegendEngineService", {
-            metadata: {
-                name: service,
-                annotations: {
-                    'service.beta.kubernetes.io/aws-load-balancer-type': 'nlb-ip'
-                }
-            },
-            spec: {
-                ports: [
-                    {
-                        port: 443,
-                        targetPort: 443,
-                        protocol: 'TCP'
-                    },
-                ],
-                type: 'LoadBalancer',
-                selector: {
-                    app: app
-                }
-            },
-        })
-
     }
 }

@@ -89,28 +89,5 @@ export class LegendSdlcChart extends cdk8s.Chart {
                 }
             }
         })
-
-        new k8s.Service(this, "LegendSDLCService", {
-            metadata: {
-                name: service,
-                annotations: {
-                    'service.beta.kubernetes.io/aws-load-balancer-type': 'nlb-ip'
-                }
-            },
-            spec: {
-                ports: [
-                    {
-                        port: 80,
-                        targetPort: 80,
-                        protocol: 'TCP'
-                    },
-                ],
-                type: 'LoadBalancer',
-                selector: {
-                    app: app
-                }
-            },
-        })
-
     }
 }
