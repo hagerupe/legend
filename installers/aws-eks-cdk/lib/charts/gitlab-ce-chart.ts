@@ -82,7 +82,7 @@ export class GitlabCeChart extends cdk8s.Chart {
                                 ],
                                 resources: {
                                     requests: {
-                                        memory: Quantity.fromString("2048Mi"),
+                                        memory: Quantity.fromString("4096Mi"),
                                         cpu: Quantity.fromString("2000m")
                                     }
                                 },

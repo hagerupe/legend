@@ -92,6 +92,8 @@
 
 - `kubectl rollout restart deployment [deployment_name]`
 
+- `kubectl replace -f [pod_name]`
+
 ## TODOs:
 
 Rename gitlab oauth parameters
