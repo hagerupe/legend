@@ -6,6 +6,7 @@ import {LegendEngineStack} from "./stacks/legend-engine";
 import {LegendSdlcStack} from "./stacks/legend-sdlc";
 import {LegendStudioStack} from "./stacks/legend-studio";
 import {LegendIngressStack} from "./stacks/legend-ingress";
+import {LegendIngressChart} from "./charts/legend-ingress-chart";
 
 export interface LegendInfrastructureStageProps extends StageProps {
     repositoryNames: string[],
@@ -14,6 +15,8 @@ export interface LegendInfrastructureStageProps extends StageProps {
 export class LegendInfrastructureStage extends Stage {
     constructor(scope: Construct, id: string, props: LegendInfrastructureStageProps) {
         super(scope, id, props);
+
+        LegendIngressChart.synth()
 
         // Base networking and Kubernetes infrastructure
         const kubernetes = new KubernetesStack(this, "Kubernetes", {
