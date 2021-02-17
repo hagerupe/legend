@@ -71,19 +71,11 @@ aws secretsmanager create-secret --name dockerhub-credentials --secret-string '{
 
 ## TODOs:
 
-Setup container insights
-
-Add documentation on running kubectl / installing etc
-
 LegendSDLC build fails - need to disable docker integ test stuff
 
 LegendStudio build fails - Add profile for legend-studio to disable git commit plugin 
 
-Make Gitlab durable
-
 Make Mongo durable
-
-Switch mongo LB to be internal instead of external
 
 Dashboards! (Woot)
 

@@ -42,7 +42,7 @@ export class LegendEngineStack extends LegendApplicationStack {
             gitlabOauthClientId: 'foo', // TODO
             gitlabOauthSecret: 'foo', // TODO
             gitlabPublicUrl: `https://gitlab.${legendZoneName}`,
-            mongoHostPort: 27017,
+            mongoHostPort: 'mongo-service.default.svc.cluster.local',
             mongoUser: 'admin',
             mongoPassword: resolveMongoPass.response,
             legendEnginePort: 80,

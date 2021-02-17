@@ -12,7 +12,7 @@ export interface LegendSdlcProps {
     readonly gitlabPublicUrl: string,
     readonly mongoUser: string,
     readonly mongoPassword: string,
-    readonly mongoHostPort: number,
+    readonly mongoHostPort: string,
     readonly gitlabHost: string,
     readonly gitlabPort: number,
     readonly legendSdlcUrl: string,
@@ -30,7 +30,7 @@ export class LegendSdlcChart extends cdk8s.Chart {
             .replace('__GITLAB_PUBLIC_URL__', props.gitlabPublicUrl)
             .replace('__MONGO_USER__', props.mongoUser)
             .replace('__MONGO_PASSWORD__', props.mongoPassword)
-            .replace('__MONGO_HOST_PORT__', String(props.mongoHostPort))
+            .replace('__MONGO_HOST_PORT__', props.mongoHostPort)
             .replace('__GITLAB_HOST__', props.gitlabHost)
             .replace('__GITLAB_PORT__', String(props.legendSdlcPort))
             .replace('__LEGEND_SDLC_URL__', props.legendSdlcUrl)

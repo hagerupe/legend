@@ -11,7 +11,7 @@ export interface LegendEngineChartProps {
     readonly gitlabPublicUrl: string,
     readonly mongoUser: string,
     readonly mongoPassword: string,
-    readonly mongoHostPort: number,
+    readonly mongoHostPort: string,
     readonly legendEnginePort: number
 }
 
