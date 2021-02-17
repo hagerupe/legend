@@ -19,20 +19,39 @@ export interface LegendSdlcProps {
 }
 
 export class LegendSdlcChart extends cdk8s.Chart {
+
+    static synth() {
+        const app = new cdk8s.App();
+        new LegendSdlcChart(app, "LegendStudio", {
+            imageId: '752499117019.dkr.ecr.us-east-1.amazonaws.com/legend-studio:3d199f2',
+            legendSdlcPort: 80,
+            mongoUser: 'admin',
+            mongoPassword: '8296daf8-6fb6-11eb-9439-0242ac130002',
+            mongoHostPort: 'mongo-service.default.svc.cluster.local',
+            gitlabOauthClientId: 'legend',
+            gitlabOauthSecret: 'foobar',
+            gitlabPublicUrl: `https://gitlab.sky-hagere.io`,
+            legendSdlcUrl: `https://sdlc.sky-hagere.io`,
+            gitlabHost: 'foobar',
+            gitlabPort: 80,
+        })
+        app.synth()
+    }
+
     constructor(scope: constructs.Construct, id: string, props: LegendSdlcProps) {
         super(scope, id);
 
         const templateText = fs.readFileSync(path.join('resources', 'configs', 'sdlc', 'config.json'), {encoding: 'utf8'})
-            .replace('__LEGEND_SDLC_PORT__', String(props.legendSdlcPort))
-            .replace('__GITLAB_OAUTH_CLIENT_ID__', props.gitlabOauthClientId)
-            .replace('__GITLAB_OAUTH_SECRET__', props.gitlabOauthSecret)
-            .replace('__GITLAB_PUBLIC_URL__', props.gitlabPublicUrl)
-            .replace('__MONGO_USER__', props.mongoUser)
-            .replace('__MONGO_PASSWORD__', props.mongoPassword)
-            .replace('__MONGO_HOST_PORT__', props.mongoHostPort)
-            .replace('__GITLAB_HOST__', props.gitlabHost)
-            .replace('__GITLAB_PORT__', String(props.legendSdlcPort))
-            .replace('__LEGEND_SDLC_URL__', props.legendSdlcUrl)
+            .replace(RegExp('__LEGEND_SDLC_PORT__', 'g'), String(props.legendSdlcPort))
+            .replace(RegExp('__GITLAB_OAUTH_CLIENT_ID__', 'g'), props.gitlabOauthClientId)
+            .replace(RegExp('__GITLAB_OAUTH_SECRET__', 'g'), props.gitlabOauthSecret)
+            .replace(RegExp('__GITLAB_PUBLIC_URL__', 'g'), props.gitlabPublicUrl)
+            .replace(RegExp('__MONGO_USER__', 'g'), props.mongoUser)
+            .replace(RegExp('__MONGO_PASSWORD__', 'g'), props.mongoPassword)
+            .replace(RegExp('__MONGO_HOST_PORT__', 'g'), props.mongoHostPort)
+            .replace(RegExp('__GITLAB_HOST__', 'g'), props.gitlabHost)
+            .replace(RegExp('__GITLAB_PORT__', 'g'), String(props.legendSdlcPort))
+            .replace(RegExp('__LEGEND_SDLC_URL__', 'g'), props.legendSdlcUrl)
 
         const config = new k8s.ConfigMap(this, "Config", {
             data: {
