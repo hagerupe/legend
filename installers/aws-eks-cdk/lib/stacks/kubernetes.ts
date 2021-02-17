@@ -8,6 +8,8 @@ import {EksAwsIngressController} from "../constructs/eks-aws-ingress-controller"
 import * as ecr from "@aws-cdk/aws-ecr";
 import {LegendApplicationStack} from "./legend-application-stack";
 import {ContainerInsights} from "../constructs/container-insights";
+import * as fs from "fs";
+import * as path from "path";
 
 export interface KubernetesStackProperties extends StackProps{
   repositoryNames: string[];
@@ -54,6 +56,11 @@ export class KubernetesStack extends LegendApplicationStack {
         "CloudWatchAgentServerPolicy", "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"))
     nodeGroup.role.addManagedPolicy(iam.ManagedPolicy.fromManagedPolicyArn(this,
         "SSMManagedInstancePolicy", "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"))
+
+    const ebsPolicy = new iam.Policy(this, "EbsPolicy", {
+      document: iam.PolicyDocument.fromJson(JSON.parse(fs.readFileSync(path.join('resources', 'ebs-policy.json'), {encoding: 'utf8'})))
+    })
+    ebsPolicy.attachToRole(nodeGroup.role);
 
     // Set up EKS master roles
     const masterRoleAccessName = ssm.StringParameter.valueForStringParameter(this, 'master-role-access');
