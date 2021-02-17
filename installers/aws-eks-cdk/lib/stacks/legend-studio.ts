@@ -48,7 +48,7 @@ export class LegendStudioStack extends LegendApplicationStack {
             gitlabOauthClientId: gitlabClientId,
             gitlabOauthSecret: gitlabAccessCode,
             gitlabPublicUrl: `https://gitlab.${legendZoneName}`,
-            legendStudioPort: 80,
+            legendStudioPort: 443,
             legendEngineUrl: `https://engine.${legendZoneName}`,
             legendSdlcUrl: `https://sdlc.${legendZoneName}`,
             legendStudioHost: legendZoneName,

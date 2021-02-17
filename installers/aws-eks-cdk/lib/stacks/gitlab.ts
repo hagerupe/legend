@@ -42,7 +42,7 @@ export class GitlabStack extends LegendApplicationStack {
         const gitlabPassword = new secretsmanager.Secret(this, "GitlabRootPassword");
         const resolveSecret = new ResolveSecret(this, "ResolvedGitlabPassword", { secret: gitlabPassword })
         cluster.addCdk8sChart("GitlabCE", new GitlabCeChart(new cdk8s.App(), "GitlabCEChart", {
-            gitlabExternalUrl: 'gitlab.legend.com',
+            gitlabExternalUrl: `https://gitlab.${legendZoneName}`,
             gitlabRootPassword: resolveSecret.response,
             image: artifactImageId,
             legendDomain: legendZoneName,
