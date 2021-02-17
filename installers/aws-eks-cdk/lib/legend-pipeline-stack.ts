@@ -207,7 +207,7 @@ export class LegendPipelineStack extends Stack {
             runtime: lambda.Runtime.PYTHON_3_6,
         })
 
-        pipeline.addApplicationStage(new LegendInfrastructureStage(this, "QA", {
+        pipeline.addApplicationStage(new LegendInfrastructureStage(this, "UAT", {
             env: { account: this.account, region: this.region },
             repositoryNames: repositoryNames,
         }), appStageOptions)
