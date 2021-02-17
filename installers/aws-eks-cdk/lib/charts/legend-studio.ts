@@ -45,7 +45,7 @@ export class LegendStudioChart extends cdk8s.Chart {
             .replace('__MONGO_USER__', props.mongoUser)
             .replace('__MONGO_PASSWORD__', props.mongoPassword)
             .replace('__MONGO_HOST_PORT__', props.mongoHostPort)
-            .replace('__GITLAB_OAUTH_CLIENT_ID__', props.gitlabOauthSecret)
+            .replace('__GITLAB_OAUTH_CLIENT_ID__', props.gitlabOauthClientId)
             .replace('__GITLAB_OAUTH_SECRET__', props.gitlabOauthSecret)
             .replace('__GITLAB_PUBLIC_URL__', props.gitlabPublicUrl)
             .replace('__LEGEND_STUDIO_PORT__', String(props.legendStudioPort))
