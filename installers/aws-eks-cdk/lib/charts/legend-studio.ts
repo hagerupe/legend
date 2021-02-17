@@ -29,10 +29,10 @@ export class LegendStudioChart extends cdk8s.Chart {
             mongoHostPort: 'mongo-service.default.svc.cluster.local',
             gitlabOauthClientId: 'foo', // TODO
             gitlabOauthSecret: 'foo', // TODO
-            gitlabPublicUrl: `gitlab.sky-hagere.io`,
+            gitlabPublicUrl: `https://gitlab.sky-hagere.io`,
             legendStudioPort: 80,
-            legendEngineUrl: `engine.sky-hagere.io`,
-            legendSdlcUrl: `sdlc.sky-hagere.io`,
+            legendEngineUrl: `https://engine.sky-hagere.io`,
+            legendSdlcUrl: `https://sdlc.sky-hagere.io`,
             legendStudioHost: 'sky-hagere.io',
         })
         app.synth()

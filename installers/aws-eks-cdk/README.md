@@ -67,6 +67,8 @@ aws secretsmanager create-secret --name dockerhub-credentials --secret-string '{
 
 - https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#dashboards:name=Legend;expand=true;autoRefresh=60
 
+- `kubectl exec --stdin --tty mongodb-standalone-0 -- /bin/bash`
+
 ## TODOs:
 
 Setup container insights

@@ -44,10 +44,10 @@ export class LegendStudioStack extends LegendApplicationStack {
             mongoHostPort: 'mongo-service.default.svc.cluster.local',
             gitlabOauthClientId: 'foo', // TODO
             gitlabOauthSecret: 'foo', // TODO
-            gitlabPublicUrl: `gitlab.${legendZoneName}`,
+            gitlabPublicUrl: `https://gitlab.${legendZoneName}`,
             legendStudioPort: 80,
-            legendEngineUrl: `engine.${legendZoneName}`,
-            legendSdlcUrl: `sdlc.${legendZoneName}`,
+            legendEngineUrl: `https://engine.${legendZoneName}`,
+            legendSdlcUrl: `https://sdlc.${legendZoneName}`,
             legendStudioHost: legendZoneName,
         }))
     }
