@@ -12,6 +12,17 @@ export interface GitlabCeChartProps {
 }
 
 export class GitlabCeChart extends cdk8s.Chart {
+
+    static synth() {
+        const app = new cdk8s.App();
+        new GitlabCeChart(app, "GitlabCeChart", {
+            gitlabExternalUrl: 'gitlab.sky-hagere.io',
+            gitlabRootPassword: '8296daf8-6fb6-11eb-9439-0242ac130002',
+            image: '752499117019.dkr.ecr.us-east-1.amazonaws.com/legend-gitlab:b8acfc3'
+        })
+        app.synth()
+    }
+
     constructor(scope: constructs.Construct, id: string, props: GitlabCeChartProps) {
         super(scope, id);
 
@@ -59,12 +70,9 @@ export class GitlabCeChart extends cdk8s.Chart {
             }
         })
 
-        const service = new k8s.Service(this, "GitlabCEService", {
+        new k8s.Service(this, "GitlabCEService", {
             metadata: {
                 name: 'gitlab-ce-service',
-                annotations: {
-                    'service.beta.kubernetes.io/aws-load-balancer-type': 'nlb-ip'
-                }
             },
             spec: {
                 ports: [
@@ -74,12 +82,11 @@ export class GitlabCeChart extends cdk8s.Chart {
                         protocol: 'TCP'
                     },
                 ],
-                type: 'LoadBalancer',
+                type: 'NodePort',
                 selector: {
                     app: 'gitlab-ce'
                 }
             },
         })
-
     }
 }

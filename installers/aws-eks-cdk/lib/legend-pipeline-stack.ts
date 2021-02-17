@@ -10,6 +10,8 @@ import {DockerBuildProject} from "./constructs/docker-build-project";
 import {SimpleSynthAction} from "./override/pipelines/lib/synths";
 import * as path from "path";
 import * as fs from "fs";
+import {GitlabCeChart} from "./charts/gitlab-ce-chart";
+import {LegendIngressChart} from "./charts/legend-ingress-chart";
 
 export class LegendPipelineStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {

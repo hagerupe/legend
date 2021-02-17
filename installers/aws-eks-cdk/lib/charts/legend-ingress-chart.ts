@@ -7,6 +7,15 @@ export interface LegendIngressChartProps {
 }
 
 export class LegendIngressChart extends cdk8s.Chart {
+
+    static synth() {
+        const app = new cdk8s.App();
+        new LegendIngressChart(app, "LegendIngressChart", {
+            legendDomain: 'sky-hagere.io',
+        })
+        app.synth()
+    }
+
     constructor(scope: constructs.Construct, id: string, props: LegendIngressChartProps) {
         super(scope, id);
 
@@ -25,14 +34,44 @@ export class LegendIngressChart extends cdk8s.Chart {
                         host: props.legendDomain,
                         http: {
                             paths: [{
-                                path: '/sudio/*',
+                                path: '/studio/*',
                                 backend: {
                                     serviceName: 'legend-studio-service',
                                     servicePort: 80,
                                 }
                             }],
                         }
-                    }
+                    },
+                ]
+            }
+        })
+
+
+        new k8s.Ingress(this, "GitlabIngress", {
+            metadata: {
+                name: 'gitlab-ingress',
+                annotations: {
+                    'kubernetes.io/ingress.class': 'alb',
+                    'alb.ingress.kubernetes.io/listen-ports': '[{"HTTPS":443}]',
+                    'alb.ingress.kubernetes.io/scheme': 'internet-facing',
+                    'alb.ingress.kubernetes.io/backend-protocol': 'HTTPS',
+                    'alb.ingress.kubernetes.io/success-codes': '200,201,302',
+                },
+            },
+            spec: {
+                rules: [
+                    {
+                        host: `gitlab.${props.legendDomain}`,
+                        http: {
+                            paths: [{
+                                path: '/*',
+                                backend: {
+                                    serviceName: 'gitlab-ce-service',
+                                    servicePort: 443,
+                                }
+                            }],
+                        }
+                    },
                 ]
             }
         })

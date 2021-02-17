@@ -17,6 +17,7 @@ export interface LegendStudioProps extends StackProps{
 }
 
 export class LegendStudioStack extends LegendApplicationStack {
+
     constructor(scope: cdk.Construct, id: string, props: LegendStudioProps) {
         super(scope, id, props);
 
