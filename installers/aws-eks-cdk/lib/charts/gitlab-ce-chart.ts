@@ -8,6 +8,7 @@ import * as path from "path";
 export interface GitlabCeChartProps {
     gitlabExternalUrl: string,
     gitlabRootPassword: string,
+    legendDomain: string,
     image: string,
 }
 
@@ -18,7 +19,8 @@ export class GitlabCeChart extends cdk8s.Chart {
         new GitlabCeChart(app, "GitlabCeChart", {
             gitlabExternalUrl: 'https://gitlab.sky-hagere.io',
             gitlabRootPassword: '8296daf8-6fb6-11eb-9439-0242ac130002',
-            image: '752499117019.dkr.ecr.us-east-1.amazonaws.com/legend-gitlab:b8acfc3'
+            image: '752499117019.dkr.ecr.us-east-1.amazonaws.com/legend-gitlab:b8acfc3',
+            legendDomain: 'sky-hagere.io',
         })
         app.synth()
     }
@@ -122,6 +124,36 @@ export class GitlabCeChart extends cdk8s.Chart {
                     app: 'gitlab-ce'
                 }
             },
+        })
+
+
+        new k8s.Ingress(this, "GitlabIngress", {
+            metadata: {
+                name: 'gitlab-ce-ingress',
+                annotations: {
+                    'kubernetes.io/ingress.class': 'alb',
+                    'alb.ingress.kubernetes.io/listen-ports': '[{"HTTPS":443}]',
+                    'alb.ingress.kubernetes.io/scheme': 'internet-facing',
+                    'alb.ingress.kubernetes.io/backend-protocol': 'HTTPS',
+                    'alb.ingress.kubernetes.io/success-codes': '200,201,302',
+                },
+            },
+            spec: {
+                rules: [
+                    {
+                        host: `gitlab.${props.legendDomain}`,
+                        http: {
+                            paths: [{
+                                path: '/*',
+                                backend: {
+                                    serviceName: 'gitlab-ce-service',
+                                    servicePort: 443,
+                                }
+                            }],
+                        }
+                    },
+                ]
+            }
         })
     }
 }

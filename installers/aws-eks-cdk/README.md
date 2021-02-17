@@ -13,7 +13,6 @@
         - Set the `access key` and `secret access key` from the IAM user setup.  
         - Set the region to `us-east-1`
     - Verify by running `aws sts get-caller-identity`, it should return the ARN of the configured user
-
 1. **Install NPM**
     - Refer to: https://nodejs.org/en/download/package-manager/
 1. **Install CDK/CDK8S**
@@ -26,8 +25,6 @@
     
     `aws secretsmanager create-secret --name github-access-token --secret-string <<access-token>>`
 
-aws secretsmanager create-secret --name github-access-token --secret-string <<access-token>>
-
 1. **Create dockerhub secret**
     - The addresses used by CodeBuild are recycled, as such the anonymous access limits for dockerhub are often encountered during builds.
     - Create an access token, refer to: https://docs.docker.com/docker-hub/access-tokens/
@@ -35,11 +32,11 @@ aws secretsmanager create-secret --name github-access-token --secret-string <<ac
 
     `aws secretsmanager create-secret --name dockerhub-credentials --secret-string '{  "Username": "<<username>>", "Password": "<<access-token>>" }'`
 
-aws secretsmanager create-secret --name dockerhub-credentials --secret-string '{  "Username": "<<username>>"," Password": "<<access-token>>" }'
-
 1. **Create Route53 hosted zone for existing / new domain**
     - A domain name may either be registered via Route53, or an existing domains nameservers can be pointed to a new HostedZone.
-    - Store the zone name (e.g. foobar.com) in parameter store:
+        - To register through Route53, refer to: https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html
+        - Otherwise, create a hosted zone in Route53 and delegate the NS records appropriately.
+    - Store the zone name (e.g. foobar.com) and zone id from the route53 console in parameter store:
     
     `aws ssm put-parameter --type String --name legend-zone-name --value <<zone-name>>`
     
@@ -60,21 +57,26 @@ aws secretsmanager create-secret --name dockerhub-credentials --secret-string '{
 1. **Monitor Deployment**
     - Navigate to: https://console.aws.amazon.com/codesuite/codepipeline/pipelines/Legend/view?region=us-east-1
     - Setup will take approximately 60 minutes
-
 1. **Setup CNAME for gitlab**
+
+    TODO document this
 
 1. **Setup GitLab Access Token**
    - Navigate to `https://gitlab.<<zone-name>>/`
    - Create an application
    - Store in parameter store (replace values):
-
+    
     `aws ssm put-parameter --type String --name gitlab-client-id --value <<client-id>>`
        
     `aws ssm put-parameter --type String --name gitlab-access-code --value <<access-token>>`
 
 1. **Deploy Remaining Stacks**
 
+    TODO document this
+
 1. **Add CNAME records**
+
+    TODO document this
 
 ## Debug Utilities:
 
@@ -89,6 +91,8 @@ aws secretsmanager create-secret --name dockerhub-credentials --secret-string '{
 - `kubectl rollout restart deployment [deployment_name]`
 
 ## TODOs:
+
+Rename gitlab oauth parameters
 
 LegendSDLC build fails - need to disable docker integ test stuff
 

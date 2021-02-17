@@ -77,35 +77,5 @@ export class LegendIngressChart extends cdk8s.Chart {
                 ]
             }
         })
-
-
-        new k8s.Ingress(this, "GitlabIngress", {
-            metadata: {
-                name: 'gitlab-ingress',
-                annotations: {
-                    'kubernetes.io/ingress.class': 'alb',
-                    'alb.ingress.kubernetes.io/listen-ports': '[{"HTTPS":443}]',
-                    'alb.ingress.kubernetes.io/scheme': 'internet-facing',
-                    'alb.ingress.kubernetes.io/backend-protocol': 'HTTPS',
-                    'alb.ingress.kubernetes.io/success-codes': '200,201,302',
-                },
-            },
-            spec: {
-                rules: [
-                    {
-                        host: `gitlab.${props.legendDomain}`,
-                        http: {
-                            paths: [{
-                                path: '/*',
-                                backend: {
-                                    serviceName: 'gitlab-ce-service',
-                                    servicePort: 443,
-                                }
-                            }],
-                        }
-                    },
-                ]
-            }
-        })
     }
 }
