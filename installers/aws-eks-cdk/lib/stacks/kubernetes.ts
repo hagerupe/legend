@@ -56,16 +56,11 @@ export class KubernetesStack extends LegendApplicationStack {
         "SSMManagedInstancePolicy", "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"))
 
     // Set up EKS master roles
-    const masterRoleAccessName = ssm.StringParameter.valueForStringParameter(
-        this, 'master-role-access');
+    const masterRoleAccessName = ssm.StringParameter.valueForStringParameter(this, 'master-role-access');
     const masterRoleAssumedBy = iam.Role.fromRoleArn(this, "MasterRoleAssumedBy", `arn:aws:iam::${this.account}:role/${masterRoleAccessName}`)
-    const kubernetesMasterRole = new iam.Role(this, "KubernetesMasterRole", {
-      roleName: 'KubernetesMasterRole',
-      assumedBy: new iam.ArnPrincipal(masterRoleAssumedBy.roleArn)});
+    const kubernetesMasterRole = iam.Role.fromRoleArn(this, "MasterRoleAssumedBy", `arn:aws:iam::${this.account}:role/KubernetesMasterRole`)
     cluster.awsAuth.addMastersRole(kubernetesMasterRole)
     cluster.awsAuth.addMastersRole(masterRoleAssumedBy)
-    kubernetesMasterRole.addManagedPolicy(iam.ManagedPolicy.fromManagedPolicyArn(this,
-        "KubernetesMasterRoleAdministratorAccess", "arn:aws:iam::aws:policy/AdministratorAccess"))
 
     new EksAwsIngressController(this, "IngressController", { cluster, vpc })
 

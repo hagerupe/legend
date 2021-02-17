@@ -10,6 +10,10 @@ import {DockerBuildProject} from "./constructs/docker-build-project";
 import {SimpleSynthAction} from "./override/pipelines/lib/synths";
 import * as path from "path";
 import * as fs from "fs";
+import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
+import {ResolveSecret} from "./constructs/resolve-secret";
+import * as iam from "@aws-cdk/aws-iam";
+import * as ssm from "@aws-cdk/aws-ssm";
 
 export class LegendPipelineStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
@@ -155,6 +159,14 @@ export class LegendPipelineStack extends Stack {
             ]
         }
 
+        const masterRoleAccessName = ssm.StringParameter.valueForStringParameter(this, 'master-role-access');
+        const masterRoleAssumedBy = iam.Role.fromRoleArn(this, "MasterRoleAssumedBy", `arn:aws:iam::${this.account}:role/${masterRoleAccessName}`)
+        const kubernetesMasterRole = new iam.Role(this, "KubernetesMasterRole", {
+            roleName: 'KubernetesMasterRole',
+            assumedBy: new iam.ArnPrincipal(masterRoleAssumedBy.roleArn)});
+        kubernetesMasterRole.addManagedPolicy(iam.ManagedPolicy.fromManagedPolicyArn(this,
+            "KubernetesMasterRoleAdministratorAccess", "arn:aws:iam::aws:policy/AdministratorAccess"))
+
         const artifactImageIdFunction = new lambda.SingletonFunction(this, 'ArtifactImageId', {
             functionName: 'ArtifactImageId',
             uuid: 'f7d4f730-4ee1-11e8-9c2d-fa7ae01bbebc',
@@ -170,6 +182,26 @@ export class LegendPipelineStack extends Stack {
             functionName: 'ResolveSecret',
             uuid: 'def1918a-6fbb-11eb-9439-0242ac130002l',
             code: new lambda.InlineCode(fs.readFileSync(path.join('lib', 'handlers', 'resolveSecret', 'index.py'), { encoding: 'utf-8' })),
+            handler: 'index.main',
+            timeout: cdk.Duration.seconds(300),
+            runtime: lambda.Runtime.PYTHON_3_6,
+        })
+
+        const gitlabAppConfigFunction = new lambda.SingletonFunction(this, 'GitlabAppConfigFunction', {
+            functionName: 'GitlabAppConfigFunction',
+            uuid: '0f1cd18d-01fd-4508-96f0-62f31f4a6140',
+            code: new lambda.AssetCode('lib/handlers/gitlabApplicationConfig'),
+            handler: 'index.main',
+            timeout: cdk.Duration.seconds(300),
+            runtime: lambda.Runtime.PYTHON_3_6,
+        })
+        const gitlabPassword = new secretsmanager.Secret(this, "GitlabRootPassword");
+        gitlabPassword.grantRead(gitlabAppConfigFunction)
+
+        const eksAlbCname = new lambda.SingletonFunction(this, 'EKSALBCnameFunction', {
+            functionName: 'EKSALBCnameFunction',
+            uuid: 'ca78d3ae-8eb2-4b7e-84af-541ee71bd98a',
+            code: new lambda.InlineCode(fs.readFileSync(path.join('lib', 'handlers', 'eksAlbCname', 'index.py'), { encoding: 'utf-8' })),
             handler: 'index.main',
             timeout: cdk.Duration.seconds(300),
             runtime: lambda.Runtime.PYTHON_3_6,

@@ -1,3 +1,5 @@
+# WARNING: These steps have not been hardened for security.
+
 ## Getting Started
 
 1. **Create AWS account if one is not yet available**
@@ -15,7 +17,7 @@
     - Verify by running `aws sts get-caller-identity`, it should return the ARN of the configured user
 1. **Install NPM**
     - Refer to: https://nodejs.org/en/download/package-manager/
-1. **Install CDK/CDK8S**
+1. **Install CDK and CDK8S**
     - Execute `npm install cdk cdk8s -g`
 1. **Create github secret**
     - The github token allows the pipeline to trigger on new commits.

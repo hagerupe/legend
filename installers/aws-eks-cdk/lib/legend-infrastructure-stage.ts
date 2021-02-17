@@ -6,10 +6,6 @@ import {LegendEngineStack} from "./stacks/legend-engine";
 import {LegendSdlcStack} from "./stacks/legend-sdlc";
 import {LegendStudioStack} from "./stacks/legend-studio";
 import {LegendIngressStack} from "./stacks/legend-ingress";
-import {LegendIngressChart} from "./charts/legend-ingress-chart";
-import {LegendDnsStack} from "./stacks/legend-dns";
-import {LegendStudioChart} from "./charts/legend-studio";
-import {LegendSdlcChart} from "./charts/legend-sdlc";
 
 export interface LegendInfrastructureStageProps extends StageProps {
     repositoryNames: string[],
