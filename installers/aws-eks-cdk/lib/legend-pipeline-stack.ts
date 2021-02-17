@@ -107,8 +107,6 @@ export class LegendPipelineStack extends Stack {
         const studioRepositoryName = 'legend-studio';
         const studioProject = new DockerBuildProject(this, 'LegendStudio', {
             preBuildCommands: [
-                'mkdir -p target/classes/web/studio',
-                'cp version.json target/classes/web/studio/',
                 'mvn install',
             ],
             repositoryName: studioRepositoryName

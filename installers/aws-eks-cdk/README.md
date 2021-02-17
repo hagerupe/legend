@@ -65,12 +65,16 @@ aws secretsmanager create-secret --name dockerhub-credentials --secret-string '{
 
 1. **Setup GitLab Access Token**
    - Navigate to `https://gitlab.<<zone-name>>/`
-   - Create an access token
+   - Create an application
    - Store in parameter store (replace values):
 
     `aws ssm put-parameter --type String --name gitlab-client-id --value <<client-id>>`
        
     `aws ssm put-parameter --type String --name gitlab-access-code --value <<access-token>>`
+
+1. **Deploy Remaining Stacks**
+
+1. **Add CNAME records**
 
 ## Debug Utilities:
 
