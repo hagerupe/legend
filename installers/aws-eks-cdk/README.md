@@ -60,7 +60,8 @@
     - Navigate to: https://console.aws.amazon.com/codesuite/codepipeline/pipelines/Legend/view?region=us-east-1
     - Setup will take approximately 60 minutes
 1. **Setup CNAME for gitlab**
-
+    - https://aws.amazon.com/premiumsupport/knowledge-center/route-53-create-alias-records/
+    
     TODO document this
 
 1. **Setup GitLab Access Token**
@@ -73,11 +74,12 @@
     `aws ssm put-parameter --type String --name gitlab-access-code --value <<access-token>>`
 
 1. **Deploy Remaining Stacks**
+    - Navigate to: https://console.aws.amazon.com/codesuite/codepipeline/pipelines/Legend/view?region=us-east-1
+    - Click `Release Changes`
 
-    TODO document this
-
-1. **Add CNAME records**
-
+1. **Add CNAME records for legend domains**
+    - https://aws.amazon.com/premiumsupport/knowledge-center/route-53-create-alias-records/
+    
     TODO document this
 
 ## Debug Utilities:

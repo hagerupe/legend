@@ -82,6 +82,7 @@ export class GitlabCeChart extends cdk8s.Chart {
                                 ],
                                 resources: {
                                     requests: {
+                                        // Needs 4GB of RAM or NGinx doesn't always configure correctly...
                                         memory: Quantity.fromString("4096Mi"),
                                         cpu: Quantity.fromString("2000m")
                                     }
