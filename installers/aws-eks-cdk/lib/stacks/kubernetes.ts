@@ -58,7 +58,7 @@ export class KubernetesStack extends LegendApplicationStack {
     // Set up EKS master roles
     const masterRoleAccessName = ssm.StringParameter.valueForStringParameter(this, 'master-role-access');
     const masterRoleAssumedBy = iam.Role.fromRoleArn(this, "MasterRoleAssumedBy", `arn:aws:iam::${this.account}:role/${masterRoleAccessName}`)
-    const kubernetesMasterRole = iam.Role.fromRoleArn(this, "MasterRoleAssumedBy", `arn:aws:iam::${this.account}:role/KubernetesMasterRole`)
+    const kubernetesMasterRole = iam.Role.fromRoleArn(this, "KubernetesMasterRole", `arn:aws:iam::${this.account}:role/KubernetesMasterRole`)
     cluster.awsAuth.addMastersRole(kubernetesMasterRole)
     cluster.awsAuth.addMastersRole(masterRoleAssumedBy)
 
