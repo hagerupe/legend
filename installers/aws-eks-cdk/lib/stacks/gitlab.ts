@@ -44,7 +44,8 @@ export class GitlabStack extends LegendApplicationStack {
         cluster.addCdk8sChart("GitlabCE", new GitlabCeChart(new cdk8s.App(), "GitlabCEChart", {
             gitlabExternalUrl: 'gitlab.legend.com',
             gitlabRootPassword: resolveSecret.response,
-            image: artifactImageId
+            image: artifactImageId,
+            legendDomain: legendZoneName,
         }))
     }
 }
