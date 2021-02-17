@@ -16,8 +16,6 @@ export class LegendInfrastructureStage extends Stage {
     constructor(scope: Construct, id: string, props: LegendInfrastructureStageProps) {
         super(scope, id, props);
 
-        LegendIngressChart.synth()
-
         // Base networking and Kubernetes infrastructure
         const kubernetes = new KubernetesStack(this, "Kubernetes", {
             repositoryNames: props.repositoryNames,
