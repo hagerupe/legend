@@ -30,8 +30,30 @@ export class GitlabCeChart extends cdk8s.Chart {
             .replace('__GITLAB_EXTERNAL_URL__', props.gitlabExternalUrl)
             .replace('__GITLAB_ROOT_PASSWORD__', props.gitlabRootPassword)
 
-        // TODO This isn't actually durable...
-        const  deployment = new k8s.Deployment(this, "GitlabCE", {
+        const storageClass = new k8s.StorageClass(this, "GitlabStorageClass", {
+            metadata: {
+                name: 'gl-sc'
+            },
+            provisioner: 'ebs.csi.aws.com',
+            volumeBindingMode: 'WaitForFirstConsumer',
+        })
+
+        const volumeClaim = new k8s.PersistentVolumeClaim(this, "GitlabDataVolumeClaim", {
+            metadata: {
+                name: 'gitlab-data-vol-claim'
+            },
+            spec: {
+                accessModes: ['ReadWriteOnce'],
+                storageClassName: storageClass.name,
+                resources: {
+                    requests: {
+                        storage: Quantity.fromString("100Gi")
+                    }
+                }
+            }
+        })
+
+        const deployment = new k8s.Deployment(this, "GitlabCE", {
             spec: {
                 selector: {
                     matchLabels: {
@@ -62,7 +84,20 @@ export class GitlabCeChart extends cdk8s.Chart {
                                         cpu: Quantity.fromString("2000m")
                                     }
                                 },
-                                // TODO volume mount
+                                volumeMounts: [
+                                    {
+                                        name: 'persistent-storage',
+                                        mountPath: '/var/opt/gitlab'
+                                    }
+                                ]
+                            }
+                        ],
+                        volumes: [
+                            {
+                                name: 'persistent-storage',
+                                persistentVolumeClaim: {
+                                    claimName: volumeClaim.name,
+                                }
                             }
                         ]
                     }
