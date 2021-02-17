@@ -22,7 +22,6 @@ export class LegendSdlcChart extends cdk8s.Chart {
     constructor(scope: constructs.Construct, id: string, props: LegendSdlcProps) {
         super(scope, id);
 
-        // TODO update these based off of config
         const templateText = fs.readFileSync(path.join('resources', 'configs', 'sdlc', 'config.json'), {encoding: 'utf8'})
             .replace('__LEGEND_SDLC_PORT__', String(props.legendSdlcPort))
             .replace('__GITLAB_OAUTH_CLIENT_ID__', props.gitlabOauthClientId)
@@ -41,7 +40,6 @@ export class LegendSdlcChart extends cdk8s.Chart {
             }
         })
 
-        // TODO get image from build input source
         const app = 'legend-sdlc'
         const service = app + "-service"
         new k8s.Deployment(this, "LegendSdlc", {

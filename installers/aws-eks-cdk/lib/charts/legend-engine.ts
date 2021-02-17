@@ -34,7 +34,6 @@ export class LegendEngineChart extends cdk8s.Chart {
             }
         })
 
-        // TODO get image from build input source
         const app = 'legend-engine'
         const service = app + "-service"
         new k8s.Deployment(this, "LegendEngine", {
@@ -83,7 +82,7 @@ export class LegendEngineChart extends cdk8s.Chart {
             }
         })
 
-        new k8s.Service(this, "LegendEngine", {
+        new k8s.Service(this, "LegendEngineService", {
             metadata: {
                 name: service,
             },
