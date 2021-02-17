@@ -7,6 +7,7 @@ import {LegendSdlcStack} from "./stacks/legend-sdlc";
 import {LegendStudioStack} from "./stacks/legend-studio";
 import {LegendIngressStack} from "./stacks/legend-ingress";
 import {LegendIngressChart} from "./charts/legend-ingress-chart";
+import {LegendDnsStack} from "./stacks/legend-dns";
 
 export interface LegendInfrastructureStageProps extends StageProps {
     repositoryNames: string[],
@@ -46,5 +47,9 @@ export class LegendInfrastructureStage extends Stage {
 
         const ingress = new LegendIngressStack(this, "Ingress", stackParams);
         ingress.addDependency(studio)
+
+        // TODO need to wait for load balancers to be created before this stack runs...
+        //const dns = new LegendDnsStack(this, "DNS", stackParams);
+        //dns.addDependency(ingress);
     }
 }

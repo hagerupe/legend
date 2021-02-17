@@ -59,7 +59,7 @@ export class LegendSdlcChart extends cdk8s.Chart {
                     spec: {
                         containers: [
                             {
-                                name: 'legend-engine',
+                                name: 'legend-sdlc',
                                 image: props.imageId,
                                 volumeMounts: [
                                     {

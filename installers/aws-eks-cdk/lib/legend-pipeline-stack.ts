@@ -10,8 +10,6 @@ import {DockerBuildProject} from "./constructs/docker-build-project";
 import {SimpleSynthAction} from "./override/pipelines/lib/synths";
 import * as path from "path";
 import * as fs from "fs";
-import {GitlabCeChart} from "./charts/gitlab-ce-chart";
-import {LegendIngressChart} from "./charts/legend-ingress-chart";
 
 export class LegendPipelineStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
@@ -109,8 +107,9 @@ export class LegendPipelineStack extends Stack {
         const studioRepositoryName = 'legend-studio';
         const studioProject = new DockerBuildProject(this, 'LegendStudio', {
             preBuildCommands: [
+                'mkdir -p target/classes/web/studio',
+                'cp version.json target/classes/web/studio/',
                 'mvn install',
-                'mv version.json target/classes/web/studio/'
             ],
             repositoryName: studioRepositoryName
         })
