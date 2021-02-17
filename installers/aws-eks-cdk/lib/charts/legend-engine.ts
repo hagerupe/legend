@@ -24,7 +24,7 @@ export class LegendEngineChart extends cdk8s.Chart {
             .replace('__GITLAB_OAUTH_SECRET__', props.gitlabOauthSecret)
             .replace('__GITLAB_PUBLIC_URL__', props.gitlabPublicUrl)
             .replace('__MONGO_USER__', props.mongoUser)
-            .replace('__MONGO_PASSWORD__', props.mongoPassword) // TODO should be in secret store not a config file...
+            .replace('__MONGO_PASSWORD__', props.mongoPassword)
             .replace('__MONGO_HOST_PORT__', String(props.mongoHostPort))
             .replace('__LEGEND_ENGINE_PORT__', String(props.legendEnginePort))
 

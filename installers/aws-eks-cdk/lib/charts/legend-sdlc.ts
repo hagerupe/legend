@@ -6,6 +6,16 @@ import * as path from "path";
 
 export interface LegendSdlcProps {
     readonly imageId: string
+    readonly legendSdlcPort: number,
+    readonly gitlabOauthClientId: string,
+    readonly gitlabOauthSecret: string,
+    readonly gitlabPublicUrl: string,
+    readonly mongoUser: string,
+    readonly mongoPassword: string,
+    readonly mongoHostPort: number,
+    readonly gitlabHost: string,
+    readonly gitlabPort: number,
+    readonly legendSdlcUrl: string,
 }
 
 export class LegendSdlcChart extends cdk8s.Chart {
@@ -14,14 +24,16 @@ export class LegendSdlcChart extends cdk8s.Chart {
 
         // TODO update these based off of config
         const templateText = fs.readFileSync(path.join('resources', 'configs', 'sdlc', 'config.json'), {encoding: 'utf8'})
-            .replace('__GITLAB_OAUTH_CLIENT_ID__', 'foo')
-            .replace('__GITLAB_OAUTH_SECRET__', 'foo')
-            .replace('__GITLAB_PUBLIC_URL__', 'foo')
-            .replace('__MONGO_USER__', 'foo')
-            .replace('__MONGO_PASSWORD__', 'foo')
-            .replace('__MONGO_HOST_PORT__', 'foo')
-            .replace('__LEGEND_SDLC_URL__', '1234')
-            .replace('__LEGEND_SDLC_PORT__', '1234')
+            .replace('__LEGEND_SDLC_PORT__', String(props.legendSdlcPort))
+            .replace('__GITLAB_OAUTH_CLIENT_ID__', props.gitlabOauthClientId)
+            .replace('__GITLAB_OAUTH_SECRET__', props.gitlabOauthSecret)
+            .replace('__GITLAB_PUBLIC_URL__', props.gitlabPublicUrl)
+            .replace('__MONGO_USER__', props.mongoUser)
+            .replace('__MONGO_PASSWORD__', props.mongoPassword)
+            .replace('__MONGO_HOST_PORT__', String(props.mongoHostPort))
+            .replace('__GITLAB_HOST__', props.gitlabHost)
+            .replace('__GITLAB_PORT__', String(props.legendSdlcPort))
+            .replace('__LEGEND_SDLC_URL__', props.legendSdlcUrl)
 
         const config = new k8s.ConfigMap(this, "Config", {
             data: {

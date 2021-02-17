@@ -34,11 +34,11 @@ export class LegendEngineStack extends LegendApplicationStack {
             imageId: artifactImageId,
             gitlabOauthClientId: 'foo', // TODO
             gitlabOauthSecret: 'foo', // TODO
-            gitlabPublicUrl: `gitlab.${legendZoneName}`,
+            gitlabPublicUrl: `https://gitlab.${legendZoneName}`,
             mongoHostPort: 27017,
             mongoUser: 'admin',
             mongoPassword: resolveMongoPass.response,
-            legendEnginePort: 1234 // TODO
+            legendEnginePort: 80,
         }))
     }
 }
