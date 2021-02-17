@@ -33,7 +33,7 @@ export class LegendSdlcChart extends cdk8s.Chart {
             gitlabPublicUrl: `https://gitlab.sky-hagere.io`,
             legendSdlcUrl: `https://sdlc.sky-hagere.io`,
             gitlabHost: 'foobar',
-            gitlabPort: 80,
+            gitlabPort: 443,
         })
         app.synth()
     }
@@ -50,7 +50,7 @@ export class LegendSdlcChart extends cdk8s.Chart {
             .replace(RegExp('__MONGO_PASSWORD__', 'g'), props.mongoPassword)
             .replace(RegExp('__MONGO_HOST_PORT__', 'g'), props.mongoHostPort)
             .replace(RegExp('__GITLAB_HOST__', 'g'), props.gitlabHost)
-            .replace(RegExp('__GITLAB_PORT__', 'g'), String(props.legendSdlcPort))
+            .replace(RegExp('__GITLAB_PORT__', 'g'), String(props.gitlabPort))
             .replace(RegExp('__LEGEND_SDLC_URL__', 'g'), props.legendSdlcUrl)
 
         const config = new k8s.ConfigMap(this, "Config", {
