@@ -8,14 +8,6 @@ export interface LegendIngressChartProps {
 
 export class LegendIngressChart extends cdk8s.Chart {
 
-    static synth() {
-        const app = new cdk8s.App();
-        new LegendIngressChart(app, "LegendIngressChart", {
-            legendDomain: 'sky-hagere.io',
-        })
-        app.synth()
-    }
-
     constructor(scope: constructs.Construct, id: string, props: LegendIngressChartProps) {
         super(scope, id);
 

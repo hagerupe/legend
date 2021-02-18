@@ -20,24 +20,6 @@ export interface LegendStudioChartProps {
 
 export class LegendStudioChart extends cdk8s.Chart {
 
-    static synth() {
-        const app = new cdk8s.App();
-        new LegendStudioChart(app, "LegendStudio", {
-            imageId: '752499117019.dkr.ecr.us-east-1.amazonaws.com/legend-studio:3d199f2',
-            mongoUser: 'admin',
-            mongoPassword: '8296daf8-6fb6-11eb-9439-0242ac130002',
-            mongoHostPort: 'mongo-service.default.svc.cluster.local',
-            gitlabOauthClientId: 'legend',
-            gitlabOauthSecret: 'foobar',
-            gitlabPublicUrl: `https://gitlab.sky-hagere.io`,
-            legendStudioPort: 80,
-            legendEngineUrl: `https://engine.sky-hagere.io`,
-            legendSdlcUrl: `https://sdlc.sky-hagere.io`,
-            legendStudioHost: 'sky-hagere.io',
-        })
-        app.synth()
-    }
-
     constructor(scope: constructs.Construct, id: string, props: LegendStudioChartProps) {
         super(scope, id);
 

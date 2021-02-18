@@ -9,16 +9,9 @@ export interface MongoCharProps {
 
 export class MongoChart extends cdk8s.Chart {
 
-    static synth() {
-        const app = new cdk8s.App();
-        new MongoChart(app, "MonogoChart", { password: '8296daf8-6fb6-11eb-9439-0242ac130002' })
-        app.synth()
-    }
-
     constructor(scope: constructs.Construct, id: string, props: MongoCharProps) {
         super(scope, id);
 
-        // TODO This isn't actually durable... we should seriously look into not using a self run mongo.
         const statefulSet = new k8s.StatefulSet(this, "MongoStandalone", {
             metadata: {
                 name: 'mongodb-standalone'

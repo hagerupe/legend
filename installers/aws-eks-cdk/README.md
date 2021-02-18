@@ -69,6 +69,14 @@
    - Create an application
    - Store in parameter store (replace values):
     
+    https://engine.sky-hagere.io/callback
+    
+    https://sdlc.sky-hagere.io/api/auth/callback
+    
+    https://sdlc.sky-hagere.io/api/pac4j/login/callback
+    
+    https://sky-hagere.io/studio/log.in/callback
+    
     `aws ssm put-parameter --type String --name gitlab-client-id --value <<client-id>>`
        
     `aws ssm put-parameter --type String --name gitlab-access-code --value <<access-token>>`

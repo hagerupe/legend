@@ -14,17 +14,6 @@ export interface GitlabCeChartProps {
 
 export class GitlabCeChart extends cdk8s.Chart {
 
-    static synth() {
-        const app = new cdk8s.App();
-        new GitlabCeChart(app, "GitlabCeChart", {
-            gitlabExternalUrl: 'https://gitlab.sky-hagere.io',
-            gitlabRootPassword: '8296daf8-6fb6-11eb-9439-0242ac130002',
-            image: '752499117019.dkr.ecr.us-east-1.amazonaws.com/legend-gitlab:b8acfc3',
-            legendDomain: 'sky-hagere.io',
-        })
-        app.synth()
-    }
-
     constructor(scope: constructs.Construct, id: string, props: GitlabCeChartProps) {
         super(scope, id);
 
