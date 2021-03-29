@@ -5,7 +5,7 @@ import * as codebuild from "@aws-cdk/aws-codebuild";
 import {BuildEnvironmentVariableType} from "@aws-cdk/aws-codebuild";
 
 export interface StaticBuildProjectProps {
-    preBuildCommands: string[]
+
 }
 
 export class StaticBuildProject extends Construct {

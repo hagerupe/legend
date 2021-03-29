@@ -24,7 +24,6 @@ export class LegendPipelineStack extends Stack {
         const legendSource = new codepipeline.Artifact();
         const engineSource = new codepipeline.Artifact();
         const sdlcSource = new codepipeline.Artifact();
-        const studioSource = new codepipeline.Artifact();
         const cloudAssemblyArtifact = new codepipeline.Artifact();
 
         const githubSecret = SecretValue.secretsManager('github-access-token')
@@ -76,15 +75,6 @@ export class LegendPipelineStack extends Stack {
             trigger: GitHubTrigger.POLL
         }))
 
-        pipeline.codePipeline.stage('Source').addAction(new GitHubSourceAction({
-            actionName: 'LegendStudio',
-            output: studioSource,
-            oauthToken: githubSecret,
-            owner: 'hagerupe',
-            repo: 'legend-studio',
-            trigger: GitHubTrigger.POLL
-        }))
-
         const runtimeBuildStage = pipeline.addStage("Legend_Runtime_Build");
 
         const engineImageDetails = new codepipeline.Artifact();
@@ -107,7 +97,7 @@ export class LegendPipelineStack extends Stack {
         runtimeBuildStage.addActions(new CodeBuildAction({
             actionName: 'Legend_Config',
             input: configSource,
-            project: new StaticBuildProject(this, 'LegendConfigProject',  {preBuildCommands:[]}).project,
+            project: new StaticBuildProject(this, 'LegendConfigProject',  {}).project,
             outputs: [ configArtifact ]
         }))
 
@@ -124,22 +114,6 @@ export class LegendPipelineStack extends Stack {
             input: legendSource,
             project: gitlabProject.project,
             outputs: [ gitlabImageDetails ]
-        }))
-
-        // https://console.aws.amazon.com/codesuite/codebuild/752499117019/projects/LegendStudioProject54E1861C-8uRXUEqTK5vq/build/LegendStudioProject54E1861C-8uRXUEqTK5vq%3A31d602c9-fd1f-4237-92f2-c29510f35fef/?region=us-east-1
-        const studioImageDetails = new codepipeline.Artifact();
-        const studioRepositoryName = 'legend-studio';
-        const studioProject = new DockerBuildProject(this, 'LegendStudio', {
-            preBuildCommands: [
-                'mvn install',
-            ],
-            repositoryName: studioRepositoryName
-        })
-        runtimeBuildStage.addActions(new CodeBuildAction({
-            actionName: 'Legend_Studio',
-            input: studioSource,
-            project: studioProject.project,
-            outputs: [ studioImageDetails ]
         }))
 
         // https://console.aws.amazon.com/codesuite/codebuild/752499117019/projects/LegendSDLCProject1E6074E7-lgyP9viVXqkI/build/LegendSDLCProject1E6074E7-lgyP9viVXqkI%3A64cec97b-ffd3-43a7-bc79-f06556d63ec9/?region=us-east-1
@@ -168,8 +142,6 @@ export class LegendPipelineStack extends Stack {
                 EngineArtifactObjectKey: engineImageDetails.objectKey,
                 SDLCArtifactBucketName: sdlcImageDetails.bucketName,
                 SDLCArtifactObjectKey: sdlcImageDetails.objectKey,
-                StudioArtifactBucketName: studioImageDetails.bucketName,
-                StudioArtifactObjectKey: studioImageDetails.objectKey,
 
                 ConfigArtifactBucketName: configArtifact.bucketName,
                 ConfigArtifactObjectKey: configArtifact.objectKey,
@@ -178,7 +150,6 @@ export class LegendPipelineStack extends Stack {
                 gitlabImageDetails,
                 engineImageDetails,
                 sdlcImageDetails,
-                studioImageDetails,
                 configArtifact,
             ]
         }

@@ -12,9 +12,6 @@ export class LegendApplicationStack extends Stack {
     readonly sdlcArtifactBucketName: CfnParameter
     readonly sdlcArtifactObjectKey: CfnParameter
 
-    readonly studioArtifactBucketName: CfnParameter
-    readonly studioArtifactObjectKey: CfnParameter
-
     readonly configArtifactBucketName: CfnParameter
     readonly configArtifactObjectKey: CfnParameter
 
@@ -29,9 +26,6 @@ export class LegendApplicationStack extends Stack {
 
         this.sdlcArtifactBucketName = new CfnParameter(this, "SDLCArtifactBucketName");
         this.sdlcArtifactObjectKey = new CfnParameter(this, "SDLCArtifactObjectKey");
-
-        this.studioArtifactBucketName = new CfnParameter(this, "StudioArtifactBucketName");
-        this.studioArtifactObjectKey = new CfnParameter(this, "StudioArtifactObjectKey");
 
         this.configArtifactBucketName = new CfnParameter(this, "ConfigArtifactBucketName");
         this.configArtifactObjectKey = new CfnParameter(this, "ConfigArtifactObjectKey");
