@@ -16,7 +16,7 @@ export interface GitlabAppConfigProps {
 export class GitlabAppConfigFunction extends lambda.SingletonFunction {
     constructor(scope: cdk.Construct, id: string, props?: lambda.SingletonFunctionProps) {
         super(scope, id, {
-            ...{functionName: 'GitlabAppConfigFunction',
+            ...{functionName: 'GitlabAppConfig',
                 uuid: '0f1cd18d-01fd-4508-96f0-62f31f4a6140',
                 code: new lambda.AssetCode('lib/handlers/gitlabApplicationConfig'),
                 handler: 'index.main',
