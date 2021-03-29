@@ -18,6 +18,7 @@ import {StaticBuildProject} from "./constructs/static-build-project";
 import {ManagedPolicy} from "@aws-cdk/aws-iam";
 import {ArtifactImageIdFunction} from "./constructs/artifact-image-id";
 import {ResolveConfigFunction} from "./constructs/resolve-config";
+import {GitlabAppConfig, GitlabAppConfigFunction} from "./constructs/gitlab-app-config";
 
 export class LegendPipelineStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
@@ -168,17 +169,7 @@ export class LegendPipelineStack extends Stack {
         new ArtifactImageIdFunction(this, 'ArtifactImageId', { artifactBucket: pipeline.codePipeline.artifactBucket })
         new ResolveSecretFunction(this, 'ResolveSecret')
         new ResolveConfigFunction(this, 'ResolveConfig', { artifactBucket: pipeline.codePipeline.artifactBucket })
-
-        const gitlabAppConfigFunction = new lambda.SingletonFunction(this, 'GitlabAppConfigFunction', {
-            functionName: 'GitlabAppConfigFunction',
-            uuid: '0f1cd18d-01fd-4508-96f0-62f31f4a6140',
-            code: new lambda.AssetCode('lib/handlers/gitlabApplicationConfig'),
-            handler: 'index.main',
-            timeout: cdk.Duration.seconds(300),
-            runtime: lambda.Runtime.PYTHON_3_6,
-        })
-        const gitlabPassword = new secretsmanager.Secret(this, "GitlabRootPassword");
-        gitlabPassword.grantRead(gitlabAppConfigFunction)
+        new GitlabAppConfigFunction(this, 'GitlabAppConfig')
 
         const eksAlbCname = new lambda.SingletonFunction(this, 'EKSALBCnameFunction', {
             functionName: 'EKSALBCnameFunction',

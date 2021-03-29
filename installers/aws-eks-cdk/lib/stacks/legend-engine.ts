@@ -1,4 +1,4 @@
-import {StackProps} from '@aws-cdk/core';
+import {Stack, StackProps} from '@aws-cdk/core';
 import * as eks from '@aws-cdk/aws-eks';
 import * as cdk8s from 'cdk8s'
 import * as cdk from "@aws-cdk/core";
@@ -11,6 +11,7 @@ import * as ssm from "@aws-cdk/aws-ssm";
 import * as route53 from "@aws-cdk/aws-route53";
 import * as certificatemanager from "@aws-cdk/aws-certificatemanager";
 import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
+import {GitlabAppConfig} from "../constructs/gitlab-app-config";
 
 export interface LegendEngineProps extends StackProps{
     clusterName: string
@@ -22,6 +23,8 @@ export class LegendEngineStack extends LegendApplicationStack {
     constructor(scope: cdk.Construct, id: string, props: LegendEngineProps) {
         super(scope, id, props);
 
+        const region = Stack.of(this).region
+        const account = Stack.of(this).account
 
         const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", props)
         const artifactImageId = new ArtifactImageId(this, 'ArtifactImageId', {
@@ -39,13 +42,17 @@ export class LegendEngineStack extends LegendApplicationStack {
         const certificate = new certificatemanager.DnsValidatedCertificate(this, "LegendEngineCert", {
             hostedZone: hostedZone, domainName: `${props.stage.prefix}${legendZoneName}`, })
 
-        const gitlabClientId = ssm.StringParameter.valueForStringParameter(this, 'gitlab-client-id');
-        const gitlabAccessCode = ssm.StringParameter.valueForStringParameter(this, 'gitlab-access-code');
+        const gitlabRootPassword = secretsmanager.Secret.fromSecretPartialArn(this, "GitlabRootPassword",
+            `arn:aws:secretsmanager:${region}:${account}:secret:GitlabRootPassword`)
+
+        const config = new GitlabAppConfig(this, "GitlabAppConfig", {
+            secret: gitlabRootPassword,
+            host: `https://gitlab.${props.stage.prefix}${legendZoneName}`})
 
         cluster.addCdk8sChart("Engine", new LegendEngineChart(new cdk8s.App(), "LegendEngine", {
             imageId: artifactImageId,
-            gitlabOauthClientId: gitlabClientId,
-            gitlabOauthSecret: gitlabAccessCode,
+            gitlabOauthClientId: config.applicationId,
+            gitlabOauthSecret: config.secret,
             gitlabPublicUrl: `https://gitlab.${props.stage.prefix}${legendZoneName}`,
             mongoHostPort: 'mongo-service.default.svc.cluster.local',
             mongoUser: 'admin',
