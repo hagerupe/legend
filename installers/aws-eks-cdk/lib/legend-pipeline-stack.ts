@@ -56,6 +56,15 @@ export class LegendPipelineStack extends Stack {
         }))
 
         pipeline.codePipeline.stage('Source').addAction(new GitHubSourceAction({
+            actionName: 'LegendEngine',
+            output: engineSource,
+            oauthToken: githubSecret,
+            owner: 'hagerupe',
+            repo: 'legend-config',
+            trigger: GitHubTrigger.POLL
+        }))
+
+        pipeline.codePipeline.stage('Source').addAction(new GitHubSourceAction({
             actionName: 'LegendSDLC',
             output: sdlcSource,
             oauthToken: githubSecret,
