@@ -19,6 +19,7 @@ export class LegendPipelineStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
         super(scope, id, props);
 
+        const configSource = new codepipeline.Artifact();
         const legendSource = new codepipeline.Artifact();
         const engineSource = new codepipeline.Artifact();
         const sdlcSource = new codepipeline.Artifact();
@@ -56,8 +57,8 @@ export class LegendPipelineStack extends Stack {
         }))
 
         pipeline.codePipeline.stage('Source').addAction(new GitHubSourceAction({
-            actionName: 'LegendEngine',
-            output: engineSource,
+            actionName: 'LegendConfig',
+            output: configSource,
             oauthToken: githubSecret,
             owner: 'hagerupe',
             repo: 'legend-config',
