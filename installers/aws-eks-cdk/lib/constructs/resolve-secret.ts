@@ -1,12 +1,29 @@
 import cfn = require('@aws-cdk/aws-cloudformation');
-import lambda = require('@aws-cdk/aws-lambda');
 import cdk = require('@aws-cdk/core');
 import {Stack} from "@aws-cdk/core";
 import * as secretmanager from "@aws-cdk/aws-secretsmanager";
-import {ManagedPolicy, PolicyStatement} from "@aws-cdk/aws-iam";
+import * as lambda from '@aws-cdk/aws-lambda';
+import {ManagedPolicy} from "@aws-cdk/aws-iam";
+import * as fs from "fs";
+import * as path from "path";
 
 export interface ResolveSecretProps {
     secret: secretmanager.Secret
+}
+
+export class ResolveSecretFunction extends lambda.SingletonFunction {
+    constructor(scope: cdk.Construct, id: string, props?: lambda.SingletonFunctionProps) {
+        super(scope, id, {
+            ...{functionName: 'ResolveSecret',
+            uuid: 'def1918a-6fbb-11eb-9439-0242ac130002l',
+            code: new lambda.InlineCode(fs.readFileSync(path.join('lib', 'handlers', 'resolveSecret', 'index.py'), { encoding: 'utf-8' })),
+            handler: 'index.main',
+            timeout: cdk.Duration.seconds(300),
+            runtime: lambda.Runtime.PYTHON_3_6},
+            ...props
+        });
+        this.role?.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("service-role/SecretsManagerReadWrite"))
+    }
 }
 
 export class ResolveSecret extends cdk.Construct {

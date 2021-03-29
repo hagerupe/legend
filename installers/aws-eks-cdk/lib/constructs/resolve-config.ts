@@ -1,13 +1,37 @@
+import {Stack} from "@aws-cdk/core";
+
 import cfn = require('@aws-cdk/aws-cloudformation');
 import lambda = require('@aws-cdk/aws-lambda');
 import cdk = require('@aws-cdk/core');
+import s3 = require('@aws-cdk/aws-s3')
 
-import {Stack} from "@aws-cdk/core";
+import * as fs from "fs";
+import * as path from "path";
 
 export interface ResolveConfigProps {
     readonly artifactBucketName: string
     readonly artifactObjectKey: string
     readonly path: string
+}
+
+export interface ResolveConfigFunctionProps {
+    readonly artifactBucket: s3.IBucket
+}
+
+export class ResolveConfigFunction extends lambda.SingletonFunction {
+    constructor(scope: cdk.Construct, id: string, props: ResolveConfigFunctionProps) {
+        super(scope, id, {
+            ...{functionName: 'ResolveConfig',
+                uuid: 'e5ba913f-69dc-4e00-8f88-65160be19920',
+                code: new lambda.InlineCode(fs.readFileSync(path.join('lib', 'handlers', 'resolveConfig', 'index.py'), { encoding: 'utf-8' })),
+                handler: 'index.main',
+                timeout: cdk.Duration.seconds(300),
+                runtime: lambda.Runtime.PYTHON_3_6},
+            ...props
+        });
+        props.artifactBucket.encryptionKey?.grantDecrypt(this)
+        props.artifactBucket.grantRead(this)
+    }
 }
 
 export class ResolveConfig extends cdk.Construct {

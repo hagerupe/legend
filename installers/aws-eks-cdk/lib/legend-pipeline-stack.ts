@@ -11,11 +11,13 @@ import {SimpleSynthAction} from "./override/pipelines/lib/synths";
 import * as path from "path";
 import * as fs from "fs";
 import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
-import {ResolveSecret} from "./constructs/resolve-secret";
+import {ResolveSecret, ResolveSecretFunction} from "./constructs/resolve-secret";
 import * as iam from "@aws-cdk/aws-iam";
 import * as ssm from "@aws-cdk/aws-ssm";
 import {StaticBuildProject} from "./constructs/static-build-project";
 import {ManagedPolicy} from "@aws-cdk/aws-iam";
+import {ArtifactImageIdFunction} from "./constructs/artifact-image-id";
+import {ResolveConfigFunction} from "./constructs/resolve-config";
 
 export class LegendPipelineStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
@@ -163,35 +165,9 @@ export class LegendPipelineStack extends Stack {
         kubernetesMasterRole.addManagedPolicy(iam.ManagedPolicy.fromManagedPolicyArn(this,
             "KubernetesMasterRoleAdministratorAccess", "arn:aws:iam::aws:policy/AdministratorAccess"))
 
-        const artifactImageIdFunction = new lambda.SingletonFunction(this, 'ArtifactImageId', {
-            functionName: 'ArtifactImageId',
-            uuid: 'f7d4f730-4ee1-11e8-9c2d-fa7ae01bbebc',
-            code: new lambda.InlineCode(fs.readFileSync(path.join('lib', 'handlers', 'artifactImageId', 'index.py'), { encoding: 'utf-8' })),
-            handler: 'index.main',
-            timeout: cdk.Duration.seconds(300),
-            runtime: lambda.Runtime.PYTHON_3_6,
-        })
-        pipeline.codePipeline.artifactBucket.encryptionKey?.grantDecrypt(artifactImageIdFunction)
-        pipeline.codePipeline.artifactBucket.grantRead(artifactImageIdFunction)
-
-        const resolveFunction = new lambda.SingletonFunction(this, 'ResolveSecret', {
-            functionName: 'ResolveSecret',
-            uuid: 'def1918a-6fbb-11eb-9439-0242ac130002l',
-            code: new lambda.InlineCode(fs.readFileSync(path.join('lib', 'handlers', 'resolveSecret', 'index.py'), { encoding: 'utf-8' })),
-            handler: 'index.main',
-            timeout: cdk.Duration.seconds(300),
-            runtime: lambda.Runtime.PYTHON_3_6,
-        })
-        resolveFunction.role?.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("service-role/SecretsManagerReadWrite"))
-
-        const resolveConfig = new lambda.SingletonFunction(this, 'ResolveConfig', {
-            functionName: 'ResolveConfig',
-            uuid: 'e5ba913f-69dc-4e00-8f88-65160be19920',
-            code: new lambda.InlineCode(fs.readFileSync(path.join('lib', 'handlers', 'resolveConfig', 'index.py'), { encoding: 'utf-8' })),
-            handler: 'index.main',
-            timeout: cdk.Duration.seconds(300),
-            runtime: lambda.Runtime.PYTHON_3_6,
-        })
+        new ArtifactImageIdFunction(this, 'ArtifactImageId', { artifactBucket: pipeline.codePipeline.artifactBucket })
+        new ResolveSecretFunction(this, 'ResolveSecret')
+        new ResolveConfigFunction(this, 'ResolveConfig', { artifactBucket: pipeline.codePipeline.artifactBucket })
 
         const gitlabAppConfigFunction = new lambda.SingletonFunction(this, 'GitlabAppConfigFunction', {
             functionName: 'GitlabAppConfigFunction',
