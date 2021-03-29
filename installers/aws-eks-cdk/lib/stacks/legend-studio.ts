@@ -11,6 +11,7 @@ import * as ssm from "@aws-cdk/aws-ssm";
 import * as route53 from "@aws-cdk/aws-route53";
 import * as certificatemanager from "@aws-cdk/aws-certificatemanager";
 import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
+import {ResolveConfig} from "../constructs/resolve-config";
 
 export interface LegendStudioProps extends StackProps{
     clusterName: string
@@ -24,9 +25,10 @@ export class LegendStudioStack extends LegendApplicationStack {
         super(scope, id, props);
 
         const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", props)
-        const artifactImageId = new ArtifactImageId(this, 'ArtifactImageId', {
-            artifactBucketName: this.studioArtifactBucketName.value.toString(),
-            artifactObjectKey: this.studioArtifactObjectKey.value.toString(),
+        const artifactImageId = new ResolveConfig(this, 'ArtifactImageId', {
+            artifactBucketName: this.configArtifactBucketName.value.toString(),
+            artifactObjectKey: this.configArtifactObjectKey.value.toString(),
+            path: 'Images.LegendStudio'
         }).response;
 
         const mongoPassword = new secretsmanager.Secret(this, "MongoPassword");

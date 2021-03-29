@@ -14,6 +14,7 @@ import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
 import {ResolveSecret} from "./constructs/resolve-secret";
 import * as iam from "@aws-cdk/aws-iam";
 import * as ssm from "@aws-cdk/aws-ssm";
+import {StaticBuildProject} from "./constructs/static-build-project";
 
 export class LegendPipelineStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
@@ -102,6 +103,14 @@ export class LegendPipelineStack extends Stack {
             outputs: [ engineImageDetails ]
         }))
 
+        const configArtifact = new codepipeline.Artifact();
+        runtimeBuildStage.addActions(new CodeBuildAction({
+            actionName: 'Legend_Engine',
+            input: configSource,
+            project: new StaticBuildProject(this, 'LegendConfigProject',  {preBuildCommands:[]}).project,
+            outputs: [ configArtifact ]
+        }))
+
         const gitlabImageDetails = new codepipeline.Artifact();
         const gitlabRepositoryName = 'legend-gitlab';
         const gitlabProject = new DockerBuildProject(this, 'LegendGitlab', {
@@ -149,7 +158,7 @@ export class LegendPipelineStack extends Stack {
             project: sdlcProject.project,
             outputs: [ sdlcImageDetails ]
         }))
-        
+
         const repositoryNames = [gitlabRepositoryName, engineRepositoryName]
         const appStageOptions = {
             parameterOverrides: {
@@ -161,12 +170,16 @@ export class LegendPipelineStack extends Stack {
                 SDLCArtifactObjectKey: sdlcImageDetails.objectKey,
                 StudioArtifactBucketName: studioImageDetails.bucketName,
                 StudioArtifactObjectKey: studioImageDetails.objectKey,
+
+                ConfigArtifactBucketName: configArtifact.bucketName,
+                ConfigArtifactObjectKey: configArtifact.objectKey,
             },
             extraInputs: [
                 gitlabImageDetails,
                 engineImageDetails,
                 sdlcImageDetails,
-                studioImageDetails
+                studioImageDetails,
+                configArtifact,
             ]
         }
 
@@ -193,6 +206,15 @@ export class LegendPipelineStack extends Stack {
             functionName: 'ResolveSecret',
             uuid: 'def1918a-6fbb-11eb-9439-0242ac130002l',
             code: new lambda.InlineCode(fs.readFileSync(path.join('lib', 'handlers', 'resolveSecret', 'index.py'), { encoding: 'utf-8' })),
+            handler: 'index.main',
+            timeout: cdk.Duration.seconds(300),
+            runtime: lambda.Runtime.PYTHON_3_6,
+        })
+
+        const resolveConfig = new lambda.SingletonFunction(this, 'ResolveConfig', {
+            functionName: 'ResolveConfig',
+            uuid: 'e5ba913f-69dc-4e00-8f88-65160be19920',
+            code: new lambda.InlineCode(fs.readFileSync(path.join('lib', 'handlers', 'resolveConfig', 'index.py'), { encoding: 'utf-8' })),
             handler: 'index.main',
             timeout: cdk.Duration.seconds(300),
             runtime: lambda.Runtime.PYTHON_3_6,

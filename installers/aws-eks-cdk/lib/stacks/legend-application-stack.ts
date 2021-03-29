@@ -15,6 +15,9 @@ export class LegendApplicationStack extends Stack {
     readonly studioArtifactBucketName: CfnParameter
     readonly studioArtifactObjectKey: CfnParameter
 
+    readonly configArtifactBucketName: CfnParameter
+    readonly configArtifactObjectKey: CfnParameter
+
     constructor(scope: cdk.Construct, id: string, props: StackProps) {
         super(scope, id, props);
 
@@ -29,5 +32,8 @@ export class LegendApplicationStack extends Stack {
 
         this.studioArtifactBucketName = new CfnParameter(this, "StudioArtifactBucketName");
         this.studioArtifactObjectKey = new CfnParameter(this, "StudioArtifactObjectKey");
+
+        this.configArtifactBucketName = new CfnParameter(this, "ConfigArtifactBucketName");
+        this.configArtifactObjectKey = new CfnParameter(this, "ConfigArtifactObjectKey");
     }
 }
