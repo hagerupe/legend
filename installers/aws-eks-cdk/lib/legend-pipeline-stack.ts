@@ -15,6 +15,7 @@ import {ResolveSecret} from "./constructs/resolve-secret";
 import * as iam from "@aws-cdk/aws-iam";
 import * as ssm from "@aws-cdk/aws-ssm";
 import {StaticBuildProject} from "./constructs/static-build-project";
+import {ManagedPolicy} from "@aws-cdk/aws-iam";
 
 export class LegendPipelineStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
@@ -181,6 +182,7 @@ export class LegendPipelineStack extends Stack {
             timeout: cdk.Duration.seconds(300),
             runtime: lambda.Runtime.PYTHON_3_6,
         })
+        resolveFunction.role?.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("service-role/SecretsManagerReadWrite"))
 
         const resolveConfig = new lambda.SingletonFunction(this, 'ResolveConfig', {
             functionName: 'ResolveConfig',
