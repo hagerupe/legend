@@ -1,14 +1,12 @@
+import logging as log
+import cfnresponse
+import boto3
+import hashlib
+
+log.getLogger().setLevel(log.INFO)
+secretsmanager = boto3.client('secretsmanager')
+
 def main(event, context):
-  import logging as log
-  import cfnresponse
-  import boto3
-  import hashlib
-
-  log.getLogger().setLevel(log.INFO)
-
-  secretsmanager = boto3.client('secretsmanager')
-
-
 
   fqn = event['StackId'] + event['LogicalResourceId']
   physical_id = hashlib.md5(fqn.encode('utf-8')).hexdigest()

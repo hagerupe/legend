@@ -105,7 +105,7 @@ export class LegendPipelineStack extends Stack {
 
         const configArtifact = new codepipeline.Artifact();
         runtimeBuildStage.addActions(new CodeBuildAction({
-            actionName: 'Legend_Engine',
+            actionName: 'Legend_Config',
             input: configSource,
             project: new StaticBuildProject(this, 'LegendConfigProject',  {preBuildCommands:[]}).project,
             outputs: [ configArtifact ]
