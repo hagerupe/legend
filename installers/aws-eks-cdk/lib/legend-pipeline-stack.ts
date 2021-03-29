@@ -61,7 +61,7 @@ export class LegendPipelineStack extends Stack {
             output: configSource,
             oauthToken: githubSecret,
             owner: 'hagerupe',
-            repo: 'legend-config',
+            repo: 'lengend-config',
             branch: 'main',
             trigger: GitHubTrigger.POLL
         }))
