@@ -1,9 +1,11 @@
 import * as constructs from 'constructs';
 import * as cdk8s from 'cdk8s';
 import * as k8s from "cdk8s-plus/lib/imports/k8s";
+import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
 
 export interface LegendIngressChartProps {
     readonly legendDomain: string
+    readonly stage: LegendInfrastructureStageProps
 }
 
 export class LegendIngressChart extends cdk8s.Chart {
@@ -24,7 +26,7 @@ export class LegendIngressChart extends cdk8s.Chart {
             spec: {
                 rules: [
                     {
-                        host: `${props.legendDomain}`,
+                        host: `${props.stage.prefix}${props.legendDomain}`,
                         http: {
                             paths: [{
                                 path: '/sdlc/*',
@@ -43,7 +45,7 @@ export class LegendIngressChart extends cdk8s.Chart {
                         }
                     },
                     {
-                        host: `${props.legendDomain}`,
+                        host: `${props.stage.prefix}${props.legendDomain}`,
                         http: {
                             paths: [{
                                 path: '/engine/*',
@@ -62,7 +64,7 @@ export class LegendIngressChart extends cdk8s.Chart {
                         }
                     },
                     {
-                        host: props.legendDomain,
+                        host: `${props.stage.prefix}${props.legendDomain}`,
                         http: {
                             paths: [{
                                 path: '/studio/*',
