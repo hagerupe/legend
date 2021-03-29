@@ -18,7 +18,7 @@ def main(event, context):
     log.info('Input event: %s', event)
 
     response = secretsmanager.get_secret_value(
-      SecretId=event['secret'],
+      SecretId=event['ResourceProperties']['secret'],
     )
 
     # TODO call secret manager
