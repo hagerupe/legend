@@ -6,6 +6,7 @@ import * as lambda from '@aws-cdk/aws-lambda';
 import {ManagedPolicy} from "@aws-cdk/aws-iam";
 import * as fs from "fs";
 import * as path from "path";
+import * as iam from "@aws-cdk/aws-iam";
 
 export interface ResolveSecretProps {
     secret: secretmanager.Secret
@@ -22,7 +23,12 @@ export class ResolveSecretFunction extends lambda.SingletonFunction {
             runtime: lambda.Runtime.PYTHON_3_6},
             ...props
         });
-        this.role?.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("service-role/SecretsManagerReadWrite"))
+        const resolveSecretPolicy = new iam.Policy(this, "ResolveSecretPolicy", {
+            document: iam.PolicyDocument.fromJson(JSON.parse(fs.readFileSync(path.join('resources', 'secrets-manager-readonly-policy.json'), {encoding: 'utf8'})))
+        })
+        if (this.role !== undefined) {
+            resolveSecretPolicy.attachToRole(this.role)
+        }
     }
 }
 
