@@ -9,6 +9,7 @@ import {LegendIngressStack} from "./stacks/legend-ingress";
 
 export interface LegendInfrastructureStageProps extends StageProps {
     repositoryNames: string[],
+    prefix?: string,
 }
 
 export class LegendInfrastructureStage extends Stage {
@@ -24,7 +25,8 @@ export class LegendInfrastructureStage extends Stage {
         const stackParams = {
             clusterName: kubernetes.clusterName.value,
             kubectlRoleArn: kubernetes.kubectlRoleArn.value,
-            env: props.env
+            env: props.env,
+            stage: props,
         }
 
         const mongo = new MongoStack(this, "Mongo", stackParams)

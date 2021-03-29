@@ -4,12 +4,14 @@ import * as k8s from "cdk8s-plus/lib/imports/k8s";
 import {Quantity} from "cdk8s-plus/lib/imports/k8s";
 import * as fs from "fs";
 import * as path from "path";
+import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
 
 export interface GitlabCeChartProps {
     gitlabExternalUrl: string,
     gitlabRootPassword: string,
     legendDomain: string,
     image: string,
+    stage: LegendInfrastructureStageProps,
 }
 
 export class GitlabCeChart extends cdk8s.Chart {
@@ -131,7 +133,7 @@ export class GitlabCeChart extends cdk8s.Chart {
             spec: {
                 rules: [
                     {
-                        host: `gitlab.${props.legendDomain}`,
+                        host: `gitlab.${props.stage.prefix}${props.legendDomain}`,
                         http: {
                             paths: [{
                                 path: '/*',

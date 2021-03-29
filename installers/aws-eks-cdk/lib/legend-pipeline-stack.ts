@@ -210,14 +210,12 @@ export class LegendPipelineStack extends Stack {
         pipeline.addApplicationStage(new LegendInfrastructureStage(this, "UAT", {
             env: { account: this.account, region: this.region },
             repositoryNames: repositoryNames,
+            prefix: 'uat.'
         }), appStageOptions)
 
-        // TODO manaual sign off stage
-
-        // TODO disable due to master role name conflict
-        /*pipeline.addApplicationStage(new LegendInfrastructureStage(this, "Prod", {
+        pipeline.addApplicationStage(new LegendInfrastructureStage(this, "Prod", {
             env: { account: this.account, region: this.region },
             repositoryNames: repositoryNames,
-        }), appStageOptions)*/
+        }), appStageOptions)
     }
 }

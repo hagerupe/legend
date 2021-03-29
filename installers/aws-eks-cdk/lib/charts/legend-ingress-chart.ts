@@ -24,10 +24,17 @@ export class LegendIngressChart extends cdk8s.Chart {
             spec: {
                 rules: [
                     {
-                        host: `sdlc.${props.legendDomain}`,
+                        host: `${props.legendDomain}`,
                         http: {
                             paths: [{
-                                path: '/*',
+                                path: '/sdlc/*',
+                                backend: {
+                                    serviceName: 'legend-sdlc-service',
+                                    servicePort: 80,
+                                }
+                            },
+                            {
+                                path: '/sdlc',
                                 backend: {
                                     serviceName: 'legend-sdlc-service',
                                     servicePort: 80,
@@ -36,10 +43,17 @@ export class LegendIngressChart extends cdk8s.Chart {
                         }
                     },
                     {
-                        host: `engine.${props.legendDomain}`,
+                        host: `${props.legendDomain}`,
                         http: {
                             paths: [{
-                                path: '/*',
+                                path: '/engine/*',
+                                backend: {
+                                    serviceName: 'legend-engine-service',
+                                    servicePort: 80,
+                                }
+                            },
+                            {
+                                path: '/engine',
                                 backend: {
                                     serviceName: 'legend-engine-service',
                                     servicePort: 80,

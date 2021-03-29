@@ -10,10 +10,12 @@ import {ResolveSecret} from "../constructs/resolve-secret";
 import * as ssm from "@aws-cdk/aws-ssm";
 import * as route53 from "@aws-cdk/aws-route53";
 import * as certificatemanager from "@aws-cdk/aws-certificatemanager";
+import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
 
 export interface LegendStudioProps extends StackProps{
-    clusterName: string,
+    clusterName: string
     kubectlRoleArn: string
+    stage: LegendInfrastructureStageProps
 }
 
 export class LegendStudioStack extends LegendApplicationStack {
@@ -35,7 +37,7 @@ export class LegendStudioStack extends LegendApplicationStack {
         const hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, "HostedZone", {
             zoneName: legendZoneName, hostedZoneId: legendHostedZoneId, })
         const certificate = new certificatemanager.DnsValidatedCertificate(this, "GitlabCert", {
-            hostedZone: hostedZone, domainName: legendZoneName, });
+            hostedZone: hostedZone, domainName: `${props.stage.prefix}${legendZoneName}`, });
 
         const gitlabClientId = ssm.StringParameter.valueForStringParameter(this, 'gitlab-client-id');
         const gitlabAccessCode = ssm.StringParameter.valueForStringParameter(this, 'gitlab-access-code');
@@ -47,11 +49,11 @@ export class LegendStudioStack extends LegendApplicationStack {
             mongoHostPort: 'mongo-service.default.svc.cluster.local',
             gitlabOauthClientId: gitlabClientId,
             gitlabOauthSecret: gitlabAccessCode,
-            gitlabPublicUrl: `https://gitlab.${legendZoneName}`,
             legendStudioPort: 80,
-            legendEngineUrl: `https://engine.${legendZoneName}`,
-            legendSdlcUrl: `https://sdlc.${legendZoneName}`,
-            legendStudioHost: legendZoneName,
+            gitlabPublicUrl: `https://gitlab.${props.stage.prefix}${legendZoneName}`,
+            legendEngineUrl: `https://${props.stage.prefix}${legendZoneName}/engine`,
+            legendSdlcUrl: `https://${props.stage.prefix}${legendZoneName}/sdlc`,
+            legendStudioHost: `${props.stage.prefix}${legendZoneName}`,
         }))
     }
 }

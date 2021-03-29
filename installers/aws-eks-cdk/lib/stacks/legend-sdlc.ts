@@ -10,10 +10,12 @@ import {ResolveSecret} from "../constructs/resolve-secret";
 import * as ssm from "@aws-cdk/aws-ssm";
 import * as certificatemanager from "@aws-cdk/aws-certificatemanager";
 import * as route53 from "@aws-cdk/aws-route53";
+import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
 
 export interface LegendEngineProps extends StackProps{
     clusterName: string,
     kubectlRoleArn: string
+    stage: LegendInfrastructureStageProps
 }
 
 export class LegendSdlcStack extends LegendApplicationStack {
@@ -34,7 +36,7 @@ export class LegendSdlcStack extends LegendApplicationStack {
         const hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, "HostedZone", {
             zoneName: legendZoneName, hostedZoneId: legendHostedZoneId, })
         const certificate = new certificatemanager.DnsValidatedCertificate(this, "LegendSdlcCert", {
-            hostedZone: hostedZone, domainName: `sdlc.${legendZoneName}`, })
+            hostedZone: hostedZone, domainName: `${props.stage.prefix}${legendZoneName}`, })
 
         const gitlabClientId = ssm.StringParameter.valueForStringParameter(this, 'gitlab-client-id');
         const gitlabAccessCode = ssm.StringParameter.valueForStringParameter(this, 'gitlab-access-code');
@@ -44,13 +46,13 @@ export class LegendSdlcStack extends LegendApplicationStack {
             legendSdlcPort: 80,
             gitlabOauthClientId: gitlabClientId,
             gitlabOauthSecret: gitlabAccessCode,
-            gitlabPublicUrl: `https://gitlab.${legendZoneName}`,
+            gitlabPublicUrl: `https://gitlab.${props.stage.prefix}${legendZoneName}`,
             mongoHostPort: 'mongo-service.default.svc.cluster.local',
             mongoUser: 'admin',
             mongoPassword: resolveMongoPass.response,
-            gitlabHost: `gitlab.${legendZoneName}`,
+            gitlabHost: `gitlab.${props.stage.prefix}${legendZoneName}`,
             gitlabPort: 443,
-            legendSdlcUrl: `https://sdlc.${legendZoneName}`,
+            legendSdlcUrl: `https://${props.stage.prefix}${legendZoneName}/sdlc`,
         }))
     }
 }

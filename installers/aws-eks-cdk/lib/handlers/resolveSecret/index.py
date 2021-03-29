@@ -6,6 +6,10 @@ def main(event, context):
 
   log.getLogger().setLevel(log.INFO)
 
+  secretsmanager = boto3.client('secretsmanager')
+
+
+
   fqn = event['StackId'] + event['LogicalResourceId']
   physical_id = hashlib.md5(fqn.encode('utf-8')).hexdigest()
   log.info(physical_id)
@@ -13,9 +17,13 @@ def main(event, context):
   try:
     log.info('Input event: %s', event)
 
+    response = secretsmanager.get_secret_value(
+      SecretId=event['secret'],
+    )
+
     # TODO call secret manager
     attributes = {
-      'Response': '8296daf8-6fb6-11eb-9439-0242ac130002'
+      'Response': response['SecretString']
     }
 
     cfnresponse.send(event, context, cfnresponse.SUCCESS, attributes, physical_id)
