@@ -5,10 +5,12 @@ import * as cdk from "@aws-cdk/core";
 import {LegendApplicationStack} from "./legend-application-stack";
 import * as ssm from "@aws-cdk/aws-ssm";
 import {LegendIngressChart} from "../charts/legend-ingress-chart";
+import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
 
 export interface LegendIngressStackProps extends StackProps{
-    clusterName: string,
-    kubectlRoleArn: string
+    readonly clusterName: string,
+    readonly kubectlRoleArn: string
+    readonly stage: LegendInfrastructureStageProps
 }
 
 export class LegendIngressStack extends LegendApplicationStack {
@@ -19,7 +21,8 @@ export class LegendIngressStack extends LegendApplicationStack {
         const legendZoneName = ssm.StringParameter.valueForStringParameter(this, 'legend-zone-name');
 
         cluster.addCdk8sChart("LegendIngressChart", new LegendIngressChart(new cdk8s.App(), "LegendIngress", {
-            legendDomain: legendZoneName
+            legendDomain: legendZoneName,
+            stage: props.stage,
         }))
     }
 }
