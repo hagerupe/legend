@@ -69,10 +69,10 @@ export class GitlabCeChart extends cdk8s.Chart {
                                         name: 'GITLAB_HOST',
                                         value: `https://${props.gitlabDomain}/`
                                     },
-                                    /*{
+                                    {
                                         name: 'GITLAB_ROOT_PASSWORD',
-                                        value: props.gitlabRootPassword
-                                    }*/
+                                        value: `"$"{props.gitlabRootPassword}"`
+                                    }
                                 ],
                                 resources: {
                                     requests: {
