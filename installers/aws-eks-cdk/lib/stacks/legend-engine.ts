@@ -13,6 +13,7 @@ import * as certificatemanager from "@aws-cdk/aws-certificatemanager";
 import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
 import {GitlabAppConfig} from "../constructs/gitlab-app-config";
 import {Secret} from "@aws-cdk/aws-secretsmanager";
+import {gitlabRootPasswordFromSecret} from "../name-utils";
 
 export interface LegendEngineProps extends StackProps{
     clusterName: string
@@ -45,7 +46,7 @@ export class LegendEngineStack extends LegendApplicationStack {
             hostedZone: hostedZone, domainName: `${props.stage.prefix}${legendZoneName}`, })
 
         const config = new GitlabAppConfig(this, "GitlabAppConfig", {
-            secret: props.gitlabRootSecret,
+            secret: gitlabRootPasswordFromSecret(this, props.gitlabRootSecret),
             host: `https://gitlab.${props.stage.prefix}${legendZoneName}`})
 
         cluster.addCdk8sChart("Engine", new LegendEngineChart(new cdk8s.App(), "LegendEngine", {

@@ -18,9 +18,8 @@ def main(event, context):
     log.info('Input event: %s', event)
 
     gitlab_host= event['ResourceProperties']['Host']
-    secret_id = event['ResourceProperties']['Secret']
+    gitlab_password = event['ResourceProperties']['Secret']
 
-    gitlab_password = secretsmanager.get_secret_value(SecretId=secret_id)['SecretString']
     application_json = subprocess.check_output(["./curl.sh", gitlab_host, gitlab_password]).decode("utf-8")
     application = json.loads(application_json)
     application_id = application['application_id']

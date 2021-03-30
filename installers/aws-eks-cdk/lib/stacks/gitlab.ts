@@ -10,7 +10,7 @@ import {ArtifactImageId} from "../constructs/artifact-image-id";
 import {LegendApplicationStack} from "./legend-application-stack";
 import {ResolveSecret} from "../constructs/resolve-secret";
 import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
-import {gitlabDomain, hostedZoneRef} from "../name-utils";
+import {gitlabDomain, gitlabRootPasswordFromSecret, hostedZoneRef} from "../name-utils";
 import * as iam from "@aws-cdk/aws-iam";
 
 export interface GitlabStackProps extends StackProps {
@@ -39,12 +39,9 @@ export class GitlabStack extends LegendApplicationStack {
         }).response;
 
         this.gitlabRootSecret = new secretsmanager.Secret(this, "GitlabRootPassword", {  });
-        const resolveSecret = new ResolveSecret(this, "ResolvedGitlabPassword", { secret: this.gitlabRootSecret })
-
-        // TODO use resolved password
         cluster.addCdk8sChart("GitlabCE", new GitlabCeChart(new cdk8s.App(), "GitlabCEChart", {
             gitlabDomain: gitlabDomain(this, props.stage),
-            gitlabRootPassword: '7cd3dcf2-5703-4e0a-b34c-2ec48ab74d77',
+            gitlabRootPassword: gitlabRootPasswordFromSecret(this, this.gitlabRootSecret),
             image: artifactImageId,
             stage: props.stage,
         }))

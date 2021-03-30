@@ -9,7 +9,7 @@ import * as path from "path";
 import * as iam from "@aws-cdk/aws-iam";
 
 export interface GitlabAppConfigProps {
-    readonly secret: secretmanager.ISecret
+    readonly secret: string
     readonly host: string
 }
 
@@ -24,12 +24,6 @@ export class GitlabAppConfigFunction extends lambda.SingletonFunction {
                 runtime: lambda.Runtime.PYTHON_3_6},
             ...props
         });
-        const resolveSecretPolicy = new iam.Policy(this, "ResolveSecretPolicy", {
-            document: iam.PolicyDocument.fromJson(JSON.parse(fs.readFileSync(path.join('resources', 'secrets-manager-readonly-policy.json'), {encoding: 'utf8'})))
-        })
-        if (this.role !== undefined) {
-            resolveSecretPolicy.attachToRole(this.role)
-        }
     }
 }
 
@@ -42,12 +36,11 @@ export class GitlabAppConfig extends cdk.Construct {
 
         const functionArn = `arn:aws:lambda:${Stack.of(this).region}:${Stack.of(this).account}:function:GitlabAppConfig`
         const lambdaSingleton = lambda.Function.fromFunctionAttributes(this, "GitlabAppConfigFunction", { functionArn: functionArn })
-        props.secret.grantRead(lambdaSingleton)
 
         const resource = new cfn.CustomResource(this, 'GitlabAppConfig', {
             provider: cfn.CustomResourceProvider.lambda(lambdaSingleton),
             properties: {
-                Secret: props.secret.secretName,
+                Secret: props.secret,
                 Host: props.host,
             }
         });
