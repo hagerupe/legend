@@ -3,7 +3,6 @@ import cdk = require('@aws-cdk/core');
 import {Stack} from "@aws-cdk/core";
 import * as secretmanager from "@aws-cdk/aws-secretsmanager";
 import * as lambda from '@aws-cdk/aws-lambda';
-import {ManagedPolicy} from "@aws-cdk/aws-iam";
 import * as fs from "fs";
 import * as path from "path";
 import * as iam from "@aws-cdk/aws-iam";
