@@ -18,10 +18,6 @@ export class GitlabCeChart extends cdk8s.Chart {
     constructor(scope: constructs.Construct, id: string, props: GitlabCeChartProps) {
         super(scope, id);
 
-        const templateText = fs.readFileSync(path.join('resources', 'configs', 'gitlab', 'omnibus.config'), {encoding: 'utf8'})
-            .replace('__GITLAB_EXTERNAL_URL__', props.gitlabDomain)
-            .replace('__GITLAB_ROOT_PASSWORD__', props.gitlabRootPassword)
-
         const storageClass = new k8s.StorageClass(this, "GitlabStorageClass", {
             metadata: {
                 name: 'gl-sc'
@@ -67,7 +63,15 @@ export class GitlabCeChart extends cdk8s.Chart {
                                 env: [
                                     {
                                         name: 'GITLAB_OMNIBUS_CONFIG',
-                                        value: templateText,
+                                        value: fs.readFileSync(path.join('resources', 'configs', 'gitlab', 'omnibus.config'), {encoding: 'utf8'}),
+                                    },
+                                    {
+                                        name: 'GITLABg_HOST',
+                                        value: `https://${props.gitlabDomain}/`
+                                    },
+                                    {
+                                        name: 'GITLAB_ROOT_PASSWORD',
+                                        value: props.gitlabRootPassword
                                     }
                                 ],
                                 resources: {
