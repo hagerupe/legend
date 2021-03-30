@@ -66,7 +66,7 @@ export class GitlabCeChart extends cdk8s.Chart {
                                         value: fs.readFileSync(path.join('resources', 'configs', 'gitlab', 'omnibus.config'), {encoding: 'utf8'}),
                                     },
                                     {
-                                        name: 'GITLABg_HOST',
+                                        name: 'GITLAB_HOST',
                                         value: `https://${props.gitlabDomain}/`
                                     },
                                     {
