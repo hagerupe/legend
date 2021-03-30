@@ -7,9 +7,8 @@ import * as path from "path";
 import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
 
 export interface GitlabCeChartProps {
-    gitlabExternalUrl: string,
+    gitlabDomain: string,
     gitlabRootPassword: string,
-    legendDomain: string,
     image: string,
     stage: LegendInfrastructureStageProps,
 }
@@ -20,7 +19,7 @@ export class GitlabCeChart extends cdk8s.Chart {
         super(scope, id);
 
         const templateText = fs.readFileSync(path.join('resources', 'configs', 'gitlab', 'omnibus.config'), {encoding: 'utf8'})
-            .replace('__GITLAB_EXTERNAL_URL__', props.gitlabExternalUrl)
+            .replace('__GITLAB_EXTERNAL_URL__', props.gitlabDomain)
             .replace('__GITLAB_ROOT_PASSWORD__', props.gitlabRootPassword)
 
         const storageClass = new k8s.StorageClass(this, "GitlabStorageClass", {
@@ -118,7 +117,6 @@ export class GitlabCeChart extends cdk8s.Chart {
             },
         })
 
-
         new k8s.Ingress(this, "GitlabIngress", {
             metadata: {
                 name: 'gitlab-ce-ingress',
@@ -133,7 +131,7 @@ export class GitlabCeChart extends cdk8s.Chart {
             spec: {
                 rules: [
                     {
-                        host: `gitlab.${props.stage.prefix}${props.legendDomain}`,
+                        host: props.gitlabDomain,
                         http: {
                             paths: [{
                                 path: '/*',
