@@ -14,6 +14,7 @@ import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
 import {GitlabAppConfig} from "../constructs/gitlab-app-config";
 import {Secret} from "@aws-cdk/aws-secretsmanager";
 import {gitlabRootPasswordFromSecret} from "../name-utils";
+import {ResolveConfig} from "../constructs/resolve-config";
 
 export interface LegendEngineProps extends StackProps{
     clusterName: string
@@ -26,13 +27,11 @@ export class LegendEngineStack extends LegendApplicationStack {
     constructor(scope: cdk.Construct, id: string, props: LegendEngineProps) {
         super(scope, id, props);
 
-        const region = Stack.of(this).region
-        const account = Stack.of(this).account
-
         const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", props)
-        const artifactImageId = new ArtifactImageId(this, 'ArtifactImageId', {
-            artifactBucketName: this.engineArtifactBucketName.value.toString(),
-            artifactObjectKey: this.engineArtifactObjectKey.value.toString(),
+        const artifactImageId = new ResolveConfig(this, 'ArtifactImageId', {
+            artifactBucketName: this.configArtifactBucketName.value.toString(),
+            artifactObjectKey: this.configArtifactObjectKey.value.toString(),
+            path: 'Images.LegendEngine'
         }).response;
 
         const mongoPassword = new secretsmanager.Secret(this, "MongoPassword");

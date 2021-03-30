@@ -41,7 +41,10 @@ export class LegendInfrastructureStage extends Stage {
         })
         engine.addDependency(gitlab)
 
-        const sdlc = new LegendSdlcStack(this, "SDLC", stackParams)
+        const sdlc = new LegendSdlcStack(this, "SDLC", {
+            ...{ gitlabRootSecret: gitlab.gitlabRootSecret },
+            ...stackParams,
+        })
         sdlc.addDependency(gitlab)
         sdlc.addDependency(engine)
 
@@ -50,9 +53,5 @@ export class LegendInfrastructureStage extends Stage {
 
         const ingress = new LegendIngressStack(this, "Ingress", stackParams);
         ingress.addDependency(studio)
-
-        // TODO need to wait for load balancers to be created before this stack runs...
-        //const dns = new LegendDnsStack(this, "DNS", stackParams);
-        //dns.addDependency(ingress);
     }
 }

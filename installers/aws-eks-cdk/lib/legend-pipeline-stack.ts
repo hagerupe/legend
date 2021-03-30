@@ -26,8 +26,6 @@ export class LegendPipelineStack extends Stack {
 
         const configSource = new codepipeline.Artifact();
         const legendSource = new codepipeline.Artifact();
-        const engineSource = new codepipeline.Artifact();
-        const sdlcSource = new codepipeline.Artifact();
         const cloudAssemblyArtifact = new codepipeline.Artifact();
 
         const githubSecret = SecretValue.secretsManager('github-access-token')
@@ -52,15 +50,6 @@ export class LegendPipelineStack extends Stack {
         });
 
         pipeline.codePipeline.stage('Source').addAction(new GitHubSourceAction({
-            actionName: 'LegendEngine',
-            output: engineSource,
-            oauthToken: githubSecret,
-            owner: 'hagerupe',
-            repo: 'legend-engine',
-            trigger: GitHubTrigger.POLL
-        }))
-
-        pipeline.codePipeline.stage('Source').addAction(new GitHubSourceAction({
             actionName: 'LegendConfig',
             output: configSource,
             oauthToken: githubSecret,
@@ -70,32 +59,7 @@ export class LegendPipelineStack extends Stack {
             trigger: GitHubTrigger.POLL
         }))
 
-        pipeline.codePipeline.stage('Source').addAction(new GitHubSourceAction({
-            actionName: 'LegendSDLC',
-            output: sdlcSource,
-            oauthToken: githubSecret,
-            owner: 'hagerupe',
-            repo: 'legend-sdlc',
-            trigger: GitHubTrigger.POLL
-        }))
-
         const runtimeBuildStage = pipeline.addStage("Legend_Runtime_Build");
-
-        const engineImageDetails = new codepipeline.Artifact();
-        const engineRepositoryName = 'legend-engine'
-        const legendEngineProject = new DockerBuildProject(this, 'LegendEngine', {
-            preBuildCommands: [
-                'mvn install',
-                'cd legend-engine-server',
-            ],
-            repositoryName: engineRepositoryName,
-        });
-        runtimeBuildStage.addActions(new CodeBuildAction({
-            actionName: 'Legend_Engine',
-            input: engineSource,
-            project: legendEngineProject.project,
-            outputs: [ engineImageDetails ]
-        }))
 
         const configArtifact = new codepipeline.Artifact();
         runtimeBuildStage.addActions(new CodeBuildAction({
@@ -120,40 +84,17 @@ export class LegendPipelineStack extends Stack {
             outputs: [ gitlabImageDetails ]
         }))
 
-        // https://console.aws.amazon.com/codesuite/codebuild/752499117019/projects/LegendSDLCProject1E6074E7-lgyP9viVXqkI/build/LegendSDLCProject1E6074E7-lgyP9viVXqkI%3A64cec97b-ffd3-43a7-bc79-f06556d63ec9/?region=us-east-1
-        const sdlcImageDetails = new codepipeline.Artifact();
-        const sdlcRepositoryName = 'legend-sdlc';
-        const sdlcProject = new DockerBuildProject(this, 'LegendSDLC', {
-            preBuildCommands: [
-                'mvn install',
-                'cd legend-sdlc-server',
-            ],
-            repositoryName: sdlcRepositoryName
-        })
-        runtimeBuildStage.addActions(new CodeBuildAction({
-            actionName: 'Legend_SDLC',
-            input: sdlcSource,
-            project: sdlcProject.project,
-            outputs: [ sdlcImageDetails ]
-        }))
-
-        const repositoryNames = [gitlabRepositoryName, engineRepositoryName]
+        const repositoryNames = [gitlabRepositoryName]
         const appStageOptions = {
             parameterOverrides: {
                 GitlabArtifactBucketName: gitlabImageDetails.bucketName,
                 GitlabArtifactObjectKey: gitlabImageDetails.objectKey,
-                EngineArtifactBucketName: engineImageDetails.bucketName,
-                EngineArtifactObjectKey: engineImageDetails.objectKey,
-                SDLCArtifactBucketName: sdlcImageDetails.bucketName,
-                SDLCArtifactObjectKey: sdlcImageDetails.objectKey,
 
                 ConfigArtifactBucketName: configArtifact.bucketName,
                 ConfigArtifactObjectKey: configArtifact.objectKey,
             },
             extraInputs: [
                 gitlabImageDetails,
-                engineImageDetails,
-                sdlcImageDetails,
                 configArtifact,
             ]
         }
