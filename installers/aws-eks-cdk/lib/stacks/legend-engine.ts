@@ -12,10 +12,12 @@ import * as route53 from "@aws-cdk/aws-route53";
 import * as certificatemanager from "@aws-cdk/aws-certificatemanager";
 import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
 import {GitlabAppConfig} from "../constructs/gitlab-app-config";
+import {Secret} from "@aws-cdk/aws-secretsmanager";
 
 export interface LegendEngineProps extends StackProps{
     clusterName: string
     kubectlRoleArn: string
+    gitlabRootSecret: Secret
     stage: LegendInfrastructureStageProps
 }
 
@@ -42,11 +44,8 @@ export class LegendEngineStack extends LegendApplicationStack {
         const certificate = new certificatemanager.DnsValidatedCertificate(this, "LegendEngineCert", {
             hostedZone: hostedZone, domainName: `${props.stage.prefix}${legendZoneName}`, })
 
-        const gitlabRootPassword = secretsmanager.Secret.fromSecretPartialArn(this, "GitlabRootPassword",
-            `arn:aws:secretsmanager:${region}:${account}:secret:GitlabRootPassword`)
-
         const config = new GitlabAppConfig(this, "GitlabAppConfig", {
-            secret: gitlabRootPassword,
+            secret: props.gitlabRootSecret,
             host: `https://gitlab.${props.stage.prefix}${legendZoneName}`})
 
         cluster.addCdk8sChart("Engine", new LegendEngineChart(new cdk8s.App(), "LegendEngine", {
