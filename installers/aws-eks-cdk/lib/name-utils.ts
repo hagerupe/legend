@@ -12,8 +12,7 @@ export function gitlabRootPassword(scope: Construct) {
 }
 
 export function gitlabRootPasswordFromSecret(scope: Construct, secret: Secret) {
-    const resolveSecret = new ResolveSecret(scope, "ResolvedGitlabPassword", { secret: secret })
-    return Buffer.from(resolveSecret.response, 'binary').toString('base64');
+    return new ResolveSecret(scope, "ResolvedGitlabPassword", { secret: secret }).response
 }
 
 export function hostedZoneName(scope: Construct) {
