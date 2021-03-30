@@ -14,7 +14,7 @@ export class LegendApplicationStack extends Stack {
 
         this.gitlabArtifactBucketName = new CfnParameter(this, "GitlabArtifactBucketName");
         this.gitlabArtifactObjectKey = new CfnParameter(this, "GitlabArtifactObjectKey");
-        
+
         this.configArtifactBucketName = new CfnParameter(this, "ConfigArtifactBucketName");
         this.configArtifactObjectKey = new CfnParameter(this, "ConfigArtifactObjectKey");
     }
