@@ -35,7 +35,7 @@ export class ResolveConfigFunction extends lambda.SingletonFunction {
 }
 
 export class ResolveConfig extends cdk.Construct {
-    public readonly response: string;
+    public readonly value: string;
 
     constructor(scope: cdk.Construct, id: string, props: ResolveConfigProps) {
         super(scope, id);
@@ -52,6 +52,6 @@ export class ResolveConfig extends cdk.Construct {
             }
         });
 
-        this.response = resource.getAtt('Response').toString();
+        this.value = resource.getAtt('Value').toString();
     }
 }

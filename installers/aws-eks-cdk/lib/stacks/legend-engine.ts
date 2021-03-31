@@ -32,7 +32,7 @@ export class LegendEngineStack extends LegendApplicationStack {
             artifactBucketName: this.configArtifactBucketName.value.toString(),
             artifactObjectKey: this.configArtifactObjectKey.value.toString(),
             path: 'Images.LegendEngine'
-        }).response;
+        }).value;
 
         const mongoPassword = new secretsmanager.Secret(this, "MongoPassword");
         const resolveMongoPass = new ResolveSecret(this, "ResolveMongoPassword", { secret: mongoPassword })

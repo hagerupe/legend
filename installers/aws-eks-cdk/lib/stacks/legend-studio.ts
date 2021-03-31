@@ -29,7 +29,7 @@ export class LegendStudioStack extends LegendApplicationStack {
             artifactBucketName: this.configArtifactBucketName.value.toString(),
             artifactObjectKey: this.configArtifactObjectKey.value.toString(),
             path: 'Images.LegendStudio'
-        }).response;
+        }).value;
 
         const mongoPassword = new secretsmanager.Secret(this, "MongoPassword");
         const resolveMongoPass = new ResolveSecret(this, "ResolveMongoPassword", { secret: mongoPassword })
