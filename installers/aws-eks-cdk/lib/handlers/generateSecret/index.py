@@ -2,6 +2,7 @@ import logging as log
 import cfnresponse
 import boto3
 import hashlib
+import uuid
 
 log.getLogger().setLevel(log.INFO)
 secretsmanager = boto3.client('secretsmanager')
@@ -15,9 +16,12 @@ def main(event, context):
   try:
     log.info('Input event: %s', event)
 
-    # TODO generate and persist secret
+    secretsmanager.put_secret_value(
+      SecretId=event['ResourceProperties']['secret'],
+      SecretString=uuid.uuid4().hex,
+    )
 
-    attributes = { }
+    attributes = {}
 
     cfnresponse.send(event, context, cfnresponse.SUCCESS, attributes, physical_id)
   except Exception as e:
