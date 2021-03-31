@@ -98,7 +98,7 @@ export class LegendPipelineStack extends Stack {
                 gitlabImageDetails,
                 configArtifact,
             ],
-            manualApprovals: true
+            //manualApprovals: true
         }
 
         const masterRoleAccessName = ssm.StringParameter.valueForStringParameter(this, 'master-role-access');
