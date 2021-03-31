@@ -8,7 +8,7 @@ import * as path from "path";
 import * as iam from "@aws-cdk/aws-iam";
 
 export interface ResolveSecretProps {
-    secret: secretmanager.Secret
+    secret: secretmanager.ISecret
 }
 
 export class ResolveSecretFunction extends lambda.SingletonFunction {

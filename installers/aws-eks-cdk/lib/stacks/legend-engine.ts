@@ -44,8 +44,9 @@ export class LegendEngineStack extends LegendApplicationStack {
         const certificate = new certificatemanager.DnsValidatedCertificate(this, "LegendEngineCert", {
             hostedZone: hostedZone, domainName: `${props.stage.prefix}${legendZoneName}`, })
 
+        const gitlabSecretRef = Secret.fromSecretNameV2(this, "GitlabSecretRef", props.gitlabRootSecret.secretName);
         const config = new GitlabAppConfig(this, "GitlabAppConfig", {
-            secret: gitlabRootPasswordFromSecret(this, props.gitlabRootSecret),
+            secret: gitlabRootPasswordFromSecret(this, gitlabSecretRef),
             host: `https://gitlab.${props.stage.prefix}${legendZoneName}`})
 
         cluster.addCdk8sChart("Engine", new LegendEngineChart(new cdk8s.App(), "LegendEngine", {

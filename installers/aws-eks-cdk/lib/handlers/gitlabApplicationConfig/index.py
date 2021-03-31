@@ -8,7 +8,6 @@ import hashlib
 def main(event, context):
 
   log.getLogger().setLevel(log.INFO)
-  secretsmanager = boto3.client('secretsmanager')
 
   fqn = event['StackId'] + event['LogicalResourceId']
   physical_id = hashlib.md5(fqn.encode('utf-8')).hexdigest()

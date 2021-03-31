@@ -23,8 +23,6 @@ def main(event, context):
       'Response': response['SecretString']
     }
 
-    log.info(attributes)
-
     cfnresponse.send(event, context, cfnresponse.SUCCESS, attributes, physical_id)
   except Exception as e:
     log.exception(e)
