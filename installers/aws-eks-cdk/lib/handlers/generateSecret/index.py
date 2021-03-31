@@ -17,7 +17,7 @@ def main(event, context):
     log.info('Input event: %s', event)
 
     secretsmanager.put_secret_value(
-      SecretId=event['ResourceProperties']['secret'],
+      SecretId=event['ResourceProperties']['Secret'],
       SecretString=uuid.uuid4().hex,
     )
 
