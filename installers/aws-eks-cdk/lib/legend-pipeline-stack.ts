@@ -19,6 +19,7 @@ import {ManagedPolicy} from "@aws-cdk/aws-iam";
 import {ArtifactImageIdFunction} from "./constructs/artifact-image-id";
 import {ResolveConfigFunction} from "./constructs/resolve-config";
 import {GitlabAppConfig, GitlabAppConfigFunction} from "./constructs/gitlab-app-config";
+import {GenerateSecretFunction} from "./constructs/generate-secret";
 
 export class LegendPipelineStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
@@ -112,6 +113,7 @@ export class LegendPipelineStack extends Stack {
         new ResolveSecretFunction(this, 'ResolveSecret')
         new ResolveConfigFunction(this, 'ResolveConfig', { artifactBucket: pipeline.codePipeline.artifactBucket })
         new GitlabAppConfigFunction(this, 'GitlabAppConfig')
+        new GenerateSecretFunction(this, 'GenerateSecret')
 
         const eksAlbCname = new lambda.SingletonFunction(this, 'EKSALBCnameFunction', {
             functionName: 'EKSALBCnameFunction',

@@ -4,7 +4,7 @@ import {Construct} from "@aws-cdk/core";
 import * as route53 from "@aws-cdk/aws-route53";
 import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
 import {ResolveSecret} from "./constructs/resolve-secret";
-import {ISecret, Secret} from "@aws-cdk/aws-secretsmanager";
+import {Secret} from "@aws-cdk/aws-secretsmanager";
 
 export function gitlabRootPassword(scope: Construct) {
     const gitlabRootSecret = new secretsmanager.Secret(scope, "GitlabRootPasswordRef", {  });

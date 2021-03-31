@@ -15,13 +15,9 @@ def main(event, context):
   try:
     log.info('Input event: %s', event)
 
-    response = secretsmanager.get_secret_value(
-      SecretId=event['ResourceProperties']['secret'],
-    )
+    # TODO generate and persist secret
 
-    attributes = {
-      'Response': response['SecretString']
-    }
+    attributes = { }
 
     cfnresponse.send(event, context, cfnresponse.SUCCESS, attributes, physical_id)
   except Exception as e:
