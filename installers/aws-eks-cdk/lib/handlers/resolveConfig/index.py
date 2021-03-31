@@ -20,14 +20,14 @@ def main(event, context):
 
     bucket = event['ResourceProperties']['Bucket']
     key = event['ResourceProperties']['ObjectKey']
-    element = event['ResourceProperties', 'Path']
+    element = event['ResourceProperties']['Path']
 
     # Retrieve artifact image details
     s3 = boto3.client('s3')
     s3.download_file(bucket, key, '/tmp/artifact.zip')
     with zipfile.ZipFile('/tmp/artifact.zip', 'r') as zip_ref:
       zip_ref.extractall('/tmp/artifacts')
-    with open('/tmp/artifacts/imageDetail.json') as f:
+    with open('/tmp/artifacts/legend.json') as f:
       data = json.load(f)
 
     attributes = {

@@ -27,7 +27,7 @@ export class StaticBuildProject extends Construct {
                 },
                 artifacts: {
                     files: [
-                        'legend.yaml'
+                        'legend.json'
                     ]
                 }
             }),

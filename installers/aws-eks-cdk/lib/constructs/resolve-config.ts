@@ -46,9 +46,9 @@ export class ResolveConfig extends cdk.Construct {
         const resource = new cfn.CustomResource(this, 'Resource', {
             provider: cfn.CustomResourceProvider.lambda(lambdaSingleton),
             properties: {
-                bucket: props.artifactBucketName,
-                objectKey: props.artifactObjectKey,
-                path: props.path,
+                Bucket: props.artifactBucketName,
+                ObjectKey: props.artifactObjectKey,
+                Path: props.path,
             }
         });
 
