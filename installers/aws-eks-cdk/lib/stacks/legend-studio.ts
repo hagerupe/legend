@@ -49,7 +49,7 @@ export class LegendStudioStack extends LegendApplicationStack {
 
 
         const mongoSecretRef = Secret.fromSecretNameV2(this, "MongoSecretRef", props.mongoSecret.secretName);
-        const mongo = new ResolveSecret(scope, "ResolveMongoPassword", { secret: mongoSecretRef }).response;
+        const mongo = new ResolveSecret(this, "ResolveMongoPassword", { secret: mongoSecretRef }).response;
 
         cluster.addCdk8sChart("Studio", new LegendStudioChart(new cdk8s.App(), "LegendStudio", {
             imageId: artifactImageId,

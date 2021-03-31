@@ -49,7 +49,7 @@ export class LegendEngineStack extends LegendApplicationStack {
             host: `https://gitlab.${props.stage.prefix}${legendZoneName}`})
 
         const mongoSecretRef = Secret.fromSecretNameV2(this, "MongoSecretRef", props.mongoSecret.secretName);
-        const mongo = new ResolveSecret(scope, "ResolveMongoPassword", { secret: mongoSecretRef }).response;
+        const mongo = new ResolveSecret(this, "ResolveMongoPassword", { secret: mongoSecretRef }).response;
 
         cluster.addCdk8sChart("Engine", new LegendEngineChart(new cdk8s.App(), "LegendEngine", {
             imageId: artifactImageId,

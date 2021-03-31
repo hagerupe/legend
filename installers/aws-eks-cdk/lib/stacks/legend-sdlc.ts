@@ -47,7 +47,7 @@ export class LegendSdlcStack extends LegendApplicationStack {
             host: `https://gitlab.${props.stage.prefix}${legendZoneName}`})
 
         const mongoSecretRef = Secret.fromSecretNameV2(this, "MongoSecretRef", props.mongoSecret.secretName);
-        const mongo = new ResolveSecret(scope, "ResolveMongoPassword", { secret: mongoSecretRef }).response;
+        const mongo = new ResolveSecret(this, "ResolveMongoPassword", { secret: mongoSecretRef }).response;
 
         cluster.addCdk8sChart("SDLC", new LegendSdlcChart(new cdk8s.App(), "LegendSdlc", {
             imageId: artifactImageId,
