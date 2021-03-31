@@ -36,19 +36,25 @@ export class LegendInfrastructureStage extends Stage {
         gitlab.addDependency(kubernetes)
 
         const engine = new LegendEngineStack(this, "Engine", {
-            ...{ gitlabRootSecret: gitlab.gitlabRootSecret },
+            ...{ gitlabRootSecret: gitlab.gitlabRootSecret,
+                 mongoSecret: mongo.mongoSecret },
             ...stackParams,
         })
         engine.addDependency(gitlab)
 
         const sdlc = new LegendSdlcStack(this, "SDLC", {
-            ...{ gitlabRootSecret: gitlab.gitlabRootSecret },
+            ...{ gitlabRootSecret: gitlab.gitlabRootSecret,
+                 mongoSecret: mongo.mongoSecret },
             ...stackParams,
         })
         sdlc.addDependency(gitlab)
         sdlc.addDependency(engine)
 
-        const studio = new LegendStudioStack(this, "Studio", stackParams)
+        const studio = new LegendStudioStack(this, "Studio", {
+            ...{ gitlabRootSecret: gitlab.gitlabRootSecret,
+                mongoSecret: mongo.mongoSecret },
+            ...stackParams,
+        })
         studio.addDependency(sdlc)
 
         const ingress = new LegendIngressStack(this, "Ingress", stackParams);

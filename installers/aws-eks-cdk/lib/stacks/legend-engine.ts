@@ -15,11 +15,13 @@ import {GitlabAppConfig} from "../constructs/gitlab-app-config";
 import {Secret} from "@aws-cdk/aws-secretsmanager";
 import {gitlabRootPasswordFromSecret} from "../name-utils";
 import {ResolveConfig} from "../constructs/resolve-config";
+import {GenerateSecret} from "../constructs/generate-secret";
 
 export interface LegendEngineProps extends StackProps{
     clusterName: string
     kubectlRoleArn: string
     gitlabRootSecret: Secret
+    mongoSecret: Secret
     stage: LegendInfrastructureStageProps
 }
 
@@ -34,9 +36,6 @@ export class LegendEngineStack extends LegendApplicationStack {
             path: 'Images.LegendEngine'
         }).value;
 
-        const mongoPassword = new secretsmanager.Secret(this, "MongoPassword");
-        const resolveMongoPass = new ResolveSecret(this, "ResolveMongoPassword", { secret: mongoPassword })
-
         const legendZoneName = ssm.StringParameter.valueForStringParameter(this, 'legend-zone-name');
         const legendHostedZoneId = ssm.StringParameter.valueForStringParameter(this, 'legend-hosted-zone-id');
         const hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, "HostedZone", {
@@ -49,6 +48,9 @@ export class LegendEngineStack extends LegendApplicationStack {
             secret: gitlabRootPasswordFromSecret(this, gitlabSecretRef),
             host: `https://gitlab.${props.stage.prefix}${legendZoneName}`})
 
+        const mongoSecretRef = Secret.fromSecretNameV2(this, "MongoSecretRef", props.mongoSecret.secretName);
+        const mongo = new ResolveSecret(scope, "ResolveMongoPassword", { secret: mongoSecretRef }).response;
+
         cluster.addCdk8sChart("Engine", new LegendEngineChart(new cdk8s.App(), "LegendEngine", {
             imageId: artifactImageId,
             gitlabOauthClientId: config.applicationId,
@@ -56,7 +58,7 @@ export class LegendEngineStack extends LegendApplicationStack {
             gitlabPublicUrl: `https://gitlab.${props.stage.prefix}${legendZoneName}`,
             mongoHostPort: 'mongo-service.default.svc.cluster.local',
             mongoUser: 'admin',
-            mongoPassword: resolveMongoPass.response,
+            mongoPassword: mongo,
             legendEnginePort: 80,
         }))
     }

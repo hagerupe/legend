@@ -5,7 +5,6 @@ import * as cdk from "@aws-cdk/core";
 import {LegendSdlcChart} from "../charts/legend-sdlc";
 import {LegendApplicationStack} from "./legend-application-stack";
 import {ArtifactImageId} from "../constructs/artifact-image-id";
-import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
 import {ResolveSecret} from "../constructs/resolve-secret";
 import * as ssm from "@aws-cdk/aws-ssm";
 import * as certificatemanager from "@aws-cdk/aws-certificatemanager";
@@ -21,6 +20,7 @@ export interface LegendEngineProps extends StackProps{
     kubectlRoleArn: string
     gitlabRootSecret: Secret
     stage: LegendInfrastructureStageProps
+    mongoSecret: Secret
 }
 
 export class LegendSdlcStack extends LegendApplicationStack {
@@ -34,9 +34,6 @@ export class LegendSdlcStack extends LegendApplicationStack {
             path: 'Images.LegendSDLC'
         }).value;
 
-        const mongoPassword = new secretsmanager.Secret(this, "MongoPassword");
-        const resolveMongoPass = new ResolveSecret(this, "ResolveMongoPassword", { secret: mongoPassword })
-
         const legendZoneName = ssm.StringParameter.valueForStringParameter(this, 'legend-zone-name');
         const legendHostedZoneId = ssm.StringParameter.valueForStringParameter(this, 'legend-hosted-zone-id');
         const hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, "HostedZone", {
@@ -49,6 +46,9 @@ export class LegendSdlcStack extends LegendApplicationStack {
             secret: gitlabRootPasswordFromSecret(this, gitlabSecretRef),
             host: `https://gitlab.${props.stage.prefix}${legendZoneName}`})
 
+        const mongoSecretRef = Secret.fromSecretNameV2(this, "MongoSecretRef", props.mongoSecret.secretName);
+        const mongo = new ResolveSecret(scope, "ResolveMongoPassword", { secret: mongoSecretRef }).response;
+
         cluster.addCdk8sChart("SDLC", new LegendSdlcChart(new cdk8s.App(), "LegendSdlc", {
             imageId: artifactImageId,
             legendSdlcPort: 80,
@@ -57,7 +57,7 @@ export class LegendSdlcStack extends LegendApplicationStack {
             gitlabPublicUrl: `https://gitlab.${props.stage.prefix}${legendZoneName}`,
             mongoHostPort: 'mongo-service.default.svc.cluster.local',
             mongoUser: 'admin',
-            mongoPassword: resolveMongoPass.response,
+            mongoPassword: mongo,
             gitlabHost: `gitlab.${props.stage.prefix}${legendZoneName}`,
             gitlabPort: 443,
             legendSdlcUrl: `https://${props.stage.prefix}${legendZoneName}/sdlc`,

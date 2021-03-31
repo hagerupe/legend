@@ -5,18 +5,22 @@ import * as cdk from "@aws-cdk/core";
 import {LegendStudioChart} from "../charts/legend-studio";
 import {LegendApplicationStack} from "./legend-application-stack";
 import {ArtifactImageId} from "../constructs/artifact-image-id";
-import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
 import {ResolveSecret} from "../constructs/resolve-secret";
 import * as ssm from "@aws-cdk/aws-ssm";
 import * as route53 from "@aws-cdk/aws-route53";
 import * as certificatemanager from "@aws-cdk/aws-certificatemanager";
 import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
 import {ResolveConfig} from "../constructs/resolve-config";
+import {Secret} from "@aws-cdk/aws-secretsmanager";
+import {GitlabAppConfig} from "../constructs/gitlab-app-config";
+import {gitlabRootPasswordFromSecret} from "../name-utils";
 
 export interface LegendStudioProps extends StackProps{
     clusterName: string
     kubectlRoleArn: string
     stage: LegendInfrastructureStageProps
+    gitlabRootSecret: Secret
+    mongoSecret: Secret
 }
 
 export class LegendStudioStack extends LegendApplicationStack {
@@ -31,9 +35,6 @@ export class LegendStudioStack extends LegendApplicationStack {
             path: 'Images.LegendStudio'
         }).value;
 
-        const mongoPassword = new secretsmanager.Secret(this, "MongoPassword");
-        const resolveMongoPass = new ResolveSecret(this, "ResolveMongoPassword", { secret: mongoPassword })
-
         const legendZoneName = ssm.StringParameter.valueForStringParameter(this, 'legend-zone-name');
         const legendHostedZoneId = ssm.StringParameter.valueForStringParameter(this, 'legend-hosted-zone-id');
         const hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, "HostedZone", {
@@ -41,16 +42,22 @@ export class LegendStudioStack extends LegendApplicationStack {
         const certificate = new certificatemanager.DnsValidatedCertificate(this, "GitlabCert", {
             hostedZone: hostedZone, domainName: `${props.stage.prefix}${legendZoneName}`, });
 
-        const gitlabClientId = ssm.StringParameter.valueForStringParameter(this, 'gitlab-client-id');
-        const gitlabAccessCode = ssm.StringParameter.valueForStringParameter(this, 'gitlab-access-code');
+        const gitlabSecretRef = Secret.fromSecretNameV2(this, "GitlabSecretRef", props.gitlabRootSecret.secretName);
+        const config = new GitlabAppConfig(this, "GitlabAppConfig", {
+            secret: gitlabRootPasswordFromSecret(this, gitlabSecretRef),
+            host: `https://gitlab.${props.stage.prefix}${legendZoneName}`})
+
+
+        const mongoSecretRef = Secret.fromSecretNameV2(this, "MongoSecretRef", props.mongoSecret.secretName);
+        const mongo = new ResolveSecret(scope, "ResolveMongoPassword", { secret: mongoSecretRef }).response;
 
         cluster.addCdk8sChart("Studio", new LegendStudioChart(new cdk8s.App(), "LegendStudio", {
             imageId: artifactImageId,
             mongoUser: 'admin',
-            mongoPassword: resolveMongoPass.response,
+            mongoPassword: mongo,
             mongoHostPort: 'mongo-service.default.svc.cluster.local',
-            gitlabOauthClientId: gitlabClientId,
-            gitlabOauthSecret: gitlabAccessCode,
+            gitlabOauthClientId: config.applicationId,
+            gitlabOauthSecret: config.secret,
             legendStudioPort: 80,
             gitlabPublicUrl: `https://gitlab.${props.stage.prefix}${legendZoneName}`,
             legendEngineUrl: `https://${props.stage.prefix}${legendZoneName}/engine`,
