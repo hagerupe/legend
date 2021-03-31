@@ -4,7 +4,6 @@ import boto3
 import zipfile
 import json
 import hashlib
-import yaml
 import operator
 from functools import reduce
 
@@ -29,7 +28,7 @@ def main(event, context):
     with zipfile.ZipFile('/tmp/artifact.zip', 'r') as zip_ref:
       zip_ref.extractall('/tmp/artifacts')
     with open('/tmp/artifacts/imageDetail.json') as f:
-      data = yaml.safe_load(f)
+      data = json.load(f)
 
     attributes = {
       'Value': reduce(operator.getitem, element.split('.'), data)

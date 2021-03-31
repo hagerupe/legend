@@ -14,7 +14,8 @@ def main(event, context):
   try:
     log.info('Input event: %s', event)
 
-    # TODO
+    eksCluster = event['Cluster']
+    stack = event['ClusterStack']
 
     attributes = {
       'Response': 'Success'
