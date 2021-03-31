@@ -12,6 +12,7 @@ import {ResolveSecret} from "../constructs/resolve-secret";
 import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
 import {gitlabDomain, gitlabRootPasswordFromSecret, hostedZoneRef} from "../name-utils";
 import * as iam from "@aws-cdk/aws-iam";
+import {GenerateSecret} from "../constructs/generate-secret";
 
 export interface GitlabStackProps extends StackProps {
     clusterName: string
@@ -39,9 +40,14 @@ export class GitlabStack extends LegendApplicationStack {
         }).response;
 
         this.gitlabRootSecret = new secretsmanager.Secret(this, "GitlabRootPassword", {  });
+
+        const gitlabGenerateRootPass = new GenerateSecret(this, "GenerateGitlabPassword", { secret: this.gitlabRootSecret })
+        const gitlabResolveSecret = new ResolveSecret(this, "ResolvedGitlabPassword", { secret: this.gitlabRootSecret })
+        gitlabResolveSecret.node.addDependency(gitlabGenerateRootPass)
+
         cluster.addCdk8sChart("GitlabCE", new GitlabCeChart(new cdk8s.App(), "GitlabCEChart", {
             gitlabDomain: gitlabDomain(this, props.stage),
-            gitlabRootPassword: gitlabRootPasswordFromSecret(this, this.gitlabRootSecret),
+            gitlabRootPassword: gitlabResolveSecret.response,
             image: artifactImageId,
             stage: props.stage,
         }))
