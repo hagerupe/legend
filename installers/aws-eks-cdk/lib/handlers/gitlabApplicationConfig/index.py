@@ -1,5 +1,4 @@
 import cfnresponse
-import boto3
 import json
 import subprocess
 import logging as log
@@ -16,10 +15,11 @@ def main(event, context):
   try:
     log.debug('Input event: %s', event)
 
-    gitlab_host= event['ResourceProperties']['Host']
+    gitlab_host = event['ResourceProperties']['Host']
     gitlab_password = event['ResourceProperties']['Secret']
+    redirect_uri = event['ResourceProperties']['RedirectUri'].replace(",", "\r\n")
 
-    application_json = subprocess.check_output(["./curl.sh", gitlab_host, gitlab_password]).decode("utf-8")
+    application_json = subprocess.check_output(["./curl.sh", gitlab_host, gitlab_password, redirect_uri]).decode("utf-8")
     application = json.loads(application_json)
     application_id = application['application_id']
     secret = application['secret']

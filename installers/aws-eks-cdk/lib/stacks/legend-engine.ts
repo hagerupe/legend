@@ -37,7 +37,8 @@ export class LegendEngineStack extends LegendApplicationStack {
         // Generate a OAuth Application
         const config = new GitlabAppConfig(this, "GitlabAppConfig", {
             secret: gitlabRootPasswordFromSecret(this, gitlabSecretRef),
-            host: `https://gitlab.${props.stage.prefix}${legendZoneName}`})
+            host: `https://gitlab.${props.stage.prefix}${legendZoneName}`,
+            stage: props.stage})
 
         cluster.addCdk8sChart("Engine", new LegendEngineChart(new cdk8s.App(), "LegendEngine", {
             imageId: resolveConfig(this, 'Images.LegendEngine'),

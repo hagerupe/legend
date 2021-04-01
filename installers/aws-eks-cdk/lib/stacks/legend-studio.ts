@@ -13,7 +13,15 @@ import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
 import {ResolveConfig} from "../constructs/resolve-config";
 import {Secret} from "@aws-cdk/aws-secretsmanager";
 import {GitlabAppConfig} from "../constructs/gitlab-app-config";
-import {gitlabRootPasswordFromSecret, mongoPassword, resolveConfig} from "../utils";
+import {
+    engineUrl,
+    gitlabRootPasswordFromSecret,
+    gitlabUrl,
+    mongoPassword,
+    resolveConfig,
+    sdlcUrl,
+    studioDomain
+} from "../utils";
 
 export interface LegendStudioProps extends StackProps{
     clusterName: string
@@ -31,9 +39,12 @@ export class LegendStudioStack extends LegendApplicationStack {
         const legendZoneName = ssm.StringParameter.valueForStringParameter(this, 'legend-zone-name');
 
         const gitlabSecretRef = Secret.fromSecretNameV2(this, "GitlabSecretRef", props.gitlabRootSecret.secretName);
+
+        // Generate a OAuth Application
         const config = new GitlabAppConfig(this, "GitlabAppConfig", {
             secret: gitlabRootPasswordFromSecret(this, gitlabSecretRef),
-            host: `https://gitlab.${props.stage.prefix}${legendZoneName}`})
+            host: `https://gitlab.${props.stage.prefix}${legendZoneName}`,
+            stage: props.stage})
 
         const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", props)
         cluster.addCdk8sChart("Studio", new LegendStudioChart(new cdk8s.App(), "LegendStudio", {
@@ -44,10 +55,10 @@ export class LegendStudioStack extends LegendApplicationStack {
             gitlabOauthClientId: config.applicationId,
             gitlabOauthSecret: config.secret,
             legendStudioPort: 80,
-            gitlabPublicUrl: `https://gitlab.${props.stage.prefix}${legendZoneName}`,
-            legendEngineUrl: `https://${props.stage.prefix}${legendZoneName}/engine`,
-            legendSdlcUrl: `https://${props.stage.prefix}${legendZoneName}/sdlc`,
-            legendStudioHost: `${props.stage.prefix}${legendZoneName}`,
+            gitlabPublicUrl: gitlabUrl(this, props.stage),
+            legendEngineUrl: engineUrl(this, props.stage),
+            legendSdlcUrl: sdlcUrl(this, props.stage),
+            legendStudioHost: studioDomain(this, props.stage),
         }))
     }
 }

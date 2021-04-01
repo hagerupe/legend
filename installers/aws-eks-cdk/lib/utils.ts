@@ -48,5 +48,29 @@ export function hostedZoneRef(scope: Construct, id: string) {
 }
 
 export function gitlabDomain(scope: Construct, props: LegendInfrastructureStageProps) {
-    return `gitlab.${props.prefix}${hostedZoneName(scope)}`
+    return `gitlab.${rootDomain(scope, props)}`
+}
+
+export function gitlabUrl(scope: Construct, props: LegendInfrastructureStageProps) {
+    return `https://${gitlabDomain(scope, props)}/`
+}
+
+export function rootDomain(scope: Construct, props: LegendInfrastructureStageProps) {
+    return `${props.prefix}${hostedZoneName(scope)}`
+}
+
+export function engineUrl(scope: Construct, props: LegendInfrastructureStageProps) {
+    return `https://${rootDomain(scope, props)}/engine`
+}
+
+export function sdlcUrl(scope: Construct, props: LegendInfrastructureStageProps) {
+    return `https://${rootDomain(scope, props)}/sdlc`
+}
+
+export function studioDomain(scope: Construct, props: LegendInfrastructureStageProps) {
+    return `${rootDomain(scope, props)}`
+}
+
+export function studioUrl(scope: Construct, props: LegendInfrastructureStageProps) {
+    return `https://${studioDomain(scope, props)}/`
 }

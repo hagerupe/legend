@@ -7,10 +7,13 @@ import {ManagedPolicy} from "@aws-cdk/aws-iam";
 import * as fs from "fs";
 import * as path from "path";
 import * as iam from "@aws-cdk/aws-iam";
+import {engineUrl, gitlabDomain, sdlcUrl, studioUrl} from "../utils";
+import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
 
 export interface GitlabAppConfigProps {
-    readonly secret: string
-    readonly host: string
+    readonly secret: string,
+    readonly host: string,
+    readonly stage: LegendInfrastructureStageProps,
 }
 
 export class GitlabAppConfigFunction extends lambda.SingletonFunction {
@@ -37,11 +40,13 @@ export class GitlabAppConfig extends cdk.Construct {
         const functionArn = `arn:aws:lambda:${Stack.of(this).region}:${Stack.of(this).account}:function:GitlabAppConfig`
         const lambdaSingleton = lambda.Function.fromFunctionAttributes(this, "GitlabAppConfigFunction", { functionArn: functionArn })
 
+        const redirectUri = `${sdlcUrl(this, props.stage)},${engineUrl(this, props.stage)},${studioUrl(this, props.stage)}`
         const resource = new cfn.CustomResource(this, 'GitlabAppConfig', {
             provider: cfn.CustomResourceProvider.lambda(lambdaSingleton),
             properties: {
                 Secret: props.secret,
                 Host: props.host,
+                RedirectUri: redirectUri,
             }
         });
 

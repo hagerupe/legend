@@ -2,6 +2,7 @@
 gitlab_host="$1"
 gitlab_user="root"
 gitlab_password="$2"
+redirect_uri="$3"
 
 # curl for the login page to get a session cookie and the sources with the auth tokens
 body_header=$(curl -s -L -c /tmp/cookies.txt -i "${gitlab_host}/users/sign_in" -s)
@@ -43,4 +44,5 @@ body_header=$(curl -s -L "${gitlab_host}/-/profile/personal_access_tokens" \
 # Scrape the personal access token from the response HTML
 personal_access_token=$(echo $body_header | perl -ne 'print "$1\n" if /created-personal-access-token"[[:blank:]]value="(.+?)"/' | sed -n 1p)
 
-curl --request POST --header "PRIVATE-TOKEN: ${personal_access_token}" --data "name=Legend Demo2&redirect_uri=http://redirect.uri&scopes=" "${gitlab_host}/api/v4/applications"
+# TODO fix redirect URI
+curl --request POST --header "PRIVATE-TOKEN: ${personal_access_token}" --data "name=Legend Demo2&redirect_uri=${redirect_uri}&scopes=" "${gitlab_host}/api/v4/applications"
