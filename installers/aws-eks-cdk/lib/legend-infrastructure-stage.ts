@@ -6,8 +6,10 @@ import {LegendEngineStack} from "./stacks/legend-engine";
 import {LegendSdlcStack} from "./stacks/legend-sdlc";
 import {LegendStudioStack} from "./stacks/legend-studio";
 import {LegendIngressStack} from "./stacks/legend-ingress";
+import {GitlabDnsStack} from "./stacks/gitlab-dns";
 
 export interface LegendInfrastructureStageProps extends StageProps {
+    stageName: string,
     repositoryNames: string[],
     prefix?: string,
 }
@@ -35,19 +37,22 @@ export class LegendInfrastructureStage extends Stage {
         const gitlab = new GitlabStack(this, "Gitlab", stackParams)
         gitlab.addDependency(kubernetes)
 
+        const gitlabDNS = new GitlabDnsStack(this, "GitlabDNS", stackParams);
+        gitlabDNS.addDependency(gitlab)
+
         const engine = new LegendEngineStack(this, "Engine", {
             ...{ gitlabRootSecret: gitlab.gitlabRootSecret,
                  mongoSecret: mongo.mongoSecret },
             ...stackParams,
         })
-        engine.addDependency(gitlab)
+        engine.addDependency(gitlabDNS)
 
         const sdlc = new LegendSdlcStack(this, "SDLC", {
             ...{ gitlabRootSecret: gitlab.gitlabRootSecret,
                  mongoSecret: mongo.mongoSecret },
             ...stackParams,
         })
-        sdlc.addDependency(gitlab)
+        sdlc.addDependency(gitlabDNS)
         sdlc.addDependency(engine)
 
         const studio = new LegendStudioStack(this, "Studio", {
@@ -55,9 +60,12 @@ export class LegendInfrastructureStage extends Stage {
                 mongoSecret: mongo.mongoSecret },
             ...stackParams,
         })
+        studio.addDependency(gitlabDNS)
         studio.addDependency(sdlc)
 
         const ingress = new LegendIngressStack(this, "Ingress", stackParams);
         ingress.addDependency(studio)
+        ingress.addDependency(sdlc)
+        ingress.addDependency(engine)
     }
 }

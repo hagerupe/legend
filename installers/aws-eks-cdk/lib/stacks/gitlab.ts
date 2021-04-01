@@ -52,19 +52,5 @@ export class GitlabStack extends LegendApplicationStack {
             image: artifactImageId,
             stage: props.stage,
         }))
-
-        const loadBalancer = elbv2.ApplicationLoadBalancer.fromLookup(this, 'GitlabLoadBalancer', {
-            loadBalancerTags: {
-                "ingress.k8s.aws/stack": "default/gitlab-ce-ingress",
-                "elbv2.k8s.aws/cluster": cluster.clusterName,
-            },
-        });
-
-        const hostedZone = hostedZoneRef(this, "LegendHostedZone")
-        new route53.ARecord(this, 'AliasRecord', {
-            zone: hostedZone,
-            recordName: gitlabDomain(this, props.stage),
-            target: route53.RecordTarget.fromAlias(new alias.LoadBalancerTarget(loadBalancer)),
-        });
     }
 }

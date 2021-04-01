@@ -130,7 +130,8 @@ export class LegendPipelineStack extends Stack {
         pipeline.addApplicationStage(new LegendInfrastructureStage(this, "UAT", {
             env: { account: this.account, region: this.region },
             repositoryNames: repositoryNames,
-            prefix: 'uat.'
+            prefix: 'uat.',
+            stageName: 'UAT',
         }), appStageOptions)
 
         pipeline.addStage("Approval").addManualApprovalAction({});
@@ -138,7 +139,8 @@ export class LegendPipelineStack extends Stack {
         pipeline.addApplicationStage(new LegendInfrastructureStage(this, "Prod", {
             env: { account: this.account, region: this.region },
             repositoryNames: repositoryNames,
-            prefix: ''
+            prefix: '',
+            stageName: 'PROD',
         }), appStageOptions)
     }
 }
