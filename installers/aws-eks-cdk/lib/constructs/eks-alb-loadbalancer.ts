@@ -7,6 +7,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
 import {ResourceEnvironment} from "@aws-cdk/core/lib/resource";
+import * as iam from "@aws-cdk/aws-iam";
 
 export interface EksAlbLoadBalancerProps {
     readonly clusterName: string,
@@ -27,6 +28,12 @@ export class EksAlbLoadBalancerFunction extends lambda.SingletonFunction {
                 runtime: lambda.Runtime.PYTHON_3_6},
             ...props
         });
+        const resolveSecretPolicy = new iam.Policy(this, "ResolveSecretPolicy", {
+            document: iam.PolicyDocument.fromJson(JSON.parse(fs.readFileSync(path.join('resources', 'elbv2-readonly-policy.json'), {encoding: 'utf8'})))
+        })
+        if (this.role !== undefined) {
+            resolveSecretPolicy.attachToRole(this.role)
+        }
     }
 }
 

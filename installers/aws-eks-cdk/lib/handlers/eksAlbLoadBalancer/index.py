@@ -5,6 +5,8 @@ import hashlib
 
 log.getLogger().setLevel(log.INFO)
 
+client = boto3.client('elbv2')
+
 def main(event, context):
 
   fqn = event['StackId'] + event['LogicalResourceId']
@@ -14,10 +16,12 @@ def main(event, context):
   try:
     log.info('Input event: %s', event)
 
-    eksCluster = event['Cluster']
-    stack = event['ClusterStack']
+    eksCluster = event['ResourceProperties']['Cluster']
+    stack = event['ResourceProperties']['ClusterStack']
 
     # TODO
+    # response = client.describe_load_balancers()
+    # log.info(response)
 
     attributes = {
       'loadBalancerDnsName': 'k8s-default-gitlabce-272116d414-585242986.us-east-2.elb.amazonaws.com',
