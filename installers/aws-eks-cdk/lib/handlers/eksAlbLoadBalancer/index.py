@@ -17,8 +17,11 @@ def main(event, context):
     eksCluster = event['Cluster']
     stack = event['ClusterStack']
 
+    # TODO
+
     attributes = {
-      'Response': 'Success'
+      'loadBalancerDnsName': 'k8s-default-gitlabce-272116d414-585242986.us-east-2.elb.amazonaws.com',
+      'loadBalancerCanonicalHostedZoneId': 'Z3AADJGX6KTTL2',
     }
 
     cfnresponse.send(event, context, cfnresponse.SUCCESS, attributes, physical_id)

@@ -1,13 +1,15 @@
-import {StackProps} from '@aws-cdk/core';
+import {Stack, StackProps} from '@aws-cdk/core';
 import * as cdk from "@aws-cdk/core";
 import * as route53 from "@aws-cdk/aws-route53"
 import * as alias from "@aws-cdk/aws-route53-targets"
 import {LegendApplicationStack} from "./legend-application-stack";
 import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
 import {gitlabDomain, hostedZoneRef} from "../utils";
-import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
+import {EksAlbLoadBalancer} from "../constructs/eks-alb-loadbalancer";
+import * as eks from "@aws-cdk/aws-eks";
 
 export interface GitlabDnsStackProps extends StackProps {
+    clusterName: string,
     stage: LegendInfrastructureStageProps
 }
 
@@ -16,18 +18,18 @@ export class GitlabDnsStack extends LegendApplicationStack {
     constructor(scope: cdk.Construct, id: string, props: GitlabDnsStackProps) {
         super(scope, id, props);
 
-        const loadBalancer = elbv2.ApplicationLoadBalancer.fromLookup(this, 'GitlabLoadBalancer', {
-            loadBalancerTags: {
-                "ingress.k8s.aws/stack": "default/gitlab-ce-ingress",
-                "EnvStage": props.stage.stageName,
-            },
-        });
-
-        const hostedZone = hostedZoneRef(this, "LegendHostedZone")
-        new route53.ARecord(this, 'AliasRecord', {
-            zone: hostedZone,
-            recordName: gitlabDomain(this, props.stage),
-            target: route53.RecordTarget.fromAlias(new alias.LoadBalancerTarget(loadBalancer)),
-        });
+        if (props.stage.env !== undefined) {
+            new route53.ARecord(Stack.of(this), 'AliasRecord', {
+                zone: hostedZoneRef(this, "LegendHostedZone"),
+                recordName: gitlabDomain(this, props.stage),
+                target: route53.RecordTarget.fromAlias(new alias.LoadBalancerTarget(new EksAlbLoadBalancer(this, 'GitlabLoadBalancerRef', {
+                    clusterName: props.clusterName,
+                    clusterStack: "default/gitlab-ce-ingress",
+                    env: props.stage.env,
+                }).loadBalancer))
+            })
+        } else {
+            throw new Error('Environment must be defined')
+        }
     }
 }
