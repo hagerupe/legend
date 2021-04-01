@@ -77,22 +77,22 @@ export class GitlabCeChart extends cdk8s.Chart {
                                         cpu: Quantity.fromString("2000m")
                                     }
                                 },
-                                /*volumeMounts: [
+                                volumeMounts: [
                                     {
                                         name: 'persistent-storage',
                                         mountPath: '/var/opt/gitlab'
                                     }
-                                ]*/
+                                ]
                             }
                         ],
-                        /*volumes: [
+                        volumes: [
                             {
                                 name: 'persistent-storage',
                                 persistentVolumeClaim: {
                                     claimName: volumeClaim.name,
                                 }
                             }
-                        ]*/
+                        ]
                     }
                 }
             }
