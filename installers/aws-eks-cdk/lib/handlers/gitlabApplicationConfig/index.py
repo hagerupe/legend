@@ -14,7 +14,7 @@ def main(event, context):
   log.info(physical_id)
 
   try:
-    log.info('Input event: %s', event)
+    log.debug('Input event: %s', event)
 
     gitlab_host= event['ResourceProperties']['Host']
     gitlab_password = event['ResourceProperties']['Secret']

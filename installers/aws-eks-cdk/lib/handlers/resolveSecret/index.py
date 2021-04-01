@@ -13,7 +13,7 @@ def main(event, context):
   log.info(physical_id)
 
   try:
-    log.info('Input event: %s', event)
+    log.debug('Input event: %s', event)
 
     response = secretsmanager.get_secret_value(
       SecretId=event['ResourceProperties']['Secret'],
