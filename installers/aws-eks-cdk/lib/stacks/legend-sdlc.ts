@@ -12,7 +12,7 @@ import * as route53 from "@aws-cdk/aws-route53";
 import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
 import {ResolveConfig} from "../constructs/resolve-config";
 import {GitlabAppConfig} from "../constructs/gitlab-app-config";
-import {gitlabRootPasswordFromSecret} from "../name-utils";
+import {gitlabRootPasswordFromSecret, mongoPassword, resolveConfig} from "../utils";
 import {Secret} from "@aws-cdk/aws-secretsmanager";
 
 export interface LegendEngineProps extends StackProps{
@@ -35,29 +35,21 @@ export class LegendSdlcStack extends LegendApplicationStack {
         }).value;
 
         const legendZoneName = ssm.StringParameter.valueForStringParameter(this, 'legend-zone-name');
-        const legendHostedZoneId = ssm.StringParameter.valueForStringParameter(this, 'legend-hosted-zone-id');
-        const hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, "HostedZone", {
-            zoneName: legendZoneName, hostedZoneId: legendHostedZoneId, })
-        const certificate = new certificatemanager.DnsValidatedCertificate(this, "LegendSdlcCert", {
-            hostedZone: hostedZone, domainName: `${props.stage.prefix}${legendZoneName}`, })
 
         const gitlabSecretRef = Secret.fromSecretNameV2(this, "GitlabSecretRef", props.gitlabRootSecret.secretName);
         const config = new GitlabAppConfig(this, "GitlabAppConfig", {
             secret: gitlabRootPasswordFromSecret(this, gitlabSecretRef),
             host: `https://gitlab.${props.stage.prefix}${legendZoneName}`})
 
-        const mongoSecretRef = Secret.fromSecretNameV2(this, "MongoSecretRef", props.mongoSecret.secretName);
-        const mongo = new ResolveSecret(this, "ResolveMongoPassword", { secret: mongoSecretRef }).response;
-
         cluster.addCdk8sChart("SDLC", new LegendSdlcChart(new cdk8s.App(), "LegendSdlc", {
-            imageId: artifactImageId,
+            imageId: resolveConfig(this, 'Images.LegendSDLC'),
             legendSdlcPort: 80,
             gitlabOauthClientId: config.applicationId,
             gitlabOauthSecret: config.secret,
             gitlabPublicUrl: `https://gitlab.${props.stage.prefix}${legendZoneName}`,
             mongoHostPort: 'mongo-service.default.svc.cluster.local',
             mongoUser: 'admin',
-            mongoPassword: mongo,
+            mongoPassword: mongoPassword(this, props.mongoSecret),
             gitlabHost: `gitlab.${props.stage.prefix}${legendZoneName}`,
             gitlabPort: 443,
             legendSdlcUrl: `https://${props.stage.prefix}${legendZoneName}/sdlc`,

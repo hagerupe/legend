@@ -13,7 +13,7 @@ import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
 import {ResolveConfig} from "../constructs/resolve-config";
 import {Secret} from "@aws-cdk/aws-secretsmanager";
 import {GitlabAppConfig} from "../constructs/gitlab-app-config";
-import {gitlabRootPasswordFromSecret} from "../name-utils";
+import {gitlabRootPasswordFromSecret, mongoPassword, resolveConfig} from "../utils";
 
 export interface LegendStudioProps extends StackProps{
     clusterName: string
@@ -28,32 +28,18 @@ export class LegendStudioStack extends LegendApplicationStack {
     constructor(scope: cdk.Construct, id: string, props: LegendStudioProps) {
         super(scope, id, props);
 
-        const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", props)
-        const artifactImageId = new ResolveConfig(this, 'ArtifactImageId', {
-            artifactBucketName: this.configArtifactBucketName.value.toString(),
-            artifactObjectKey: this.configArtifactObjectKey.value.toString(),
-            path: 'Images.LegendStudio'
-        }).value;
-
         const legendZoneName = ssm.StringParameter.valueForStringParameter(this, 'legend-zone-name');
-        const legendHostedZoneId = ssm.StringParameter.valueForStringParameter(this, 'legend-hosted-zone-id');
-        const hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, "HostedZone", {
-            zoneName: legendZoneName, hostedZoneId: legendHostedZoneId, })
-        const certificate = new certificatemanager.DnsValidatedCertificate(this, "GitlabCert", {
-            hostedZone: hostedZone, domainName: `${props.stage.prefix}${legendZoneName}`, });
 
         const gitlabSecretRef = Secret.fromSecretNameV2(this, "GitlabSecretRef", props.gitlabRootSecret.secretName);
         const config = new GitlabAppConfig(this, "GitlabAppConfig", {
             secret: gitlabRootPasswordFromSecret(this, gitlabSecretRef),
             host: `https://gitlab.${props.stage.prefix}${legendZoneName}`})
 
-        const mongoSecretRef = Secret.fromSecretNameV2(this, "MongoSecretRef", props.mongoSecret.secretName);
-        const mongo = new ResolveSecret(this, "ResolveMongoPassword", { secret: mongoSecretRef }).response;
-
+        const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", props)
         cluster.addCdk8sChart("Studio", new LegendStudioChart(new cdk8s.App(), "LegendStudio", {
-            imageId: artifactImageId,
+            imageId: resolveConfig(this, 'Images.LegendStudio'),
             mongoUser: 'admin',
-            mongoPassword: mongo,
+            mongoPassword: mongoPassword(this, props.mongoSecret),
             mongoHostPort: 'mongo-service.default.svc.cluster.local',
             gitlabOauthClientId: config.applicationId,
             gitlabOauthSecret: config.secret,

@@ -10,7 +10,7 @@ import {ArtifactImageId} from "../constructs/artifact-image-id";
 import {LegendApplicationStack} from "./legend-application-stack";
 import {ResolveSecret} from "../constructs/resolve-secret";
 import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
-import {gitlabDomain, gitlabRootPasswordFromSecret, hostedZoneRef} from "../name-utils";
+import {gitlabDomain, gitlabRootPasswordFromSecret, hostedZoneRef} from "../utils";
 import * as iam from "@aws-cdk/aws-iam";
 import {GenerateSecret} from "../constructs/generate-secret";
 

@@ -6,6 +6,8 @@ import {LegendApplicationStack} from "./legend-application-stack";
 import * as ssm from "@aws-cdk/aws-ssm";
 import {LegendIngressChart} from "../charts/legend-ingress-chart";
 import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
+import * as route53 from "@aws-cdk/aws-route53";
+import * as certificatemanager from "@aws-cdk/aws-certificatemanager";
 
 export interface LegendIngressStackProps extends StackProps{
     readonly clusterName: string,
@@ -19,6 +21,12 @@ export class LegendIngressStack extends LegendApplicationStack {
 
         const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", props)
         const legendZoneName = ssm.StringParameter.valueForStringParameter(this, 'legend-zone-name');
+        const legendHostedZoneId = ssm.StringParameter.valueForStringParameter(this, 'legend-hosted-zone-id');
+
+        const hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, "HostedZone", {
+            zoneName: legendZoneName, hostedZoneId: legendHostedZoneId, })
+        new certificatemanager.DnsValidatedCertificate(this, "LegendEngineCert", {
+            hostedZone: hostedZone, domainName: `${props.stage.prefix}${legendZoneName}`, })
 
         cluster.addCdk8sChart("LegendIngressChart", new LegendIngressChart(new cdk8s.App(), "LegendIngress", {
             legendDomain: legendZoneName,
