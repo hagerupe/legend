@@ -7,6 +7,7 @@ import {LegendSdlcStack} from "./stacks/legend-sdlc";
 import {LegendStudioStack} from "./stacks/legend-studio";
 import {LegendIngressStack} from "./stacks/legend-ingress";
 import {GitlabDnsStack} from "./stacks/gitlab-dns";
+import {LegendDnsStack} from "./stacks/legend-dns";
 
 export interface LegendInfrastructureStageProps extends StageProps {
     stageName: string,
@@ -67,5 +68,8 @@ export class LegendInfrastructureStage extends Stage {
         ingress.addDependency(studio)
         ingress.addDependency(sdlc)
         ingress.addDependency(engine)
+
+        const legendDns = new LegendDnsStack(this, "LegendDNS", stackParams);
+        legendDns.addDependency(ingress)
     }
 }
