@@ -5,14 +5,15 @@ import * as cdk8s from 'cdk8s'
 import * as cdk from "@aws-cdk/core";
 import * as certificatemanager from "@aws-cdk/aws-certificatemanager"
 import * as route53 from "@aws-cdk/aws-route53"
+import * as alias from "@aws-cdk/aws-route53-targets"
 import {GitlabCeChart} from "../charts/gitlab-ce-chart";
 import {ArtifactImageId} from "../constructs/artifact-image-id";
 import {LegendApplicationStack} from "./legend-application-stack";
 import {ResolveSecret} from "../constructs/resolve-secret";
 import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
-import {gitlabDomain, gitlabRootPasswordFromSecret, hostedZoneRef} from "../utils";
-import * as iam from "@aws-cdk/aws-iam";
+import {gitlabDomain, hostedZoneRef} from "../utils";
 import {GenerateSecret} from "../constructs/generate-secret";
+import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
 
 export interface GitlabStackProps extends StackProps {
     clusterName: string
@@ -51,5 +52,19 @@ export class GitlabStack extends LegendApplicationStack {
             image: artifactImageId,
             stage: props.stage,
         }))
+
+        const loadBalancer = elbv2.ApplicationLoadBalancer.fromLookup(this, 'GitlabLoadBalancer', {
+            loadBalancerTags: {
+                "ingress.k8s.aws/stack": "default/gitlab-ce-ingress",
+                "elbv2.k8s.aws/cluster": cluster.clusterName,
+            },
+        });
+
+        const hostedZone = hostedZoneRef(this, "LegendHostedZone")
+        new route53.ARecord(this, 'AliasRecord', {
+            zone: hostedZone,
+            recordName: gitlabDomain(this, props.stage),
+            target: route53.RecordTarget.fromAlias(new alias.LoadBalancerTarget(loadBalancer)),
+        });
     }
 }
