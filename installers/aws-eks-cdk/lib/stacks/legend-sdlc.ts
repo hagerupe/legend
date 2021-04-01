@@ -29,12 +29,11 @@ export class LegendSdlcStack extends LegendApplicationStack {
 
         const gitlabSecretRef = Secret.fromSecretNameV2(this, "GitlabSecretRef", props.gitlabRootSecret.secretName);
         const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", props)
-        const legendZoneName = ssm.StringParameter.valueForStringParameter(this, 'legend-zone-name');
 
         // Generate a OAuth Application
         const config = new GitlabAppConfig(this, "GitlabAppConfig", {
             secret: gitlabRootPasswordFromSecret(this, gitlabSecretRef),
-            host: `https://gitlab.${props.stage.prefix}${legendZoneName}`,
+            host: gitlabUrl(this, props.stage),
             stage: props.stage})
 
         cluster.addCdk8sChart("SDLC", new LegendSdlcChart(new cdk8s.App(), "LegendSdlc", {
