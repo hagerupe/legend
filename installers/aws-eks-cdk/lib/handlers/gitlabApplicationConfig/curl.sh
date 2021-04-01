@@ -45,4 +45,4 @@ body_header=$(curl -s -L "${gitlab_host}/-/profile/personal_access_tokens" \
 personal_access_token=$(echo $body_header | perl -ne 'print "$1\n" if /created-personal-access-token"[[:blank:]]value="(.+?)"/' | sed -n 1p)
 
 # TODO fix redirect URI
-curl --request POST --header "PRIVATE-TOKEN: ${personal_access_token}" --data "name=Legend Demo2&redirect_uri=${redirect_uri}&scopes=" "${gitlab_host}/api/v4/applications"
+curl --request POST --header "PRIVATE-TOKEN: ${personal_access_token}" --data "name=Legend Demo2&redirect_uri=${redirect_uri}&scopes=api" "${gitlab_host}/api/v4/applications"
