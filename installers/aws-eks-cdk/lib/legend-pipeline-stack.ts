@@ -2,7 +2,12 @@ import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
 import * as lambda from '@aws-cdk/aws-lambda';
 import cdk = require('@aws-cdk/core');
-import { CodeBuildAction, GitHubSourceAction, GitHubTrigger } from '@aws-cdk/aws-codepipeline-actions';
+import {
+    CodeBuildAction,
+    GitHubSourceAction,
+    GitHubTrigger,
+    ManualApprovalAction
+} from '@aws-cdk/aws-codepipeline-actions';
 import { Construct, SecretValue, Stack, StackProps } from '@aws-cdk/core';
 import {CdkPipeline} from "./override/pipelines/lib";
 import {LegendInfrastructureStage} from "./legend-infrastructure-stage";
@@ -127,6 +132,8 @@ export class LegendPipelineStack extends Stack {
             repositoryNames: repositoryNames,
             prefix: 'uat.'
         }), appStageOptions)
+
+        pipeline.addStage("Approval").addManualApprovalAction({});
 
         pipeline.addApplicationStage(new LegendInfrastructureStage(this, "Prod", {
             env: { account: this.account, region: this.region },
