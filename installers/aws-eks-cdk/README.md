@@ -27,7 +27,7 @@
     
     `aws secretsmanager create-secret --name github-access-token --secret-string <<access-token>>`
 
-1. **Create dockerhub secret**
+1. **Create dockerhub secret** (Remove)
     - The addresses used by CodeBuild are recycled, as such the anonymous access limits for dockerhub are often encountered during builds.
     - Create an access token, refer to: https://docs.docker.com/docker-hub/access-tokens/
     - Store the access token in secrets manager (replace values):
@@ -59,19 +59,6 @@
 1. **Monitor Deployment**
     - Navigate to: https://console.aws.amazon.com/codesuite/codepipeline/pipelines/Legend/view?region=us-east-1
     - Setup will take approximately 60 minutes
-1. **Setup CNAME for gitlab**
-    - https://aws.amazon.com/premiumsupport/knowledge-center/route-53-create-alias-records/
-    
-    TODO document this
-
-1. **Deploy Remaining Stacks**
-    - Navigate to: https://console.aws.amazon.com/codesuite/codepipeline/pipelines/Legend/view?region=us-east-1
-    - Click `Release Changes`
-
-1. **Add CNAME records for legend domains**
-    - https://aws.amazon.com/premiumsupport/knowledge-center/route-53-create-alias-records/
-    
-    TODO document this
 
 ## Debug Utilities:
 
