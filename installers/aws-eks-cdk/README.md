@@ -64,23 +64,6 @@
     
     TODO document this
 
-1. **Setup GitLab Access Token**
-   - Navigate to `https://gitlab.<<zone-name>>/`
-   - Create an application
-   - Store in parameter store (replace values):
-    
-    https://engine.sky-hagere.io/callback
-    
-    https://sdlc.sky-hagere.io/api/auth/callback
-    
-    https://sdlc.sky-hagere.io/api/pac4j/login/callback
-    
-    https://sky-hagere.io/studio/log.in/callback
-    
-    `aws ssm put-parameter --type String --name gitlab-client-id --value <<client-id>>`
-       
-    `aws ssm put-parameter --type String --name gitlab-access-code --value <<access-token>>`
-
 1. **Deploy Remaining Stacks**
     - Navigate to: https://console.aws.amazon.com/codesuite/codepipeline/pipelines/Legend/view?region=us-east-1
     - Click `Release Changes`
@@ -108,10 +91,6 @@
 
 Rename gitlab oauth parameters
 
-LegendSDLC build fails - need to disable docker integ test stuff
-
-LegendStudio build fails - Add profile for legend-studio to disable git commit plugin 
-
 Make Mongo durable
 
 Dashboards! (Woot)
@@ -119,9 +98,5 @@ Dashboards! (Woot)
 Health checks? Scaling, etc...
 
 Move master kubernetes role to pipeline stack (broken prod provision)
-
-Gitlab oauth app create automation, somehow?
-
-Move secrets to direct kubernetes external secrets instead of secrets manager directly
 
 Automate A record aliases to LB, needs to await for lb to be created by k8
