@@ -4,13 +4,7 @@ import * as cdk8s from 'cdk8s'
 import * as cdk from "@aws-cdk/core";
 import {LegendSdlcChart} from "../charts/legend-sdlc";
 import {LegendApplicationStack} from "./legend-application-stack";
-import {ArtifactImageId} from "../constructs/artifact-image-id";
-import {ResolveSecret} from "../constructs/resolve-secret";
-import * as ssm from "@aws-cdk/aws-ssm";
-import * as certificatemanager from "@aws-cdk/aws-certificatemanager";
-import * as route53 from "@aws-cdk/aws-route53";
 import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
-import {ResolveConfig} from "../constructs/resolve-config";
 import {GitlabAppConfig} from "../constructs/gitlab-app-config";
 import {gitlabDomain, gitlabRootPasswordFromSecret, gitlabUrl, mongoPassword, resolveConfig, sdlcUrl} from "../utils";
 import {Secret} from "@aws-cdk/aws-secretsmanager";

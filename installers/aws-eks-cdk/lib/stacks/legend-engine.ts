@@ -13,7 +13,7 @@ import * as certificatemanager from "@aws-cdk/aws-certificatemanager";
 import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
 import {GitlabAppConfig} from "../constructs/gitlab-app-config";
 import {Secret} from "@aws-cdk/aws-secretsmanager";
-import {gitlabRootPasswordFromSecret, mongoPassword, resolveConfig} from "../utils";
+import {gitlabRootPasswordFromSecret, gitlabUrl, mongoPassword, resolveConfig} from "../utils";
 import {ResolveConfig} from "../constructs/resolve-config";
 import {GenerateSecret} from "../constructs/generate-secret";
 
@@ -32,19 +32,18 @@ export class LegendEngineStack extends LegendApplicationStack {
         // Resolve referenced constructs
         const cluster = eks.Cluster.fromClusterAttributes(this, "KubernetesCluster", props)
         const gitlabSecretRef = Secret.fromSecretNameV2(this, "GitlabSecretRef", props.gitlabRootSecret.secretName);
-        const legendZoneName = ssm.StringParameter.valueForStringParameter(this, 'legend-zone-name');
 
         // Generate a OAuth Application
         const config = new GitlabAppConfig(this, "GitlabAppConfig", {
             secret: gitlabRootPasswordFromSecret(this, gitlabSecretRef),
-            host: `https://gitlab.${props.stage.prefix}${legendZoneName}`,
+            host: gitlabUrl(this, props.stage),
             stage: props.stage})
 
         cluster.addCdk8sChart("Engine", new LegendEngineChart(new cdk8s.App(), "LegendEngine", {
             imageId: resolveConfig(this, 'Images.LegendEngine'),
             gitlabOauthClientId: config.applicationId,
             gitlabOauthSecret: config.secret,
-            gitlabPublicUrl: `https://gitlab.${props.stage.prefix}${legendZoneName}`,
+            gitlabPublicUrl: gitlabUrl(this, props.stage),
             mongoHostPort: 'mongo-service.default.svc.cluster.local',
             mongoUser: 'admin',
             mongoPassword: mongoPassword(this, props.mongoSecret),

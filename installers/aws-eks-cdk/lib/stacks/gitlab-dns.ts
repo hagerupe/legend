@@ -6,7 +6,6 @@ import {LegendApplicationStack} from "./legend-application-stack";
 import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
 import {gitlabDomain, hostedZoneRef} from "../utils";
 import {EksAlbLoadBalancer} from "../constructs/eks-alb-loadbalancer";
-import * as eks from "@aws-cdk/aws-eks";
 
 export interface GitlabDnsStackProps extends StackProps {
     clusterName: string,

@@ -4,7 +4,7 @@ import * as route53 from "@aws-cdk/aws-route53"
 import * as alias from "@aws-cdk/aws-route53-targets"
 import {LegendApplicationStack} from "./legend-application-stack";
 import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
-import {gitlabDomain, hostedZoneRef, rootDomain} from "../utils";
+import {hostedZoneRef, rootDomain} from "../utils";
 import {EksAlbLoadBalancer} from "../constructs/eks-alb-loadbalancer";
 
 export interface LegendDnsStackProps extends StackProps {
