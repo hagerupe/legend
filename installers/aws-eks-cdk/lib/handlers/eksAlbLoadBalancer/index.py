@@ -19,16 +19,20 @@ def main(event, context):
     eksCluster = event['ResourceProperties']['Cluster']
     stack = event['ResourceProperties']['ClusterStack']
 
-    # TODO
-    # response = client.describe_load_balancers()
-    # log.info(response)
-
-    attributes = {
-      'loadBalancerDnsName': 'k8s-default-gitlabce-272116d414-585242986.us-east-2.elb.amazonaws.com',
-      'loadBalancerCanonicalHostedZoneId': 'Z3AADJGX6KTTL2',
-    }
-
-    cfnresponse.send(event, context, cfnresponse.SUCCESS, attributes, physical_id)
+    loadBalancers = client.describe_load_balancers()
+    for lb in loadBalancers['LoadBalancers']:
+      tagDescriptions = client.describe_tags(ResourceArns = [ lb['LoadBalancerArn'] ])
+      tags = tagDescriptions['TagDescriptions'][0]['Tags']
+      stackTag = list(filter(lambda tag: tag['Key'] == 'ingress.k8s.aws/stack', tags))
+      clusterTag = list(filter(lambda tag: tag['Key'] == 'elbv2.k8s.aws/cluster', tags))
+      if len(stackTag) > 0 and stackTag[0]['Value'] == stack and len(clusterTag) > 0 and clusterTag[0]['Value'] == eksCluster:
+        attributes = {
+          'loadBalancerDnsName': lb['DNSName'],
+          'loadBalancerCanonicalHostedZoneId': lb['CanonicalHostedZoneId'],
+        }
+        cfnresponse.send(event, context, cfnresponse.SUCCESS, attributes, physical_id)
+        return None
+    cfnresponse.send(event, context, cfnresponse.FAILED, {}, physical_id)
   except Exception as e:
     log.exception(e)
     # cfnresponse's error message is always "see CloudWatch"
