@@ -41,32 +41,8 @@ export class LegendIngressChart extends cdk8s.Chart {
                                     serviceName: 'legend-sdlc-service',
                                     servicePort: 80,
                                 }
-                            }],
-                        }
-                    },
-                    {
-                        host: `${props.stage.prefix}${props.legendDomain}`,
-                        http: {
-                            paths: [{
-                                path: '/engine/*',
-                                backend: {
-                                    serviceName: 'legend-engine-service',
-                                    servicePort: 80,
-                                }
                             },
                             {
-                                path: '/engine',
-                                backend: {
-                                    serviceName: 'legend-engine-service',
-                                    servicePort: 80,
-                                }
-                            }],
-                        }
-                    },
-                    {
-                        host: `${props.stage.prefix}${props.legendDomain}`,
-                        http: {
-                            paths: [{
                                 path: '/studio/*',
                                 backend: {
                                     serviceName: 'legend-studio-service',
@@ -79,6 +55,20 @@ export class LegendIngressChart extends cdk8s.Chart {
                                     serviceName: 'legend-studio-service',
                                     servicePort: 80,
                                 },
+                            },
+                            {
+                                path: '/engine/*',
+                                backend: {
+                                    serviceName: 'legend-engine-service',
+                                    servicePort: 80,
+                                }
+                            },
+                            {
+                                path: '/engine',
+                                backend: {
+                                    serviceName: 'legend-engine-service',
+                                    servicePort: 80,
+                                }
                             }],
                         }
                     },
