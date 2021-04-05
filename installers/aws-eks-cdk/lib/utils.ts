@@ -72,5 +72,5 @@ export function studioDomain(scope: Construct, props: LegendInfrastructureStageP
 }
 
 export function studioUrl(scope: Construct, props: LegendInfrastructureStageProps) {
-    return `https://${studioDomain(scope, props)}/`
+    return `https://${studioDomain(scope, props)}/studio`
 }

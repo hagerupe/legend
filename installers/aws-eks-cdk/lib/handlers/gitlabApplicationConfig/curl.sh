@@ -23,8 +23,8 @@ csrf_token=$(echo $body_header | perl -ne 'print "$1\n" if /authenticity_token"[
 # curl POST request to send the "generate personal access token form"
 # the response will be a redirect, so we have to follow using `-L`
 body_header=$(curl -s -L "${gitlab_host}/-/profile/personal_access_tokens" \
-  -H 'authority: gitlab.sky-hagere.io' \
-  -H 'pragma: no-cache' \
+  -H "authority: ${gitlab_host}" \
+  -H "pragma: no-cache' \
   -H 'cache-control: no-cache' \
   -H 'upgrade-insecure-requests: 1' \
   -H "origin: ${gitlab_host}" \
@@ -44,5 +44,4 @@ body_header=$(curl -s -L "${gitlab_host}/-/profile/personal_access_tokens" \
 # Scrape the personal access token from the response HTML
 personal_access_token=$(echo $body_header | perl -ne 'print "$1\n" if /created-personal-access-token"[[:blank:]]value="(.+?)"/' | sed -n 1p)
 
-# TODO fix redirect URI
-curl --request POST --header "PRIVATE-TOKEN: ${personal_access_token}" --data "name=Legend Demo2&redirect_uri=${redirect_uri}&scopes=api" "${gitlab_host}/api/v4/applications"
+curl --request POST --header "PRIVATE-TOKEN: ${personal_access_token}" --data "name=Legend&redirect_uri=${redirect_uri}&scopes=api" "${gitlab_host}/api/v4/applications"

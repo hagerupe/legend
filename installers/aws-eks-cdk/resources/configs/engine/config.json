@@ -20,7 +20,7 @@
     ]
   },
   "pac4j": {
-    "callbackPrefix": "",
+    "callbackPrefix": "/engine",
     "mongoUri": "mongodb://__MONGO_USER__:__MONGO_PASSWORD__@__MONGO_HOST_PORT__",
     "mongoDb": "legend",
     "bypassPaths": [
