@@ -126,7 +126,6 @@ export class GitlabCeChart extends cdk8s.Chart {
                     'alb.ingress.kubernetes.io/scheme': 'internet-facing',
                     'alb.ingress.kubernetes.io/backend-protocol': 'HTTPS',
                     'alb.ingress.kubernetes.io/success-codes': '200,201,302',
-                    'alb.ingress.kubernetes.io/tags': `EnvStage=${props.stage}`,
                 },
             },
             spec: {
