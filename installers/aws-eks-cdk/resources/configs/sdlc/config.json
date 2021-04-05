@@ -30,7 +30,7 @@
         }
       ]
     },
-    "rootPath": "/api"
+    "rootPath": "/sdlc/api"
   },
   "projectStructure": {
     "projectCreation": {
