@@ -54,12 +54,12 @@
   "swagger": {
     "title": "Legend Execution REST Services",
     "resourcePackage": "org.finos.legend",
-    "uriPrefix": "/api"
+    "uriPrefix": "/engine/api"
   },
   "server": {
     "type": "simple",
-    "applicationContextPath": "/",
-    "adminContextPath": "/admin",
+    "applicationContextPath": "/engine",
+    "adminContextPath": "/engine/admin",
     "connector": {
       "maxRequestHeaderSize": "32KiB",
       "type": "http",
