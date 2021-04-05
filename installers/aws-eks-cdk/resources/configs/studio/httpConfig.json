@@ -21,7 +21,7 @@
     }
   },
   "html5Router": true,
-  "uiPath": "",
+  "uiPath": "/studio",
   "routerExemptPaths": [
       "/editor.worker.js",
       "/json.worker.js",
@@ -37,7 +37,7 @@
   },
   "server": {
     "type": "simple",
-    "applicationContextPath": "/",
+    "applicationContextPath": "/studio",
     "adminContextPath": "/studio/admin",
     "connector": {
       "type": "http",
