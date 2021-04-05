@@ -24,7 +24,7 @@ export class EksAlbLoadBalancerFunction extends lambda.SingletonFunction {
                 uuid: 'e0a18e29-f326-45ba-8ccb-66f31bfce1f1',
                 code: new lambda.InlineCode(fs.readFileSync(path.join('lib', 'handlers', 'eksAlbLoadBalancer', 'index.py'), { encoding: 'utf-8' })),
                 handler: 'index.main',
-                timeout: cdk.Duration.seconds(300),
+                timeout: cdk.Duration.seconds(900),
                 runtime: lambda.Runtime.PYTHON_3_6},
             ...props
         });
