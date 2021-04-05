@@ -9,7 +9,7 @@
         "level": "info"
       },
       "org.pac4j": {
-        "level": "debug"
+        "level": "info"
       }
     },
     "appenders": [
@@ -52,23 +52,36 @@
     }
   },
   "swagger": {
-    "title": "Legend Execution REST Services",
     "resourcePackage": "org.finos.legend",
-    "uriPrefix": "/engine/api"
+    "title": "Legend Execution REST Services",
+    "version": "local-snapshot",
+    "schemes": []
   },
   "server": {
-    "type": "simple",
-    "applicationContextPath": "/engine",
-    "adminContextPath": "/engine/admin",
-    "connector": {
-      "maxRequestHeaderSize": "32KiB",
-      "type": "http",
-      "port": __LEGEND_ENGINE_PORT__
+    "applicationConnectors": [
+      {
+        "type": "http",
+        "port": "80",
+        "maxRequestHeaderSize": "128KiB"
+      }
+    ],
+    "adminConnectors": [
+      {
+        "type": "http",
+        "port": 7076
+      }
+    ],
+    "gzip": {
+      "includedMethods": [
+        "GET",
+        "POST"
+      ]
     },
     "requestLog": {
       "appenders": [
       ]
-    }
+    },
+    "rootPath": "/engine/api"
   },
   "metadataserver": {
     "pure": {

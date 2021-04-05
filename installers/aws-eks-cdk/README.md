@@ -74,6 +74,8 @@
 
 - `kubectl replace -f [pod_name]`
 
+- `kubectl apply -f configmap.yaml && kubectl rollout restart deployment`
+
 ## TODOs:
 
 Rename gitlab oauth parameters

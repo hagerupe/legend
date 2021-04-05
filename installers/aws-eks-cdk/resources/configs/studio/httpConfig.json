@@ -37,7 +37,7 @@
   },
   "server": {
     "type": "simple",
-    "applicationContextPath": "/studio",
+    "applicationContextPath": "/",
     "adminContextPath": "/studio/admin",
     "connector": {
       "type": "http",
