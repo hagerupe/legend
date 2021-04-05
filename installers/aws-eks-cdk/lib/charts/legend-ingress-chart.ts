@@ -26,7 +26,7 @@ export class LegendIngressChart extends cdk8s.Chart {
             spec: {
                 rules: [
                     {
-                        host: `${props.stage.prefix}${props.legendDomain}`,
+                        host: `${props.legendDomain}`,
                         http: {
                             paths: [{
                                 path: '/sdlc/*',

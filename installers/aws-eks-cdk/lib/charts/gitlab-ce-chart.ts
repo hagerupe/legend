@@ -45,7 +45,7 @@ export class GitlabCeChart extends cdk8s.Chart {
             }
         })
 
-        const deployment = new k8s.Deployment(this, "GitlabCE", {
+        new k8s.Deployment(this, "GitlabCE", {
             spec: {
                 selector: {
                     matchLabels: {
