@@ -40,7 +40,7 @@ export class GitlabAppConfig extends cdk.Construct {
         const functionArn = `arn:aws:lambda:${Stack.of(this).region}:${Stack.of(this).account}:function:GitlabAppConfig`
         const lambdaSingleton = lambda.Function.fromFunctionAttributes(this, "GitlabAppConfigFunction", { functionArn: functionArn })
 
-        const redirectUri = `${sdlcUrl(this, props.stage)},${engineUrl(this, props.stage)},${studioUrl(this, props.stage)}`
+        const redirectUri = `${sdlcUrl(this, props.stage)}/api/auth/callback,${sdlcUrl(this, props.stage)}/api/pac4j/login/callback,${engineUrl(this, props.stage)}/callback,${studioUrl(this, props.stage)}/log.in/callback`
         const resource = new cfn.CustomResource(this, 'GitlabAppConfig', {
             provider: cfn.CustomResourceProvider.lambda(lambdaSingleton),
             properties: {
