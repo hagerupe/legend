@@ -24,7 +24,7 @@ csrf_token=$(echo $body_header | perl -ne 'print "$1\n" if /authenticity_token"[
 # the response will be a redirect, so we have to follow using `-L`
 body_header=$(curl -s -L "${gitlab_host}/-/profile/personal_access_tokens" \
   -H "authority: ${gitlab_host}" \
-  -H "pragma: no-cache' \
+  -H 'pragma: no-cache' \
   -H 'cache-control: no-cache' \
   -H 'upgrade-insecure-requests: 1' \
   -H "origin: ${gitlab_host}" \
