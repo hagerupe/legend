@@ -45,8 +45,9 @@ export class GitlabCeChart extends cdk8s.Chart {
             }
         })
 
-        new k8s.Deployment(this, "GitlabCE", {
+        new k8s.StatefulSet(this, "GitlabCE", {
             spec: {
+                serviceName: 'gitlab-ce-service',
                 selector: {
                     matchLabels: {
                         app: 'gitlab-ce'
