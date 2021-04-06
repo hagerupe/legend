@@ -44,5 +44,6 @@ body_header=$(curl -s -L "${gitlab_host}/-/profile/personal_access_tokens" \
 # Scrape the personal access token from the response HTML
 personal_access_token=$(echo $body_header | perl -ne 'print "$1\n" if /created-personal-access-token"[[:blank:]]value="(.+?)"/' | sed -n 1p)
 
+scopes=$'api\nprofile\nopenid'
 curl --request POST --header "PRIVATE-TOKEN: ${personal_access_token}" \
-  --data "name=Legend&redirect_uri=${redirect_uri}&scopes[]=api&scopes[]=openid&scopes[]=profile" "${gitlab_host}/api/v4/applications"
+  --data "name=Legend&redirect_uri=${redirect_uri}&scopes[]=api&scopes[]=openid&scopes=${scopes}" "${gitlab_host}/api/v4/applications"

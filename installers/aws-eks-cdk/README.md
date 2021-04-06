@@ -78,14 +78,8 @@
 
 ## TODOs:
 
-Rename gitlab oauth parameters
-
-Make Mongo durable
-
-Dashboards! (Woot)
+Make Mongo durable, or just use dynamo...
 
 Health checks? Scaling, etc...
 
-Move master kubernetes role to pipeline stack (broken prod provision)
-
-Automate A record aliases to LB, needs to await for lb to be created by k8
+Dashboards! (Woot)
