@@ -23,7 +23,7 @@ export class GenerateSecretFunction extends lambda.SingletonFunction {
             ...props
         });
         const generateSecretPolicy = new iam.Policy(this, "GenerateSecretPolicy", {
-            document: iam.PolicyDocument.fromJson(JSON.parse(fs.readFileSync(path.join('resources', 'secrets-manager-write-policy.json'), {encoding: 'utf8'})))
+            document: iam.PolicyDocument.fromJson(JSON.parse(fs.readFileSync(path.join('resources', 'policies', 'secrets-manager-write-policy.json'), {encoding: 'utf8'})))
         })
         if (this.role !== undefined) {
             generateSecretPolicy.attachToRole(this.role)

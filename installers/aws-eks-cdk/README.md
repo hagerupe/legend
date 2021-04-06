@@ -13,8 +13,8 @@
     - Reference: https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html
     - From the terminal run `aws configure`
         - Set the `access key` and `secret access key` from the IAM user setup.  
-        - Set the region to `us-east-1`
-    - Verify by running `aws sts get-caller-identity`, it should return the ARN of the configured user
+        - Set the region, e.g.: `us-east-1`
+    - Verify by running `aws sts get-caller-identity`.  It should return the ARN of the configured user
 1. **Install NPM**
     - Refer to: https://nodejs.org/en/download/package-manager/
 1. **Install CDK and CDK8S**
@@ -27,7 +27,7 @@
     
     `aws secretsmanager create-secret --name github-access-token --secret-string <<access-token>>`
 
-1. **Create dockerhub secret** (Remove)
+1. **Create dockerhub secret** (Remove once gitlab build removed)
     - The addresses used by CodeBuild are recycled, as such the anonymous access limits for dockerhub are often encountered during builds.
     - Create an access token, refer to: https://docs.docker.com/docker-hub/access-tokens/
     - Store the access token in secrets manager (replace values):

@@ -11,7 +11,7 @@ import {ArtifactImageId} from "../constructs/artifact-image-id";
 import {LegendApplicationStack} from "./legend-application-stack";
 import {ResolveSecret} from "../constructs/resolve-secret";
 import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
-import {gitlabDomain, hostedZoneRef} from "../utils";
+import {gitlabDomain, hostedZoneRef, resolveConfig} from "../utils";
 import {GenerateSecret} from "../constructs/generate-secret";
 import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
 
@@ -35,11 +35,6 @@ export class GitlabStack extends LegendApplicationStack {
             domainName: gitlabDomain(this, props.stage),
         });
 
-        const artifactImageId = new ArtifactImageId(this, 'ArtifactImageId', {
-            artifactBucketName: this.gitlabArtifactBucketName.value.toString(),
-            artifactObjectKey: this.gitlabArtifactObjectKey.value.toString(),
-        }).response;
-
         this.gitlabRootSecret = new secretsmanager.Secret(this, "GitlabRootPassword", {  });
 
         const gitlabGenerateRootPass = new GenerateSecret(this, "GenerateGitlabPassword", { secret: this.gitlabRootSecret })
@@ -49,7 +44,7 @@ export class GitlabStack extends LegendApplicationStack {
         cluster.addCdk8sChart("GitlabCE", new GitlabCeChart(new cdk8s.App(), "GitlabCEChart", {
             gitlabDomain: gitlabDomain(this, props.stage),
             gitlabRootPassword: gitlabResolveSecret.response,
-            image: artifactImageId,
+            image: resolveConfig(this, 'Images.GitlabCE'),
             stage: props.stage,
         }))
     }

@@ -22,7 +22,7 @@ export class EksAwsIngressController extends Construct {
         })
 
         const ingressCtrlPolicy = new iam.Policy(this, "IngressCtrlPolicy", {
-            document: iam.PolicyDocument.fromJson(JSON.parse(fs.readFileSync(path.join('resources', 'alb-ingress-controller-policy.json'), {encoding: 'utf8'})))
+            document: iam.PolicyDocument.fromJson(JSON.parse(fs.readFileSync(path.join('resources', 'policies', 'alb-ingress-controller-policy.json'), {encoding: 'utf8'})))
         })
         ingressCtrlPolicy.attachToRole(ingressCtrlServiceAccount.role);
 

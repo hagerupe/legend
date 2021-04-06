@@ -23,7 +23,7 @@ export class ResolveSecretFunction extends lambda.SingletonFunction {
             ...props
         });
         const resolveSecretPolicy = new iam.Policy(this, "ResolveSecretPolicy", {
-            document: iam.PolicyDocument.fromJson(JSON.parse(fs.readFileSync(path.join('resources', 'secrets-manager-readonly-policy.json'), {encoding: 'utf8'})))
+            document: iam.PolicyDocument.fromJson(JSON.parse(fs.readFileSync(path.join('resources', 'policies', 'secrets-manager-readonly-policy.json'), {encoding: 'utf8'})))
         })
         if (this.role !== undefined) {
             resolveSecretPolicy.attachToRole(this.role)

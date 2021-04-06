@@ -5,6 +5,7 @@ import {Quantity} from "cdk8s-plus/lib/imports/k8s";
 import * as fs from "fs";
 import * as path from "path";
 import {LegendInfrastructureStageProps} from "../legend-infrastructure-stage";
+import {v4 as uuidv4} from "uuid";
 
 export interface GitlabCeChartProps {
     gitlabDomain: string,
@@ -45,6 +46,15 @@ export class GitlabCeChart extends cdk8s.Chart {
             }
         })
 
+        const encode = (str: string):string => Buffer.from(str, 'binary').toString('base64');
+        const configId = uuidv4()
+        const config = new k8s.ConfigMap(this, "Config", {
+            binaryData: {
+                'config.sh': encode(fs.readFileSync(path.join('resources', 'gitlab-no-signup', 'config.sh'), {encoding: 'utf8'})),
+                'gen_cert.sh': encode(fs.readFileSync(path.join('resources', 'gitlab-no-signup', 'gen_cert.sh'), {encoding: 'utf8'})),
+            }
+        })
+
         new k8s.StatefulSet(this, "GitlabCE", {
             spec: {
                 serviceName: 'gitlab-ce-service',
@@ -69,8 +79,13 @@ export class GitlabCeChart extends cdk8s.Chart {
                                     {
                                         name: 'GITLAB_OMNIBUS_CONFIG',
                                         value: templateText,
+                                    },
+                                    {
+                                        name: 'GITLAB_POST_RECONFIGURE_SCRIPT',
+                                        value: '/config/config.sh'
                                     }
                                 ],
+                                args: ["-c", "chmod +x /config/* && ./config/gen_cert.sh && /usr/local/bin/wrapper"],
                                 resources: {
                                     requests: {
                                         // Needs 4GB of RAM or NGinx doesn't always configure correctly...
@@ -82,6 +97,10 @@ export class GitlabCeChart extends cdk8s.Chart {
                                     {
                                         name: 'persistent-storage',
                                         mountPath: '/var/opt/gitlab'
+                                    },
+                                    {
+                                        name: configId,
+                                        mountPath: '/config'
                                     }
                                 ]
                             }
@@ -91,6 +110,12 @@ export class GitlabCeChart extends cdk8s.Chart {
                                 name: 'persistent-storage',
                                 persistentVolumeClaim: {
                                     claimName: volumeClaim.name,
+                                }
+                            },
+                            {
+                                name: configId,
+                                configMap: {
+                                    name: config.name,
                                 }
                             }
                         ]

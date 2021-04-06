@@ -29,7 +29,7 @@ export class EksAlbLoadBalancerFunction extends lambda.SingletonFunction {
             ...props
         });
         const resolveSecretPolicy = new iam.Policy(this, "ELBReadonlyPolicy", {
-            document: iam.PolicyDocument.fromJson(JSON.parse(fs.readFileSync(path.join('resources', 'elbv2-readonly-policy.json'), {encoding: 'utf8'})))
+            document: iam.PolicyDocument.fromJson(JSON.parse(fs.readFileSync(path.join('resources', 'policies', 'elbv2-readonly-policy.json'), {encoding: 'utf8'})))
         })
         if (this.role !== undefined) {
             resolveSecretPolicy.attachToRole(this.role)

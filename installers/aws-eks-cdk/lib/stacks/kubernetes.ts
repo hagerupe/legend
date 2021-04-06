@@ -58,7 +58,7 @@ export class KubernetesStack extends LegendApplicationStack {
         "SSMManagedInstancePolicy", "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"))
 
     const ebsPolicy = new iam.Policy(this, "EbsPolicy", {
-      document: iam.PolicyDocument.fromJson(JSON.parse(fs.readFileSync(path.join('resources', 'ebs-policy.json'), {encoding: 'utf8'})))
+      document: iam.PolicyDocument.fromJson(JSON.parse(fs.readFileSync(path.join('resources', 'policies', 'ebs-policy.json'), {encoding: 'utf8'})))
     })
     ebsPolicy.attachToRole(nodeGroup.role);
 
