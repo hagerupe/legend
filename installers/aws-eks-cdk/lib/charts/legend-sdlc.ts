@@ -3,6 +3,7 @@ import * as cdk8s from 'cdk8s';
 import * as k8s from "cdk8s-plus/lib/imports/k8s";
 import * as fs from "fs";
 import * as path from "path";
+import {Quantity} from "cdk8s-plus/lib/imports/k8s";
 
 export interface LegendSdlcProps {
     readonly imageId: string
@@ -62,6 +63,12 @@ export class LegendSdlcChart extends cdk8s.Chart {
                             {
                                 name: 'legend-sdlc',
                                 image: props.imageId,
+                                resources: {
+                                    requests: {
+                                        memory: Quantity.fromString("2048Mi"),
+                                        cpu: Quantity.fromString("2000m")
+                                    }
+                                },
                                 volumeMounts: [
                                     {
                                         name: 'configurations',
