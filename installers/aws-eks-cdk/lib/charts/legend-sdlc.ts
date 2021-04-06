@@ -63,12 +63,6 @@ export class LegendSdlcChart extends cdk8s.Chart {
                             {
                                 name: 'legend-sdlc',
                                 image: props.imageId,
-                                resources: {
-                                    requests: {
-                                        memory: Quantity.fromString("2048Mi"),
-                                        cpu: Quantity.fromString("2000m")
-                                    }
-                                },
                                 volumeMounts: [
                                     {
                                         name: 'configurations',
