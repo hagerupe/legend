@@ -3,6 +3,7 @@ import * as cdk8s from 'cdk8s';
 import * as k8s from "cdk8s-plus/lib/imports/k8s";
 import * as fs from "fs";
 import * as path from "path";
+import { v4 as uuidv4 } from 'uuid';
 
 export interface LegendEngineChartProps {
     readonly imageId: string,
@@ -36,6 +37,8 @@ export class LegendEngineChart extends cdk8s.Chart {
 
         const app = 'legend-engine'
         const service = app + "-service"
+        const configId = uuidv4()
+
         new k8s.Deployment(this, "LegendEngine", {
             spec: {
                 selector: {
@@ -57,7 +60,7 @@ export class LegendEngineChart extends cdk8s.Chart {
                                 image: props.imageId,
                                 volumeMounts: [
                                     {
-                                        name: 'configurations',
+                                        name: configId,
                                         mountPath: '/config'
                                     }
                                 ]
@@ -65,7 +68,7 @@ export class LegendEngineChart extends cdk8s.Chart {
                         ],
                         volumes: [
                             {
-                                name: 'configurations',
+                                name: configId,
                                 configMap: {
                                     name: config.name,
                                     items: [
