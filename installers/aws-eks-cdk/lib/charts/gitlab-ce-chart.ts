@@ -85,7 +85,8 @@ export class GitlabCeChart extends cdk8s.Chart {
                                         value: '/config/config.sh'
                                     }
                                 ],
-                                args: ["-c", "chmod +x /config/* && ./config/gen_cert.sh && /usr/local/bin/wrapper"],
+                                command: ["/bin/sh"],
+                                args: ["-c", "cp /config/* /tmp/ && chmod +x /tmp/* && ./tmp/gen_cert.sh && ./assets/wrapper"],
                                 resources: {
                                     requests: {
                                         // Needs 4GB of RAM or NGinx doesn't always configure correctly...
