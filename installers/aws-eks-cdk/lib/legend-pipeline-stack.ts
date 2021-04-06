@@ -1,15 +1,10 @@
 import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
-import * as lambda from '@aws-cdk/aws-lambda';
-import cdk = require('@aws-cdk/core');
 import { CodeBuildAction, GitHubSourceAction, GitHubTrigger } from '@aws-cdk/aws-codepipeline-actions';
 import { Construct, SecretValue, Stack, StackProps } from '@aws-cdk/core';
 import { CdkPipeline } from "./override/pipelines/lib";
 import { LegendInfrastructureStage } from "./legend-infrastructure-stage";
-import { DockerBuildProject } from "./constructs/docker-build-project";
 import { SimpleSynthAction } from "./override/pipelines/lib/synths";
-import * as path from "path";
-import * as fs from "fs";
 import {ResolveSecret, ResolveSecretFunction} from "./constructs/resolve-secret";
 import * as iam from "@aws-cdk/aws-iam";
 import * as ssm from "@aws-cdk/aws-ssm";
@@ -69,35 +64,14 @@ export class LegendPipelineStack extends Stack {
             outputs: [ configArtifact ]
         }))
 
-        const gitlabImageDetails = new codepipeline.Artifact();
-        const gitlabRepositoryName = 'legend-gitlab';
-        const gitlabProject = new DockerBuildProject(this, 'LegendGitlab', {
-            preBuildCommands: [
-                'cd installers/aws-eks-cdk/resources/docker/gitlab-no-signup',
-            ],
-            repositoryName: gitlabRepositoryName
-        })
-        runtimeBuildStage.addActions(new CodeBuildAction({
-            actionName: 'Legend_Gitlab',
-            input: legendSource,
-            project: gitlabProject.project,
-            outputs: [ gitlabImageDetails ]
-        }))
-
-        const repositoryNames = [gitlabRepositoryName]
         const appStageOptions = {
             parameterOverrides: {
-                GitlabArtifactBucketName: gitlabImageDetails.bucketName,
-                GitlabArtifactObjectKey: gitlabImageDetails.objectKey,
-
                 ConfigArtifactBucketName: configArtifact.bucketName,
                 ConfigArtifactObjectKey: configArtifact.objectKey,
             },
             extraInputs: [
-                gitlabImageDetails,
                 configArtifact,
             ],
-            //manualApprovals: true
         }
 
         const masterRoleAccessName = ssm.StringParameter.valueForStringParameter(this, 'master-role-access');
@@ -117,7 +91,7 @@ export class LegendPipelineStack extends Stack {
 
         pipeline.addApplicationStage(new LegendInfrastructureStage(this, "UAT", {
             env: { account: this.account, region: this.region },
-            repositoryNames: repositoryNames,
+            repositoryNames: [],
             prefix: 'uat.',
             stageName: 'UAT',
         }), appStageOptions)
@@ -126,7 +100,7 @@ export class LegendPipelineStack extends Stack {
 
         pipeline.addApplicationStage(new LegendInfrastructureStage(this, "Prod", {
             env: { account: this.account, region: this.region },
-            repositoryNames: repositoryNames,
+            repositoryNames: [],
             prefix: '',
             stageName: 'PROD',
         }), appStageOptions)
