@@ -82,7 +82,7 @@ export class GitlabCeChart extends cdk8s.Chart {
                                     },
                                     {
                                         name: 'GITLAB_POST_RECONFIGURE_SCRIPT',
-                                        value: '/config/config.sh'
+                                        value: '/tmp/config.sh'
                                     }
                                 ],
                                 command: ["/bin/sh"],
