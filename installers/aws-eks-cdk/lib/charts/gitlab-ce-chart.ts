@@ -121,8 +121,8 @@ export class GitlabCeChart extends cdk8s.Chart {
             spec: {
                 ports: [
                     {
-                        port: 443,
-                        targetPort: 443,
+                        port: 80,
+                        targetPort: 80,
                         protocol: 'TCP'
                     },
                 ],
