@@ -153,7 +153,7 @@ export class GitlabCeChart extends cdk8s.Chart {
                                 path: '/*',
                                 backend: {
                                     serviceName: 'gitlab-ce-service',
-                                    servicePort: 443,
+                                    servicePort: 80,
                                 }
                             }],
                         }
