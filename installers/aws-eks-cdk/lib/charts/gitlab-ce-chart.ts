@@ -23,7 +23,7 @@ export class GitlabCeChart extends cdk8s.Chart {
             .replace('__GITLAB_EXTERNAL_URL__', props.gitlabDomain)
             .replace('__GITLAB_ROOT_PASSWORD__', props.gitlabRootPassword)
 
-        const storageClass = new k8s.StorageClass(this, "GitlabStorageClass", {
+        /*const storageClass = new k8s.StorageClass(this, "GitlabStorageClass", {
             metadata: {
                 name: 'gl-sc'
             },
@@ -44,7 +44,7 @@ export class GitlabCeChart extends cdk8s.Chart {
                     }
                 }
             }
-        })
+        })*/
 
         const encode = (str: string):string => Buffer.from(str, 'binary').toString('base64');
         const configId = uuidv4()
@@ -86,7 +86,7 @@ export class GitlabCeChart extends cdk8s.Chart {
                                     }
                                 ],
                                 command: ["/bin/sh"],
-                                args: ["-c", "cp /config/* /tmp/ && chmod +x /tmp/* && ./tmp/gen_cert.sh && ./assets/wrapper"],
+                                args: ["-c", "cp /config/* /tmp/ && chmod +x /tmp/* && ./assets/wrapper"],
                                 resources: {
                                     requests: {
                                         // Needs 4GB of RAM or NGinx doesn't always configure correctly...
@@ -107,12 +107,12 @@ export class GitlabCeChart extends cdk8s.Chart {
                             }
                         ],
                         volumes: [
-                            {
+                            /*{
                                 name: 'persistent-storage',
                                 persistentVolumeClaim: {
                                     claimName: volumeClaim.name,
                                 }
-                            },
+                            },*/
                             {
                                 name: configId,
                                 configMap: {
