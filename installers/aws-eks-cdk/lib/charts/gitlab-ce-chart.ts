@@ -55,9 +55,8 @@ export class GitlabCeChart extends cdk8s.Chart {
             }
         })
 
-        new k8s.StatefulSet(this, "GitlabCE", {
+        new k8s.Deployment(this, "GitlabCE", {
             spec: {
-                serviceName: 'gitlab-ce-service',
                 selector: {
                     matchLabels: {
                         app: 'gitlab-ce'
@@ -96,10 +95,6 @@ export class GitlabCeChart extends cdk8s.Chart {
                                 },
                                 volumeMounts: [
                                     {
-                                        name: 'persistent-storage',
-                                        mountPath: '/var/opt/gitlab'
-                                    },
-                                    {
                                         name: configId,
                                         mountPath: '/config'
                                     }
@@ -107,12 +102,6 @@ export class GitlabCeChart extends cdk8s.Chart {
                             }
                         ],
                         volumes: [
-                            /*{
-                                name: 'persistent-storage',
-                                persistentVolumeClaim: {
-                                    claimName: volumeClaim.name,
-                                }
-                            },*/
                             {
                                 name: configId,
                                 configMap: {
