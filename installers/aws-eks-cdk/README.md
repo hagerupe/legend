@@ -78,6 +78,9 @@
 
 ## TODOs:
 
+Override for codepipeline cdk module, pending the ability to set stack overrides:
+https://github.com/aws/aws-cdk/issues/9560
+
 Make Mongo durable, or just use dynamo...
 
 Health checks? Scaling, etc...
